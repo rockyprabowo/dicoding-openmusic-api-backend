@@ -1,0 +1,44 @@
+{
+  "name": "dicoding-openmusic-api-backend",
+  "version": "1.0.0",
+  "description": "Dicoding Fundamental Backend Class Submission 1 - OpenMusic API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "NODE_ENV=production node ./src/server.js",
+    "dev": "nodemon ./src/server.js",
+    "lint": "eslint ./src",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "migrate": "node-pg-migrate"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rockyprabowo/dicoding-openmusic-api-backend.git"
+  },
+  "keywords": [
+    "dicoding",
+    "backend-course"
+  ],
+  "author": "Rocky Prabowo <rocky@lazycats.id>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rockyprabowo/dicoding-openmusic-api-backend/issues"
+  },
+  "homepage": "https://github.com/rockyprabowo/dicoding-openmusic-api-backend#readme",
+  "devDependencies": {
+    "eslint": "^8.10.0",
+    "eslint-config-standard": "17.0.0-1",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-n": "^14.0.0",
+    "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "@hapi/hapi": "^20.2.1",
+    "dotenv": "^16.0.0",
+    "joi": "^17.6.0",
+    "nanoid": "^3.3.1",
+    "node-pg-migrate": "^6.2.1",
+    "pg": "^8.7.3"
+  }
+}
