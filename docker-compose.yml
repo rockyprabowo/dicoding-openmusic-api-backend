@@ -1,5 +1,20 @@
-version: '3.8'
+version: '3.9'
 services:
+  web:
+    container_name: openmusic_web
+    build:
+      context: ./
+      target: dev
+    restart: always
+    depends_on:
+      - db
+    volumes:
+      - .:/src
+    command: npm run dev
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: development
   db:
     container_name: openmusic_postgres
     image: postgres:14-alpine
@@ -16,6 +31,8 @@ services:
     container_name: openmusic_pgadmin4
     image: dpage/pgadmin4
     restart: always
+    depends_on:
+      - db
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMINEMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGPASSWORD}

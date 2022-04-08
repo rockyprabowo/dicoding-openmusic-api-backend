@@ -4,8 +4,8 @@
   "description": "Dicoding Fundamental Backend Class Submission 1 - OpenMusic API",
   "main": "src/server.js",
   "scripts": {
-    "start": "NODE_ENV=production node ./src/server.js",
-    "dev": "nodemon ./src/server.js",
+    "start": "NODE_ENV=production node .",
+    "dev": "nodemon",
     "lint": "eslint ./src",
     "test": "echo \"Error: no test specified\" && exit 1",
     "migrate": "node-pg-migrate"
