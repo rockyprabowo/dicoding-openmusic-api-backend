@@ -6,6 +6,7 @@ const ClientError = require('./client_error')
  * @module exceptions
  */
 class InvariantError extends ClientError {
+  name
   /**
    * @function Object() { [native code] }
    * @param {string} [message] Error message

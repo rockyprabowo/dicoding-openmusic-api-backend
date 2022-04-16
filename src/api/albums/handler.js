@@ -11,14 +11,16 @@
  * Albums Plugin - Handler
  */
 class AlbumsHandler {
+  service
+  validator
   /**
    * Album plugin handler
    *
    * @param {AlbumsPluginOptions} options Albums plugin options
    */
   constructor (options) {
-    this.albumsService = options.service
-    this.albumValidator = options.validator
+    this.service = options.service
+    this.validator = options.validator
   }
 
   // TODO: Implement AlbumsHandler

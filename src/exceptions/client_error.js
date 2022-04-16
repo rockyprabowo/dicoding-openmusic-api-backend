@@ -4,6 +4,8 @@
  * @module exceptions
  */
 class ClientError extends Error {
+  name
+  statusCode
   /**
    * @function Object() { [native code] }
    * @param {string} [message] Error message

@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * Songs Plugin - Handler class
  *
@@ -11,6 +12,8 @@
  * Songs Plugin - Handler
  */
 class SongsHandler {
+  service
+  validator
   /**
    * Album plugin handler
    *

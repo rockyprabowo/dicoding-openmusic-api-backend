@@ -4,6 +4,7 @@
  * @module exceptions
  */
 class UnimplementedError extends Error {
+  name
   /**
    * @function Object() { [native code] }
    * @param {string} [message] Error message
