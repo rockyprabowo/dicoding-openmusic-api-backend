@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   web:
-    container_name: openmusic_web
+    container_name: openmusic_api
     build:
       context: ./
       target: dev
@@ -12,8 +12,10 @@ services:
       - .:/src
     command: npm run dev
     ports:
-      - "5000:5000"
+      - "${PORT}:${PORT}"
     environment:
+      HOST : "${DOCKER_HOST}"
+      PORT : "${PORT}"
       NODE_ENV: development
   db:
     container_name: openmusic_postgres
@@ -24,7 +26,7 @@ services:
       POSTGRES_PASSWORD: ${PGPASSWORD}
       POSTGRES_DB: ${PGDATABASE}
     ports:
-      - '5432:5432'
+      - '${PGPORT}:${PGPORT}'
     volumes:
       - db:/var/lib/postgresql/data
   pgadmin:

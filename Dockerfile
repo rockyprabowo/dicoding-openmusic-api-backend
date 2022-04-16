@@ -1,19 +1,17 @@
 FROM node:14-alpine as base
 
-ARG PORT=5000
-
 WORKDIR /src
-COPY package*.json /
+COPY package*.json /src/
 EXPOSE ${PORT}
 
 FROM base as production
 ENV NODE_ENV=production
 RUN npm ci
-COPY . /
+COPY . /src/
 CMD ["node", "."]
 
 FROM base as dev
 ENV NODE_ENV=development
 RUN npm install -g nodemon && npm install
-COPY . /
+COPY . /src/
 CMD ["nodemon"]
