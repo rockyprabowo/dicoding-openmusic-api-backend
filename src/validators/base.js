@@ -13,7 +13,7 @@ class Validator {
    * @param {object} payload Object payload
    * @returns {void|never} `void` or `UnimplementedError`
    */
-  validate (payload) {
+  validate = (payload) => {
     throw new UnimplementedError()
   }
 }

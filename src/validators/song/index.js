@@ -12,7 +12,7 @@ class SongValidator extends Validator {
   /**
    * @param {object} payload Object payload
    */
-  validate (payload) {
+  validate = (payload) => {
     const validationResult = SongPayloadSchema.validate(payload)
     if (validationResult.error) {
       throw new InvariantError(validationResult.error.message)
