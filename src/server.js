@@ -1,9 +1,13 @@
-require('dotenv').config()
 const Hapi = require('@hapi/hapi')
 
+/**
+ * Server object
+ *
+ * @type {Hapi.Server}
+ */
 const server = Hapi.server({
-  port: process.env.PORT || 5000,
-  host: process.env.HOST || 'localhost',
+  port: process.env.PORT,
+  host: process.env.HOST,
   routes: {
     cors: {
       origin: ['*']
@@ -11,10 +15,14 @@ const server = Hapi.server({
   }
 })
 
+/**
+ * Server plugins registrations
+ *
+ * @returns {Promise<Hapi.Server>} Hapi server object
+ */
 const registerPlugins = async () => {
-  /// TODO: Plugin registrations goes here
-  /// For now, it's just a route for GET / with "Hello, world" as the response
-
+  // TODO: Plugin registrations goes here
+  // For now, it's just a route for GET / with "Hello, world" as the response
   server.route({
     method: 'GET',
     path: '/',
@@ -25,6 +33,11 @@ const registerPlugins = async () => {
   return server
 }
 
+/**
+ * Initialise the server and listen to configured host and port
+ *
+ * @returns {Promise<Hapi.Server>} Hapi server object
+ */
 const start = async () => {
   await registerPlugins()
   await server.start()
@@ -32,6 +45,11 @@ const start = async () => {
   return server
 }
 
+/**
+ * Initialise the server without listening to configured host and port
+ *
+ * @returns {Promise<Hapi.Server>} Hapi server object
+ */
 const init = async () => {
   await registerPlugins()
   await server.initialize()
