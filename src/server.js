@@ -1,4 +1,5 @@
 const Hapi = require('@hapi/hapi')
+require('dotenv').config()
 
 /**
  * Server object
