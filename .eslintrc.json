@@ -1,14 +1,25 @@
 {
+  "plugins": [
+    "jsdoc"
+  ],
   "env": {
     "commonjs": true,
     "es2021": true,
     "node": true
   },
   "extends": [
-    "standard"
+    "standard",
+    "plugin:jsdoc/recommended"
   ],
   "parserOptions": {
     "ecmaVersion": "latest"
   },
-  "rules": {}
+  "rules": {
+    "valid-jsdoc": "off"
+  },
+  "settings": {
+    "jsdoc": {
+      "mode": "typescript"
+    }
+  }
 }
