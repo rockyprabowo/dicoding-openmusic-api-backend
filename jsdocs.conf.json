@@ -1,0 +1,16 @@
+{
+  "plugins": [
+    "jsdoc-ts-utils"
+  ],
+  "source": {
+    "include": [
+      "src"
+    ]
+  },
+  "opts": {
+    "encoding": "utf8",
+    "private": true,
+    "destination": "./docs/",
+    "recurse": true
+  }
+}
