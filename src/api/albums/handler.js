@@ -1,20 +1,24 @@
+const NotImplementedError = require('../../exceptions/not_implemented_error')
+const { LifecycleMethod } = require('../_types')
+const { AlbumsPluginOptions } = require('./_types')
+
 /**
- * Albums Plugin - Handler class
+ * Albums Plugin - Route Handler
  *
- * @module api/albums
- * @typedef {import('.').AlbumsPluginOptions} AlbumsPluginOptions
- * @typedef {import('@hapi/hapi').Request} Request
- * @typedef {import('@hapi/hapi').ResponseToolkit} ResponseToolkit
+ * @typedef {import('./routes')} AlbumRoutes
+ * @typedef {import('../../data/album/album')} Album
  */
 
 /**
- * Albums Plugin - Handler
+ * Represents a class handling the {@link AlbumRoutes routes}
+ *
+ * @memberof module:api/albums
  */
 class AlbumsHandler {
   service
   validator
   /**
-   * Album plugin handler
+   * Construct a new {@link AlbumsHandler} with {@link AlbumsPluginOptions}
    *
    * @param {AlbumsPluginOptions} options Albums plugin options
    */
@@ -26,54 +30,49 @@ class AlbumsHandler {
   // TODO: Implement AlbumsHandler
 
   /**
-   * Handles `POST` request to add a new album.
+   * Handles `POST` request to add a new {@link Album album}
    *
-   * @param {Request} request Request object
-   * @param {ResponseToolkit} h Response toolkit
+   * @type {LifecycleMethod}
    */
   postAlbumHandler = (request, h) => {
-
+    throw new NotImplementedError()
   }
 
   /**
-   * Handles `GET` request to fetch all album.
+   * Handles `GET` request to fetch all {@link Album album}
    *
-   * @param {Request} request Request object Request object
-   * @param {ResponseToolkit} h Response toolkit
+   * @type {LifecycleMethod}
    */
   getAlbumsHandler = (request, h) => {
-
+    throw new NotImplementedError()
   }
 
   /**
-   * Handles `GET` request to fetch an album by its `id`.
+   * Handles `GET` request to fetch an {@link Album album} by its {@link Album.id id}
    *
-   * @param {Request} request Request object Request object
-   * @param {ResponseToolkit} h Response toolkit
+   * @type {LifecycleMethod}
    */
   getAlbumByIdHandler = (request, h) => {
-
+    throw new NotImplementedError()
   }
 
   /**
-   * Handles `PUT` request to update an album with `id`.
+   * Handles `PUT` request to update an {@link Album album} with {@link Album.id id}
    *
-   * @param {Request} request Request object Request object
-   * @param {ResponseToolkit} h Response toolkit
+   * @type {LifecycleMethod}
    */
   putAlbumByIdHandler = (request, h) => {
-
+    throw new NotImplementedError()
   }
 
   /**
-   * Handles `DELETE` request to delete an album with `id`.
+   * Handles `DELETE` request to delete an {@link Album album} with {@link Album.id id}
    *
-   * @param {Request} request Request object Request object
-   * @param {ResponseToolkit} h Response toolkit
+   * @type {LifecycleMethod}
    */
   deleteAlbumByIdHandler = (request, h) => {
-
+    throw new NotImplementedError()
   }
 }
 
-module.exports = AlbumsHandler
+module.exports = { AlbumsHandler }

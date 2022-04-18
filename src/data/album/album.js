@@ -1,10 +1,14 @@
 const { nanoid } = require('nanoid')
 
 /**
- * Represents an Album
+ * OpenMusic API - Album data model
  *
  * @module data/album
- * @typedef {import('../song/song')} Song
+ */
+
+/**
+ * Represents an Album
+ *
  */
 class Album {
   id
@@ -12,7 +16,8 @@ class Album {
   year
 
   /**
-   * @function Object() { [native code] }
+   * Construct a new {@link Album}
+   *
    * @param {object} obj Object payload
    * @param {string} [obj.id] id
    * @param {string} obj.name name
@@ -24,8 +29,14 @@ class Album {
     this.year = year
   }
 
+  /**
+   * Generates a new random `id` for {@link Album}
+   *
+   * @returns {string} Random `id` for {@link Album}
+   */
   static generateId () {
     return `album-${nanoid(16)}`
   }
 }
+
 module.exports = Album

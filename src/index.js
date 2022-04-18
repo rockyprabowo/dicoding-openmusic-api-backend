@@ -1,3 +1,11 @@
+/**
+ * @file index.js is the root file for this project
+ * @author Rocky Prabowo
+ * @see https://dev.lazycats.id
+ */
+
+require('dotenv').config()
+
 const { start } = require('./server')
 
 start()

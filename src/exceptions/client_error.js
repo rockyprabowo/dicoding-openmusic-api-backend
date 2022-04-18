@@ -1,13 +1,20 @@
 /**
+ * Client-related error types.
+ *
+ * @module exceptions/client_error
+ */
+
+/**
  * Represent a Client related errors
  *
- * @module exceptions
  */
 class ClientError extends Error {
   name
   statusCode
+
   /**
-   * @function Object() { [native code] }
+   * Construct a new {@link ClientError} with a {@link ClientError.message message} and {@link ClientError.statusCode status code}.
+   *
    * @param {string} [message] Error message
    * @param {number} [statusCode] HTTP status code
    */

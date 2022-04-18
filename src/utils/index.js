@@ -1,1 +1,5 @@
-/// TODO: Helper functions here
+/**
+ * @module utils
+ */
+
+// TODO: Helper functions here

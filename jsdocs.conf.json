@@ -10,7 +10,7 @@
   "opts": {
     "encoding": "utf8",
     "private": true,
-    "destination": "./docs/",
+    "destination": "./public/docs/",
     "recurse": true
   }
 }

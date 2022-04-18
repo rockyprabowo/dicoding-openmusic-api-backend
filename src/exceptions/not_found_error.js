@@ -1,14 +1,15 @@
 const ClientError = require('./client_error')
 
 /**
- * Represent a not found error
+ * Represent a not found error.
  *
- * @module exceptions
+ * @memberof module:exceptions/client_error
  */
 class NotFoundError extends ClientError {
   name
   /**
-   * @function Object() { [native code] }
+   * Construct a new {@link NotFoundError} with a {@link NotFoundError.message message} and 404 HTTP status code.
+   *
    * @param {string} [message] Error message
    */
   constructor (message) {

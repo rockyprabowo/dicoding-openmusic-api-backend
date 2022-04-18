@@ -1,17 +1,22 @@
-const UnimplementedError = require('../exceptions/unimplemented_error')
+const UnimplementedError = require('../exceptions/not_implemented_error')
 
 /**
- * Represent a base validator class
+ * Data validation layer.
  *
  * @module validators
  */
+
+/**
+ * Represents a base validator class.
+ *
+ */
 class Validator {
   /**
-   * Validate the {@link payload}
+   * Validates the {@link payload} against a data validation schema.
    *
    * @abstract
    * @param {object} payload Object payload
-   * @returns {void|never} `void` or `UnimplementedError`
+   * @returns {(void | never)} Throws an exception or nothing
    */
   validate = (payload) => {
     throw new UnimplementedError()

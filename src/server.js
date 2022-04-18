@@ -1,5 +1,11 @@
 const Hapi = require('@hapi/hapi')
-require('dotenv').config()
+const path = require('path')
+
+/**
+ * Server module
+ *
+ * @module server
+ */
 
 /**
  * Server object
@@ -17,13 +23,32 @@ const server = Hapi.server({
 })
 
 /**
+ * Prints ASCII Art Logo to console
+ *
+ */
+const printAsciiArtLogo = () => {
+  console.log(require('../ascii_art.json').projectName)
+}
+
+/**
  * Server plugins registrations
  *
  * @returns {Promise<Hapi.Server>} Hapi server object
  */
 const registerPlugins = async () => {
   // TODO: Plugin registrations goes here
-  // For now, it's just a route for GET / with "Hello, world" as the response
+  await server.register(require('@hapi/inert'))
+
+  server.register({
+    plugin: require('./api/docs'),
+    options: {
+      docsPath: path.resolve(__dirname, '../public/docs')
+    },
+    routes: {
+      prefix: '/docs'
+    }
+  })
+
   server.route({
     method: 'GET',
     path: '/',
@@ -40,6 +65,7 @@ const registerPlugins = async () => {
  * @returns {Promise<Hapi.Server>} Hapi server object
  */
 const start = async () => {
+  printAsciiArtLogo()
   await registerPlugins()
   await server.start()
   console.log(`Server berjalan pada ${server.info.uri}`)

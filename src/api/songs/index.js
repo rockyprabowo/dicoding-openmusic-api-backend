@@ -1,28 +1,19 @@
+const { SongsPluginOptions } = require('./_types')
+const { Plugin } = require('../_types')
 const { SongsHandler } = require('./handler')
 const routes = require('./routes')
 
 /**
- * Songs Plugin
+ * OpenMusic API - Songs API
  *
  * @module api/songs
  */
 
 /**
- * Represents the options for Songs Plugin
+ * Songs plugin registration object
  *
- * @typedef {import('../../services/postgresql/songs_service')} SongsService
- * @typedef {import('../../validators/base')} Validator
- * @typedef {object} SongsPluginOptions
- * @property {SongsService} service {@link SongsService}
- * @property {Validator} validator Validator for {@link AlbumsPlugin}
- */
-
-/**
- * Songs Plugin object
- *
- * @template T
- * @typedef {import('@hapi/hapi').Plugin<T>} Plugin
  * @type {Plugin<SongsPluginOptions>}
+ * @memberof module:api/songs
  */
 const SongsPlugin = {
   name: 'songs',
@@ -33,4 +24,4 @@ const SongsPlugin = {
   }
 }
 
-module.exports = { SongsPlugin }
+module.exports = SongsPlugin

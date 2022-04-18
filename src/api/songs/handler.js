@@ -1,21 +1,24 @@
-// @ts-check
+const NotImplementedError = require('../../exceptions/not_implemented_error')
+const { LifecycleMethod } = require('../_types')
+const { SongsPluginOptions } = require('./_types')
+
 /**
  * Songs Plugin - Handler class
  *
- * @module api/songs
- * @typedef {import('.').SongsPluginOptions} SongsPluginOptions
- * @typedef {import('@hapi/hapi').Request} Request
- * @typedef {import('@hapi/hapi').ResponseToolkit} ResponseToolkit
+ * @typedef {import('./routes')} SongRoutes
+ * @typedef {import('../../data/song/song')} Song
  */
 
 /**
- * Songs Plugin - Handler
+ * Represents a class handling the {@link SongRoutes routes}
+ *
+ * @memberof module:api/songs
  */
 class SongsHandler {
   service
   validator
   /**
-   * Album plugin handler
+   * Construct a new {@link SongsHandler Songs Handler} with {@link SongsPluginOptions options}
    *
    * @param {SongsPluginOptions} options Songs plugin options
    */
@@ -27,44 +30,49 @@ class SongsHandler {
   // TODO: Implement SongsHandler
 
   /**
-   * Handles `POST` request to add a new song.
+   * Handles `POST` request to add a new {@link Song song}
    *
-   * @param {Request} request Request object
-   * @param {ResponseToolkit} h Response toolkit
+   * @type {LifecycleMethod}
    */
-  postSongHandler = (request, h) => {}
+  postSongHandler = (request, h) => {
+    throw new NotImplementedError()
+  }
 
   /**
    * Handles `GET` request to fetch all songs.
    *
-   * @param {Request} request Request object
-   * @param {ResponseToolkit} h Response toolkit
+   * @type {LifecycleMethod}
    */
-  getSongsHandler = (request, h) => {}
+  getSongsHandler = (request, h) => {
+    throw new NotImplementedError()
+  }
 
   /**
-   * Handles `GET` request to fetch a song by its id.
+   * Handles `GET` request to fetch a {@link Song song} by its {@link Song.id id
    *
-   * @param {Request} request Request object
-   * @param {ResponseToolkit} h Response toolkit
+   * @type {LifecycleMethod}
    */
-  getSongByIdHandler = (request, h) => {}
+  getSongByIdHandler = (request, h) => {
+    throw new NotImplementedError()
+  }
 
   /**
-   * Handles `PUT` request to update a song with `id`.
+   * Handles `PUT` request to update a {@link Song song} with {@link Song.id id}
    *
-   * @param {Request} request Request object
-   * @param {ResponseToolkit} h Response toolkit
+   * @type {LifecycleMethod}
    */
-  putSongByIdHandler = (request, h) => {}
+  putSongByIdHandler = (request, h) => {
+    throw new NotImplementedError()
+  }
 
   /**
-   * Handles `DELETE` request to delete an album with `id`.
+   * Handles `DELETE` request to delete an {@link Song song} with {@link Song.id id}
    *
-   * @param {Request} request Request object
-   * @param {ResponseToolkit} h Response toolkit
+   * @type {LifecycleMethod}
    */
-  deleteSongByIdHandler = (request, h) => {}
+  deleteSongByIdHandler = (request, h) => {
+    throw new NotImplementedError()
+  }
 }
 
 module.exports = { SongsHandler }

@@ -1,12 +1,19 @@
-const AlbumsHandler = require('./handler') // eslint-disable-line
+const { AlbumsHandler } = require('./handler')
 
 /**
- * Albums Plugin - Routes
+ * Album Plugin - Routes
  *
- * @module api/albums
- * @typedef {import('@hapi/hapi').ServerRoute} ServerRoute Hapi route definitions
+ * @typedef {import('@hapi/hapi').ServerRoute} ServerRoute
+ * @external ServerRoute
+ * @see https://hapi.dev/api/#-serverrouteroute
+ */
+
+/**
+ * Routes of {@link AlbumsPlugin} handled by {@link AlbumsHandler}
+ *
  * @param {AlbumsHandler} handler Albums handler
  * @returns {ServerRoute[]} Hapi route definitions
+ * @memberof module:api/albums
  */
 const routes = (handler) => [
   {

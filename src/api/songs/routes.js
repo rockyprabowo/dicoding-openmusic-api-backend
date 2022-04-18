@@ -1,12 +1,12 @@
-const { SongsHandler } = require('./handler') // eslint-disable-line
+const { ServerRoute } = require('../_types')
+const { SongsHandler } = require('./handler')
 
 /**
- * Songs Plugin - Routes
+ * Routes of {@link SongsPlugin} handled by {@link SongsHandler}
  *
- * @module api/songs
- * @typedef {import('@hapi/hapi').ServerRoute} ServerRoute
- * @param {SongsHandler} handler Songs handler
- * @returns {ServerRoute[]} Hapi route definitions
+ * @param {SongsHandler} handler {@link SongPlugin} route handler
+ * @returns {ServerRoute[]} {@link SongPlugin} Hapi route definitions
+ * @memberof module:api/songs
  */
 const routes = (handler) => [
   // TODO: Fill song API routes

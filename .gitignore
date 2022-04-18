@@ -4,4 +4,4 @@ node_modules
 .prod.env
 .editorconfig
 .vscode
-docs
+public/docs
