@@ -14,9 +14,12 @@ services:
     ports:
       - "${PORT}:${PORT}"
     environment:
+      NODE_ENV: development
       HOST : "${DOCKER_HOST}"
       PORT : "${PORT}"
-      NODE_ENV: development
+      PGUSER: ${PGUSER}
+      PGPASSWORD: ${PGPASSWORD}
+      PGDATABASE: ${PGDATABASE}
   db:
     container_name: openmusic_postgres
     image: postgres:14-alpine

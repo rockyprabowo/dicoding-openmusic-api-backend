@@ -1,5 +1,9 @@
 const Hapi = require('@hapi/hapi')
 const path = require('path')
+const AlbumsService = require('./services/postgresql/albums_service')
+const SongsService = require('./services/postgresql/songs_service')
+const AlbumValidator = require('./validators/album')
+const SongValidator = require('./validators/song')
 
 /**
  * Server module
@@ -27,7 +31,7 @@ const server = Hapi.server({
  *
  */
 const printAsciiArtLogo = () => {
-  console.log(require('../ascii_art.json').projectName)
+  console.log(require('../ascii_art.json').projectNameArt)
 }
 
 /**
@@ -36,7 +40,6 @@ const printAsciiArtLogo = () => {
  * @returns {Promise<Hapi.Server>} Hapi server object
  */
 const registerPlugins = async () => {
-  // TODO: Plugin registrations goes here
   await server.register(require('@hapi/inert'))
 
   server.register({
@@ -46,6 +49,28 @@ const registerPlugins = async () => {
     },
     routes: {
       prefix: '/docs'
+    }
+  })
+
+  server.register({
+    plugin: require('./api/albums'),
+    options: {
+      service: new AlbumsService(),
+      validator: new AlbumValidator()
+    },
+    routes: {
+      prefix: '/albums'
+    }
+  })
+
+  server.register({
+    plugin: require('./api/songs'),
+    options: {
+      service: new SongsService(),
+      validator: new SongValidator()
+    },
+    routes: {
+      prefix: '/songs'
     }
   })
 
