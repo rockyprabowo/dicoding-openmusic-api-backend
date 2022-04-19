@@ -68,7 +68,7 @@ const start = async () => {
   printAsciiArtLogo()
   await registerPlugins()
   await server.start()
-  console.log(`Server berjalan pada ${server.info.uri}`)
+  console.log(`Server berjalan di: ${server.info.uri}`)
   return server
 }
 
