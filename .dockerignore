@@ -1,5 +1,8 @@
+docker-compose.yml
+Dockerfile
+.idea
+.vscode
 .git
 node_modules
-.editorconfig
 .env
 .prod.env

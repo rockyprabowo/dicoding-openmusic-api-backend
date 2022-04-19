@@ -1,7 +1,6 @@
 .idea
+.vscode
 node_modules
 .env
 .prod.env
-.editorconfig
-.vscode
 public/docs
