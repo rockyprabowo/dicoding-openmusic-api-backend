@@ -7,6 +7,7 @@ const ClientError = require('./client_error')
  */
 class NotFoundError extends ClientError {
   name
+
   /**
    * Construct a new {@link NotFoundError} with a {@link NotFoundError.message message} and 404 HTTP status code.
    *

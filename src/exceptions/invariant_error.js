@@ -7,6 +7,7 @@ const ClientError = require('./client_error')
  */
 class InvariantError extends ClientError {
   name
+
   /**
    * Construct a new {@link InvariantError} with a {@link InvariantError.message message} and 400 HTTP status code.
    *

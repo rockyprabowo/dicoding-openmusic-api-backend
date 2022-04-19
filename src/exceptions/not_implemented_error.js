@@ -10,6 +10,7 @@
  */
 class NotImplementedError extends Error {
   name
+
   /**
    * Construct a new {@link NotImplementedError} with a {@link NotImplementedError.message message}.
    *
