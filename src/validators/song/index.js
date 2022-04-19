@@ -1,5 +1,5 @@
-const InvariantError = require('../../exceptions/invariant_error')
-const Validator = require('../base')
+const InvariantError = require('@exceptions/invariant_error')
+const Validator = require('@validators/base')
 const SongPayloadSchema = require('./schema')
 
 /**
@@ -9,7 +9,7 @@ const SongPayloadSchema = require('./schema')
  */
 
 /**
- * @typedef {import('../../data/song/song')} Song
+ * @typedef {import('@data/song/song')} Song
  */
 
 /**

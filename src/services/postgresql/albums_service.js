@@ -1,13 +1,10 @@
 const PostgresBase = require('./base')
+const { AlbumRequestPayload } = require('~types/data/album')
 
 /**
  * OpenMusic API - Albums Service (PostgreSQL Persistence)
  *
  * @module services/postgresql/albums
- */
-
-/**
- * @typedef {import('../../data/album/album')} Album
  */
 
 /**
@@ -20,30 +17,36 @@ class AlbumsService extends PostgresBase {
   /**
    * Adds an {@link Album} into database.
    *
+   * @param {AlbumRequestPayload} payload Payload
    * @async
    */
-  async addAlbum () {}
+  async addAlbum (payload) {
+  }
 
   /**
    * Get an {@link Album} by its {@link Album.id id} from database.
    *
+   * @param {number} id Album {@link Album.id id}
    * @async
    */
-  async getAlbumById () {}
+  async getAlbumById (id) {}
 
   /**
    * Edit an {@link Album} with {@link Album.id id} from database.
    *
+   * @param {number} id Album {@link Album.id id}
+   * @param {AlbumRequestPayload} payload Request Payload
    * @async
    */
-  async editAlbumById () {}
+  async editAlbumById (id, payload) {}
 
   /**
    * Delete an {@link Album} with {@link Album.id id} from database.
    *
+   * @param {number} id Album {@link Album.id id}
    * @async
    */
-  async deleteAlbumById () {}
+  async deleteAlbumById (id) {}
 }
 
 module.exports = AlbumsService

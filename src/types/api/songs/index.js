@@ -2,8 +2,8 @@
 /**
  * Songs Plugin
  *
- * @typedef {import('../../services/postgresql/songs_service')} SongsService
- * @typedef {import('../../validators/base')} Validator
+ * @typedef {import('@services/postgresql/songs_service')} SongsService
+ * @typedef {import('@validators/base')} Validator
  */
 
 /**

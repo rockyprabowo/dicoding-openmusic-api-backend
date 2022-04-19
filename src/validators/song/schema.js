@@ -1,7 +1,7 @@
 const Joi = require('joi')
 
 /**
- * @typedef {import('../../data/song/song')} Song
+ * @typedef {import('@data/song/song')} Song
  */
 
 /**

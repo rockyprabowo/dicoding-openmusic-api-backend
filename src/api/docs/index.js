@@ -1,4 +1,4 @@
-const { Plugin } = require('../_types')
+const { Plugin } = require('~types/api')
 const path = require('path')
 const fs = require('fs')
 /**
@@ -23,6 +23,9 @@ const fs = require('fs')
 const DocsPlugin = {
   name: 'documentation',
   version: '1.0.0',
+  dependencies: [
+    '@hapi/inert'
+  ],
   register: async (server, options) => {
     const prefix = server.realm.modifiers.route.prefix
     const docsPath = path.resolve(options.docsPath)

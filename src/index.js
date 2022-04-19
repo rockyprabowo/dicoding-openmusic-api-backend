@@ -4,6 +4,7 @@
  * @see https://dev.lazycats.id
  */
 
+require('module-alias/register')
 require('dotenv').config()
 
 const { start } = require('./server')

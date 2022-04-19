@@ -4,6 +4,35 @@
     "target": "ES2017",
     "checkJs": true,
     "strict": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "paths": {
+      "@root/*": [
+        "."
+      ],
+      "~/*": [
+        "./src"
+      ],
+      "~types/*": [
+        "./src/types/*"
+      ],
+      "@api/*": [
+        "./src/api/*"
+      ],
+      "@data/*": [
+        "./src/data/*"
+      ],
+      "@exceptions/*": [
+        "./src/exceptions/*"
+      ],
+      "@services/*": [
+        "./src/services/*"
+      ],
+      "@utils/*": [
+        "./src/utils/*"
+      ],
+      "@validators/*": [
+        "./src/validators/*"
+      ]
+    }
   }
 }

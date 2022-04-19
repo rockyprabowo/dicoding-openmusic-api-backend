@@ -1,7 +1,7 @@
 
 /**
  * @typedef {import('joi').ObjectSchema} ObjectSchema
- * @external Joi.ObjectSchema
+ * @external ObjectSchema
  * @see https://definitelytyped.org/docs/joi--joi/interfaces/joi.objectschema.html
  */
 

@@ -7,10 +7,6 @@ const PostgresBase = require('./base')
  */
 
 /**
- * @typedef {import('../../data/song/song')} Song
- */
-
-/**
  * Represents a service class related to {@link Song}.
  *
  * @augments PostgresBase
@@ -33,25 +29,28 @@ class SongsService extends PostgresBase {
   async getSongs () {}
 
   /**
-   * Get all {@link Song} by its {@link Song.id id} from the database.
+   * Get a {@link Song} by its {@link Song.id id} from the database.
    *
+   * @param {string} id {@link Song.id id}
    * @async
    */
-  async getSongById () {}
+  async getSongById (id) {}
 
   /**
    * Edit the {@link Song} with {@link Song.id id} from the database.
    *
+   * @param {string} id {@link Song.id id}
    * @async
    */
-  async editSongById () {}
+  async editSongById (id) {}
 
   /**
    * Delete the {@link Song} with {@link Song.id id} from the database.
    *
+   * @param {string} id {@link Song.id id}
    * @async
    */
-  async deleteSongById () {}
+  async deleteSongById (id) {}
 }
 
 module.exports = SongsService

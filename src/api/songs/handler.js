@@ -1,12 +1,12 @@
-const NotImplementedError = require('../../exceptions/not_implemented_error')
-const { LifecycleMethod } = require('../_types')
-const { SongsPluginOptions } = require('./_types')
+const NotImplementedError = require('@exceptions/not_implemented_error')
+const { LifecycleMethod } = require('~types/api')
+const { SongsPluginOptions } = require('~types/api/songs')
 
 /**
  * Songs Plugin - Handler class
  *
  * @typedef {import('./routes')} SongRoutes
- * @typedef {import('../../data/song/song')} Song
+ * @typedef {import('@data/song/song')} Song
  */
 
 /**

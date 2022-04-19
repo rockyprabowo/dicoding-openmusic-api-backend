@@ -1,5 +1,5 @@
 const { nanoid } = require('nanoid')
-
+const { AlbumRequestPayload } = require('~types/data/album')
 /**
  * OpenMusic API - Album data model
  *
@@ -18,10 +18,7 @@ class Album {
   /**
    * Construct a new {@link Album}
    *
-   * @param {object} obj Object payload
-   * @param {string} [obj.id] id
-   * @param {string} obj.name name
-   * @param {number} obj.year year
+   * @param {AlbumRequestPayload} obj Object payload
    */
   constructor ({ id, name, year }) {
     this.id = id ?? Album.generateId()

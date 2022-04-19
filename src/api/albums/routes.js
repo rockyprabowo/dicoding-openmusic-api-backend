@@ -1,44 +1,43 @@
+const { ServerRoute } = require('~types/api')
 const { AlbumsHandler } = require('./handler')
 
 /**
- * Album Plugin - Routes
+ * Albums Plugin - Routes
  *
- * @typedef {import('@hapi/hapi').ServerRoute} ServerRoute
- * @external ServerRoute
- * @see https://hapi.dev/api/#-serverrouteroute
+ *  @typedef {import('.')} AlbumsPlugin
  */
 
 /**
- * Routes of {@link AlbumsPlugin} handled by {@link AlbumsHandler}
+ * Routes of {@link AlbumsPlugin}, handled by {@link AlbumsHandler}
  *
- * @param {AlbumsHandler} handler Albums handler
+ * @param {AlbumsHandler} handler {@link AlbumsPlugin} handler
  * @returns {ServerRoute[]} Hapi route definitions
  * @memberof module:api/albums
  */
 const routes = (handler) => [
   {
     method: 'POST',
-    path: '/albums',
+    path: '/',
     handler: handler.postAlbumHandler
   },
   {
     method: 'GET',
-    path: '/albums',
+    path: '/',
     handler: handler.getAlbumsHandler
   },
   {
     method: 'GET',
-    path: '/albums/{id}',
+    path: '/{id}',
     handler: handler.getAlbumByIdHandler
   },
   {
     method: 'PUT',
-    path: '/albums/{id}',
+    path: '/{id}',
     handler: handler.putAlbumByIdHandler
   },
   {
     method: 'DELETE',
-    path: '/albums/{id}',
+    path: '/{id}',
     handler: handler.deleteAlbumByIdHandler
   }
 ]

@@ -1,7 +1,7 @@
-const UnimplementedError = require('../exceptions/not_implemented_error')
+const UnimplementedError = require('@exceptions/not_implemented_error')
 
 /**
- * Data validation layer.
+ * Data validation layer
  *
  * @module validators
  */

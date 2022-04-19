@@ -1,5 +1,5 @@
-const { AlbumsPluginOptions } = require('./_types')
-const { Plugin } = require('../_types')
+const { AlbumsPluginOptions } = require('~types/api/albums')
+const { Plugin } = require('~types/api')
 const { AlbumsHandler } = require('./handler')
 const routes = require('./routes')
 

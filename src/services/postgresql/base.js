@@ -1,5 +1,6 @@
+const { Connection } = require('~types/services/postgresql')
 const { Pool } = require('pg')
-const BaseService = require('../base')
+const BaseService = require('@services/base')
 
 /**
  * OpenMusic API - PostgreSQL Persistence Service Layer
@@ -8,14 +9,16 @@ const BaseService = require('../base')
  */
 
 /**
- * @typedef {import('pg').Client} Client
- * @typedef {(Pool | Client)} Connection
+ * @typedef {object} PostgresBaseOptions
+ * @property {Connection} connection Connection
+ * @memberof module:services/postgresql
  */
 
 /**
  * Represents the base PostgreSQL persistence service
  *
  * @abstract
+ * @memberof module:services/postgresql
  */
 class PostgresBase extends BaseService {
   #connection
@@ -23,12 +26,11 @@ class PostgresBase extends BaseService {
   /**
    * Construct a new {@link PostgresBase}.
    *
-   * @param {object} [options] Options
-   * @param {Connection} [options.connection] Connection
+   * @param {PostgresBaseOptions} [options] Options
    */
-  constructor ({ connection }) {
+  constructor (options) {
     super()
-    this.#connection = connection ?? new Pool()
+    this.#connection = options?.connection ?? new Pool()
   }
 
   get db () { return this.#connection }

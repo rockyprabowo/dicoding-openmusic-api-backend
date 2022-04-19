@@ -1,38 +1,43 @@
-const { ServerRoute } = require('../_types')
+const { ServerRoute } = require('~types/api')
 const { SongsHandler } = require('./handler')
 
 /**
- * Routes of {@link SongsPlugin} handled by {@link SongsHandler}
+ * Songs Plugin - Routes
+ *
+ * @typedef {import('.')} SongsPlugin
+ */
+
+/**
+ * Routes of {@link SongsPlugin}, handled by {@link SongsHandler}
  *
  * @param {SongsHandler} handler {@link SongPlugin} route handler
- * @returns {ServerRoute[]} {@link SongPlugin} Hapi route definitions
+ * @returns {ServerRoute[]} Hapi route definitions
  * @memberof module:api/songs
  */
 const routes = (handler) => [
-  // TODO: Fill song API routes
   {
     method: 'POST',
-    path: '/songs',
+    path: '/',
     handler: handler.postSongHandler
   },
   {
     method: 'GET',
-    path: '/songs',
+    path: '/',
     handler: handler.getSongsHandler
   },
   {
     method: 'GET',
-    path: '/songs/{id}',
+    path: '/{id}',
     handler: handler.getSongByIdHandler
   },
   {
     method: 'PUT',
-    path: '/songs/{id}',
+    path: '/{id}',
     handler: handler.putSongByIdHandler
   },
   {
     method: 'DELETE',
-    path: '/songs/{id}',
+    path: '/{id}',
     handler: handler.deleteSongByIdHandler
   }
 ]

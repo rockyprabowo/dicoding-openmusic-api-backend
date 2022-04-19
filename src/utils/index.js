@@ -1,4 +1,6 @@
 /**
+ * Utilities
+ *
  * @module utils
  */
 

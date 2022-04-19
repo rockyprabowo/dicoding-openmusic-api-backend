@@ -1,12 +1,12 @@
-const NotImplementedError = require('../../exceptions/not_implemented_error')
-const { LifecycleMethod } = require('../_types')
-const { AlbumsPluginOptions } = require('./_types')
+const NotImplementedError = require('@exceptions/not_implemented_error')
+const { LifecycleMethod } = require('~types/api')
+const { AlbumsPluginOptions } = require('~types/api/albums')
 
 /**
  * Albums Plugin - Route Handler
  *
  * @typedef {import('./routes')} AlbumRoutes
- * @typedef {import('../../data/album/album')} Album
+ * @typedef {import('@data/album/album')} Album
  */
 
 /**
