@@ -24,7 +24,7 @@ exports.up = pgm => {
     performer: { type: 'TEXT', notNull: true },
     genre: { type: 'TEXT', notNull: true },
     duration: { type: 'INTEGER' },
-    albumId: { type: 'VARCHAR(32)' }
+    album_id: { type: 'VARCHAR(32)' }
   })
 }
 

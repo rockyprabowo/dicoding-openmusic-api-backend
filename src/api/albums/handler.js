@@ -43,7 +43,7 @@ class AlbumsHandler {
 
     return h.response({
       status: 'success',
-      message: 'Album berhasil ditambahkan',
+      message: 'Album added successfully',
       data: {
         albumId: album.id
       }
@@ -96,7 +96,7 @@ class AlbumsHandler {
 
     return h.response({
       status: 'success',
-      message: 'Album berhasil diperbarui'
+      message: 'Album updated successfully'
     })
   }
 
@@ -112,7 +112,7 @@ class AlbumsHandler {
 
     return h.response({
       status: 'success',
-      message: 'Album berhasil dihapus'
+      message: 'Album deleted successfully'
     })
   }
 }

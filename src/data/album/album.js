@@ -1,5 +1,7 @@
 const { nanoid } = require('nanoid')
+const Song = require('@data/song/song')
 const { AlbumRequestPayload } = require('~types/data/album')
+const { AlbumSongListItem } = require('~types/data/song')
 /**
  * OpenMusic API - Album data model
  *
@@ -15,6 +17,8 @@ class Album {
   id
   name
   year
+  /** @type {(Song[] | AlbumSongListItem[])}  */
+  #songs = []
 
   /**
    * Construct a new {@link Album}
@@ -26,6 +30,9 @@ class Album {
     this.name = name
     this.year = year
   }
+
+  get songs () { return this.#songs }
+  set songs (songs) { this.#songs = songs }
 
   /**
    * Generates a new random `id` for {@link Album}
@@ -43,6 +50,13 @@ class Album {
    * @returns {Album} This data model
    */
   static mapDBToModel = ({ id, name, year }) => new Album({ id, name, year })
+
+  toJSON () {
+    return {
+      ...this,
+      songs: this.songs
+    }
+  }
 }
 
 module.exports = Album

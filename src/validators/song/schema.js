@@ -11,7 +11,12 @@ const Joi = require('joi')
  * @memberof module:validators/song
  */
 const SongPayloadSchema = Joi.object({
-  // TODO: Song payload schema
+  title: Joi.string().required(),
+  year: Joi.number().required(),
+  genre: Joi.string().required(),
+  performer: Joi.string().required(),
+  duration: Joi.number(),
+  albumId: Joi.string()
 })
 
 module.exports = SongPayloadSchema

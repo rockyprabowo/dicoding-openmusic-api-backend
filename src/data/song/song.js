@@ -1,4 +1,5 @@
 const { nanoid } = require('nanoid')
+const { SongRequestPayload, SongDbRow, AlbumSongListItem } = require('~types/data/song')
 
 /**
  * OpenMusic API - Song data model
@@ -11,32 +12,26 @@ const { nanoid } = require('nanoid')
  *
  */
 class Song {
+  static tableName = 'songs'
   id
   title
   year
-  performer
   genre
+  performer
   duration
   albumId
 
   /**
    * Construct a new {@link Song}.
    *
-   * @param {object} obj Object payload
-   * @param {string} [obj.id] id
-   * @param {string} obj.title title
-   * @param {number} obj.year year
-   * @param {string} obj.performer performer
-   * @param {string} obj.genre genre
-   * @param {string} [obj.duration] duration
-   * @param {string} [obj.albumId] albumId
+   * @param {SongRequestPayload} obj Object payload
    */
-  constructor ({ id, title, year, performer, genre, duration, albumId }) {
+  constructor ({ id, title, year, genre, performer, duration, albumId }) {
     this.id = id ?? Song.generateId()
     this.title = title
     this.year = year
-    this.performer = performer
     this.genre = genre
+    this.performer = performer
     this.duration = duration
     this.albumId = albumId
   }
@@ -49,6 +44,24 @@ class Song {
   static generateId () {
     return `song-${nanoid(16)}`
   }
+
+  /* eslint-disable camelcase */
+
+  /**
+   * Maps database result(s) to this data model
+   *
+   * @param {SongDbRow}  dbRow Item from database
+   * @returns {Song} This data model
+   */
+  static mapDBToModel =
+    ({ id, title, year, performer, genre, duration, album_id }) =>
+      new Song({ id, title, year, performer, genre, duration, albumId: album_id })
+
+  /**
+   * @param {AlbumSongListItem} obj Album Song List Item
+   * @returns {AlbumSongListItem} Album Song List Item
+   */
+  static mapDBToAlbumSongListItem = ({ id, title, performer }) => ({ id, title, performer })
 }
 
 module.exports = Song

@@ -34,6 +34,7 @@ const DocsPlugin = {
       fs.statSync(docsPath)
 
       // Workaround for a 2 years old @hapi/inert bug.
+      // Caveat: Can't be used with router.stripTrailingSlash
       // See: https://github.com/hapijs/inert/issues/146
       if (prefix) {
         server.route({

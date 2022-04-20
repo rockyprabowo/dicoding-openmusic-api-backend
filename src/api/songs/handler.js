@@ -1,6 +1,6 @@
-const NotImplementedError = require('@exceptions/not_implemented_error')
 const { LifecycleMethod } = require('~types/api')
 const { SongsPluginOptions } = require('~types/api/songs')
+const { SongRequestPayload } = require('~types/data/song')
 
 /**
  * Songs Plugin - Handler class
@@ -27,15 +27,27 @@ class SongsHandler {
     this.validator = options.validator
   }
 
-  // TODO: Implement SongsHandler
-
   /**
    * Handles `POST` request to add a new {@link Song song}
    *
    * @type {LifecycleMethod}
    */
-  postSongHandler = (request, h) => {
-    throw new NotImplementedError()
+  postSongHandler = async (request, h) => {
+    const payload = /** @type {SongRequestPayload} */ (request.payload)
+
+    this.validator.validate(payload)
+
+    const { title, year, performer, genre, duration, albumId } = payload
+
+    const song = await this.service.addSong({ title, year, performer, genre, duration, albumId })
+
+    return h.response({
+      status: 'success',
+      message: 'Song added successfully',
+      data: {
+        songId: song.id
+      }
+    }).code(201)
   }
 
   /**
@@ -43,8 +55,14 @@ class SongsHandler {
    *
    * @type {LifecycleMethod}
    */
-  getSongsHandler = (request, h) => {
-    throw new NotImplementedError()
+  getSongsHandler = async (request, h) => {
+    const { performer, title } = request.query
+    const songs = await this.service.getSongs({ performer, title })
+
+    return h.response({
+      status: 'success',
+      data: { songs }
+    })
   }
 
   /**
@@ -52,8 +70,14 @@ class SongsHandler {
    *
    * @type {LifecycleMethod}
    */
-  getSongByIdHandler = (request, h) => {
-    throw new NotImplementedError()
+  getSongByIdHandler = async (request, h) => {
+    const { id } = request.params
+    const song = await this.service.getSongById(id)
+
+    return h.response({
+      status: 'success',
+      data: { song }
+    })
   }
 
   /**
@@ -61,8 +85,20 @@ class SongsHandler {
    *
    * @type {LifecycleMethod}
    */
-  putSongByIdHandler = (request, h) => {
-    throw new NotImplementedError()
+  putSongByIdHandler = async (request, h) => {
+    const { id } = request.params
+    const payload = /** @type {SongRequestPayload} */ (request.payload)
+
+    this.validator.validate(payload)
+
+    const { title, genre, performer, year, duration, albumId } = /** @type {SongRequestPayload} */ (payload)
+
+    await this.service.editSongById(id, { title, genre, performer, year, duration, albumId })
+
+    return h.response({
+      status: 'success',
+      message: 'Song updated successfully'
+    })
   }
 
   /**
@@ -70,8 +106,15 @@ class SongsHandler {
    *
    * @type {LifecycleMethod}
    */
-  deleteSongByIdHandler = (request, h) => {
-    throw new NotImplementedError()
+  deleteSongByIdHandler = async (request, h) => {
+    const { id } = request.params
+
+    await this.service.deleteSongById(id)
+
+    return h.response({
+      status: 'success',
+      message: 'Song deleted successfully'
+    })
   }
 }
 

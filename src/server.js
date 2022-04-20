@@ -86,7 +86,7 @@ const registerPlugins = async () => {
     handler: (request, h) => {
       return h.response({
         status: 'error',
-        message: 'URL tidak valid'
+        message: 'Not Found'
       }).code(404)
     }
   })

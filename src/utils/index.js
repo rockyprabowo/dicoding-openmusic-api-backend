@@ -19,16 +19,22 @@ exports.genericPreResponseHandler = (request, h) => {
     // Specific error
     if (response instanceof ClientError) {
       return h.response({
-        status: 'error',
+        status: 'fail',
         message: response.message
       }).code(response.statusCode)
     }
+
+    // For non 5xx errors, pass to default Hapi behaviour
+    if (!response.isServer) {
+      return h.continue
+    }
+
     // Unexpected error
     return h.response({
       status: 'error',
       message: 'Maaf, terjadi kegagalan pada server kami.',
-      detail: (process.env.NODE_ENV !== 'production' ? { ...response } : {})
-    })
+      ...(process.env.NODE_ENV !== 'production') && { detail: { ...response } }
+    }).code(500)
   }
 
   // Continue
