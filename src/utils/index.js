@@ -27,7 +27,7 @@ exports.genericPreResponseHandler = (request, h) => {
     return h.response({
       status: 'error',
       message: 'Maaf, terjadi kegagalan pada server kami.',
-      debug: (process.env.NODE_ENV !== 'production' ? { ...response } : {})
+      detail: (process.env.NODE_ENV !== 'production' ? { ...response } : {})
     })
   }
 
