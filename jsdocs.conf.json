@@ -11,6 +11,7 @@
     "encoding": "utf8",
     "private": true,
     "destination": "./public/docs/",
-    "recurse": true
+    "recurse": true,
+    "readme": "./README.md"
   }
 }
