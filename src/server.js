@@ -77,11 +77,12 @@ const registerPlugins = async () => {
     }
   })
 
+  // Redirect to documentation
   server.route({
     method: 'GET',
     path: '/',
-    handler: function () {
-      return 'Hello World!'
+    handler: function (request, h) {
+      return h.redirect('/docs')
     }
   })
   return server

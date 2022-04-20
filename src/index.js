@@ -8,8 +8,13 @@ require('module-alias/register')
 require('dotenv').config()
 
 const { start } = require('./server')
+const { createDatabase } = require('./setup')
 
-start()
+if (process.argv[process.argv.length - 1] === '--create-db') {
+  createDatabase()
+} else {
+  start()
+}
 
 process.on('unhandledRejection', (err) => {
   console.log(err)
