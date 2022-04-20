@@ -5,6 +5,7 @@
     "checkJs": true,
     "strict": true,
     "resolveJsonModule": true,
+    "strictNullCheck": true,
     "paths": {
       "@root/*": [
         "."
