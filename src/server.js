@@ -78,6 +78,19 @@ const registerPlugins = async () => {
       return h.redirect('/docs')
     }
   })
+
+  // Invalid routes
+  server.route({
+    method: '*',
+    path: '/{any*}',
+    handler: (request, h) => {
+      return h.response({
+        status: 'error',
+        message: 'URL tidak valid'
+      }).code(404)
+    }
+  })
+
   return server
 }
 

@@ -12,13 +12,13 @@ services:
       - .:/srv/app
     command: npm run dev
     ports:
-      - "${PORT}:${PORT}"
-    networks:
-      - backend
+      - ${PORT}:${PORT}
     environment:
       NODE_ENV: development
-      HOST : "${DOCKER_HOST}"
-      PORT : "${PORT}"
+      HOST : ${DOCKER_HOST}
+      PORT : ${PORT}
+      PGHOST: ${PG_DOCKER_SERVICE_NAME}
+      PGPORT: ${PGPORT}
       PGUSER: ${PGUSER}
       PGPASSWORD: ${PGPASSWORD}
       PGDATABASE: ${PGDATABASE}
@@ -31,11 +31,9 @@ services:
       POSTGRES_PASSWORD: ${PGPASSWORD}
       POSTGRES_DB: ${PGDATABASE}
     ports:
-      - '${PGPORT}:${PGPORT}'
+      - ${PGPORT}:${PGPORT}
     volumes:
       - db:/var/lib/postgresql/data
-    networks:
-      - backend
   pgadmin:
     container_name: openmusic_pgadmin4
     image: dpage/pgadmin4
@@ -46,16 +44,11 @@ services:
       PGADMIN_DEFAULT_EMAIL: ${PGADMINEMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGPASSWORD}
     ports:
-      - "5050:80"
+      - 5050:80
     volumes:
       - pgadmin:/var/lib/pgadmin
-    networks:
-      - backend
 volumes:
   db:
     driver: local
   pgadmin:
     driver: local
-networks:
-  backend:
-    name: backend-network

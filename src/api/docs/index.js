@@ -35,13 +35,15 @@ const DocsPlugin = {
 
       // Workaround for a 2 years old @hapi/inert bug.
       // See: https://github.com/hapijs/inert/issues/146
-      server.route({
-        method: 'GET',
-        path: '/',
-        handler: (request, h) => {
-          return h.redirect(prefix + '/')
-        }
-      })
+      if (prefix) {
+        server.route({
+          method: 'GET',
+          path: '/',
+          handler: (request, h) => {
+            return h.redirect(prefix + '/')
+          }
+        })
+      }
 
       server.route({
         method: 'GET',
