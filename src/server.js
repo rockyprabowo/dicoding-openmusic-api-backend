@@ -4,6 +4,7 @@ const AlbumsService = require('@services/postgresql/albums_service')
 const SongsService = require('@services/postgresql/songs_service')
 const AlbumValidator = require('@validators/album')
 const SongValidator = require('@validators/song')
+const { printAsciiArtLogo } = require('@utils/index')
 
 /**
  * Server module
@@ -25,14 +26,6 @@ const server = Hapi.server({
     }
   }
 })
-
-/**
- * Prints ASCII Art Logo to console
- *
- */
-const printAsciiArtLogo = () => {
-  console.log(require('../ascii_art.json').projectNameArt)
-}
 
 /**
  * Server plugins registrations

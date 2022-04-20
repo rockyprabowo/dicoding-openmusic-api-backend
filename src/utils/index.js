@@ -34,3 +34,11 @@ exports.genericPreResponseHandler = (request, h) => {
   // Continue
   return h.continue
 }
+
+/**
+ * Prints ASCII Art Logo to console
+ *
+ */
+exports.printAsciiArtLogo = () => {
+  console.log(require('./ascii_art.json').projectNameArt)
+}
