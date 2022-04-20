@@ -11,6 +11,7 @@ const { AlbumRequestPayload } = require('~types/data/album')
  *
  */
 class Album {
+  static tableName = 'albums'
   id
   name
   year
@@ -34,6 +35,14 @@ class Album {
   static generateId () {
     return `album-${nanoid(16)}`
   }
+
+  /**
+   * Maps database result(s) to this data model
+   *
+   * @param {AlbumRequestPayload} dbRow Item from database
+   * @returns {Album} This data model
+   */
+  static mapDBToModel = ({ id, name, year }) => new Album({ id, name, year })
 }
 
 module.exports = Album

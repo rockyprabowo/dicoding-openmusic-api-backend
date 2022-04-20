@@ -11,7 +11,8 @@ const Joi = require('joi')
  * @memberof module:validators/album
  */
 const AlbumPayloadSchema = Joi.object({
-  // TODO: Album payload schema
+  name: Joi.string().required(),
+  year: Joi.number().required()
 })
 
 module.exports = AlbumPayloadSchema

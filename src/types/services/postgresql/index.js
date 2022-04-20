@@ -11,6 +11,12 @@
  */
 
 /**
+ * @typedef {import('pg').QueryConfig} QueryConfig
+ * @external QueryConfig
+ * @see http://example.com
+ */
+
+/**
  * @typedef {(Pool | Client)} Connection
  * @memberof module:services/postgresql
  */

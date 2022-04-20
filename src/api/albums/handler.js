@@ -1,6 +1,6 @@
-const NotImplementedError = require('@exceptions/not_implemented_error')
 const { LifecycleMethod } = require('~types/api')
 const { AlbumsPluginOptions } = require('~types/api/albums')
+const { AlbumRequestPayload } = require('~types/data/album')
 
 /**
  * Albums Plugin - Route Handler
@@ -27,15 +27,27 @@ class AlbumsHandler {
     this.validator = options.validator
   }
 
-  // TODO: Implement AlbumsHandler
-
   /**
    * Handles `POST` request to add a new {@link Album album}
    *
    * @type {LifecycleMethod}
    */
-  postAlbumHandler = (request, h) => {
-    throw new NotImplementedError()
+  postAlbumHandler = async (request, h) => {
+    const payload = /** @type {AlbumRequestPayload} */ (request.payload)
+
+    this.validator.validate(payload)
+
+    const { name, year } = payload
+
+    const album = await this.service.addAlbum({ name, year })
+
+    return h.response({
+      status: 'success',
+      message: 'Album berhasil ditambahkan',
+      data: {
+        albumId: album.id
+      }
+    }).code(201)
   }
 
   /**
@@ -43,8 +55,13 @@ class AlbumsHandler {
    *
    * @type {LifecycleMethod}
    */
-  getAlbumsHandler = (request, h) => {
-    throw new NotImplementedError()
+  getAlbumsHandler = async (request, h) => {
+    const albums = await this.service.getAlbums()
+
+    return h.response({
+      status: 'success',
+      data: { albums }
+    })
   }
 
   /**
@@ -52,8 +69,14 @@ class AlbumsHandler {
    *
    * @type {LifecycleMethod}
    */
-  getAlbumByIdHandler = (request, h) => {
-    throw new NotImplementedError()
+  getAlbumByIdHandler = async (request, h) => {
+    const { id } = request.params
+    const album = await this.service.getAlbumById(id)
+
+    return h.response({
+      status: 'success',
+      data: { album }
+    })
   }
 
   /**
@@ -61,8 +84,20 @@ class AlbumsHandler {
    *
    * @type {LifecycleMethod}
    */
-  putAlbumByIdHandler = (request, h) => {
-    throw new NotImplementedError()
+  putAlbumByIdHandler = async (request, h) => {
+    const { id } = request.params
+    const payload = /** @type {AlbumRequestPayload} */ (request.payload)
+
+    this.validator.validate(payload)
+
+    const { name, year } = /** @type {AlbumRequestPayload} */ (payload)
+
+    await this.service.editAlbumById(id, { name, year })
+
+    return h.response({
+      status: 'success',
+      message: 'Album berhasil diperbarui'
+    })
   }
 
   /**
@@ -70,8 +105,15 @@ class AlbumsHandler {
    *
    * @type {LifecycleMethod}
    */
-  deleteAlbumByIdHandler = (request, h) => {
-    throw new NotImplementedError()
+  deleteAlbumByIdHandler = async (request, h) => {
+    const { id } = request.params
+
+    await this.service.deleteAlbumById(id)
+
+    return h.response({
+      status: 'success',
+      message: 'Album berhasil dihapus'
+    })
   }
 }
 
