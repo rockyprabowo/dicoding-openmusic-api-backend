@@ -15,7 +15,17 @@
     "ecmaVersion": "latest"
   },
   "rules": {
-    "valid-jsdoc": "off"
+    "valid-jsdoc": "off",
+    "spaced-comment": [
+      "error",
+      "always",
+      {
+        "markers": [
+          "/",
+          "//"
+        ]
+      }
+    ]
   },
   "settings": {
     "jsdoc": {
