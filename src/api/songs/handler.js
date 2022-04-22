@@ -1,4 +1,4 @@
-const { LifecycleMethod } = require('~types/api')
+const { LifecycleMethod, ResponseObject } = require('~types/api')
 const { SongsPluginOptions } = require('~types/api/songs')
 const { SongRequestPayload } = require('~types/data/song')
 
@@ -31,6 +31,7 @@ class SongsHandler {
    * Handles `POST` request to add a new {@link Song song}
    *
    * @type {LifecycleMethod}
+   * @returns {Promise<ResponseObject>} Response
    */
   postSongHandler = async (request, h) => {
     const payload = /** @type {SongRequestPayload} */ (request.payload)
@@ -54,6 +55,7 @@ class SongsHandler {
    * Handles `GET` request to fetch all songs.
    *
    * @type {LifecycleMethod}
+   * @returns {Promise<ResponseObject>} Response
    */
   getSongsHandler = async (request, h) => {
     const { performer, title } = request.query
@@ -66,9 +68,10 @@ class SongsHandler {
   }
 
   /**
-   * Handles `GET` request to fetch a {@link Song song} by its {@link Song.id id
+   * Handles `GET` request to fetch a {@link Song song} by its {@link Song.id id}
    *
    * @type {LifecycleMethod}
+   * @returns {Promise<ResponseObject>} Response
    */
   getSongByIdHandler = async (request, h) => {
     const { id } = request.params
@@ -84,6 +87,7 @@ class SongsHandler {
    * Handles `PUT` request to update a {@link Song song} with {@link Song.id id}
    *
    * @type {LifecycleMethod}
+   * @returns {Promise<ResponseObject>} Response
    */
   putSongByIdHandler = async (request, h) => {
     const { id } = request.params
@@ -91,7 +95,7 @@ class SongsHandler {
 
     this.validator.validate(payload)
 
-    const { title, genre, performer, year, duration, albumId } = /** @type {SongRequestPayload} */ (payload)
+    const { title, genre, performer, year, duration, albumId } = payload
 
     await this.service.editSongById(id, { title, genre, performer, year, duration, albumId })
 
@@ -105,6 +109,7 @@ class SongsHandler {
    * Handles `DELETE` request to delete an {@link Song song} with {@link Song.id id}
    *
    * @type {LifecycleMethod}
+   * @returns {Promise<ResponseObject>} Response
    */
   deleteSongByIdHandler = async (request, h) => {
     const { id } = request.params

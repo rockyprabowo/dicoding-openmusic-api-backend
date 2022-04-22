@@ -23,7 +23,7 @@ class AlbumsService extends PostgresBase {
    * Adds an {@link Album} into database.
    *
    * @param {AlbumRequestPayload} payload Payload
-   * @returns {Promise<{id: string}>} Newly persisted Album ID
+   * @returns {Promise<{id: string}>} Newly persisted Album {@link Album.id id}
    * @async
    */
   addAlbum = async (payload) => {
@@ -48,6 +48,7 @@ class AlbumsService extends PostgresBase {
    * Get an {@link Album} by its {@link Album.id id} from database.
    *
    * @param {number} id Album {@link Album.id id}
+   * @returns {Promise<Album>} Album
    * @async
    */
   getAlbumById = async (id) => {
@@ -74,6 +75,7 @@ class AlbumsService extends PostgresBase {
   /**
    * Get all {@link Album} from database.
    *
+   * @returns {Promise<Album[]>} Albums
    * @async
    */
   getAlbums = async () => {
@@ -89,6 +91,7 @@ class AlbumsService extends PostgresBase {
    *
    * @param {number} id Album {@link Album.id id}
    * @param {AlbumRequestPayload} payload Request Payload
+   * @returns {Promise<{id: string}>} Updated Album {@link Album.id id}
    * @async
    */
   editAlbumById = async (id, payload) => {
@@ -110,6 +113,7 @@ class AlbumsService extends PostgresBase {
    * Delete an {@link Album} with {@link Album.id id} from database.
    *
    * @param {number} id Album {@link Album.id id}
+   * @returns {Promise<{id: string}>} Deleted Album {@link Album.id id}
    * @async
    */
   deleteAlbumById = async (id) => {

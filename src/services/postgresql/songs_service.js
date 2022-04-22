@@ -1,6 +1,6 @@
 const PostgresBase = require('./base')
 const Song = require('@data/song/song')
-const { SongRequestPayload, SongsFilterPayload } = require('~types/data/song')
+const { SongRequestPayload, SongsFilterPayload, SongListItem } = require('~types/data/song')
 const { QueryConfig } = require('~types/services/postgresql')
 const InvariantError = require('@exceptions/invariant_error')
 const NotFoundError = require('@exceptions/not_found_error')
@@ -23,6 +23,7 @@ class SongsService extends PostgresBase {
    * Adds a {@link Song} into the database.
    *
    * @param {SongRequestPayload} payload Payload
+   * @returns {Promise<{id: string}>} Newly persisted Song {@link Song.id id}
    * @async
    */
   addSong = async (payload) => {
@@ -51,6 +52,7 @@ class SongsService extends PostgresBase {
    * Get all {@link Song} from the database.
    *
    * @param {SongsFilterPayload} filters Filters
+   * @returns {Promise<SongListItem[]>} Songs
    * @async
    */
   getSongs = async (filters) => {
@@ -81,13 +83,14 @@ class SongsService extends PostgresBase {
 
     const result = await this.db.query(query)
 
-    return result.rows.map(Song.mapDBToAlbumSongListItem)
+    return result.rows.map(Song.mapDBToSongListItem)
   }
 
   /**
    * Get a {@link Song} by its {@link Song.id id} from the database.
    *
    * @param {string} id {@link Song.id id}
+   * @returns {Promise<Song>} Song
    * @async
    */
   getSongById = async (id) => {
@@ -111,6 +114,7 @@ class SongsService extends PostgresBase {
    *
    * @param {string} id {@link Song.id id}
    * @param {SongRequestPayload} payload Payload
+   * @returns {Promise<{id: string}>} Updated Song {@link Song.id id}
    * @async
    */
   editSongById = async (id, payload) => {
@@ -124,7 +128,7 @@ class SongsService extends PostgresBase {
     const result = await this.db.query(query)
 
     if (result.rowCount === 0) {
-      throw new NotFoundError(`Song ${id} update has failed. Can't find an album with id ${id}`)
+      throw new NotFoundError(`Song ${id} update has failed. Can't find an song with id ${id}`)
     }
 
     return result.rows[0]
@@ -134,6 +138,7 @@ class SongsService extends PostgresBase {
    * Delete the {@link Song} with {@link Song.id id} from the database.
    *
    * @param {string} id {@link Song.id id}
+   * @returns {Promise<{id: string}>} Deleted Song {@link Song.id id}
    * @async
    */
   deleteSongById = async (id) => {

@@ -1,5 +1,5 @@
 const { nanoid } = require('nanoid')
-const { SongRequestPayload, SongDbRow, AlbumSongListItem } = require('~types/data/song')
+const { SongRequestPayload, SongDbRow, SongListItem } = require('~types/data/song')
 
 /**
  * OpenMusic API - Song data model
@@ -45,23 +45,26 @@ class Song {
     return `song-${nanoid(16)}`
   }
 
-  /* eslint-disable camelcase */
-
   /**
    * Maps database result(s) to this data model
    *
    * @param {SongDbRow}  dbRow Item from database
    * @returns {Song} This data model
    */
+
+  /* eslint-disable camelcase */
+
   static mapDBToModel =
     ({ id, title, year, performer, genre, duration, album_id }) =>
       new Song({ id, title, year, performer, genre, duration, albumId: album_id })
 
+  /* eslint-enable camelcase */
+
   /**
-   * @param {AlbumSongListItem} obj Album Song List Item
-   * @returns {AlbumSongListItem} Album Song List Item
+   * @param {SongListItem} obj Album Song List Item
+   * @returns {SongListItem} Album Song List Item
    */
-  static mapDBToAlbumSongListItem = ({ id, title, performer }) => ({ id, title, performer })
+  static mapDBToSongListItem = ({ id, title, performer }) => ({ id, title, performer })
 }
 
 module.exports = Song

@@ -1,4 +1,4 @@
-const { LifecycleMethod } = require('~types/api')
+const { LifecycleMethod, ResponseObject } = require('~types/api')
 const { AlbumsPluginOptions } = require('~types/api/albums')
 const { AlbumRequestPayload } = require('~types/data/album')
 
@@ -31,6 +31,7 @@ class AlbumsHandler {
    * Handles `POST` request to add a new {@link Album album}
    *
    * @type {LifecycleMethod}
+   * @returns {Promise<ResponseObject>} Response
    */
   postAlbumHandler = async (request, h) => {
     const payload = /** @type {AlbumRequestPayload} */ (request.payload)
@@ -54,6 +55,7 @@ class AlbumsHandler {
    * Handles `GET` request to fetch all {@link Album album}
    *
    * @type {LifecycleMethod}
+   * @returns {Promise<ResponseObject>} Response
    */
   getAlbumsHandler = async (request, h) => {
     const albums = await this.service.getAlbums()
@@ -68,6 +70,7 @@ class AlbumsHandler {
    * Handles `GET` request to fetch an {@link Album album} by its {@link Album.id id}
    *
    * @type {LifecycleMethod}
+   * @returns {Promise<ResponseObject>} Response
    */
   getAlbumByIdHandler = async (request, h) => {
     const { id } = request.params
@@ -83,6 +86,7 @@ class AlbumsHandler {
    * Handles `PUT` request to update an {@link Album album} with {@link Album.id id}
    *
    * @type {LifecycleMethod}
+   * @returns {Promise<ResponseObject>} Response
    */
   putAlbumByIdHandler = async (request, h) => {
     const { id } = request.params
@@ -90,7 +94,7 @@ class AlbumsHandler {
 
     this.validator.validate(payload)
 
-    const { name, year } = /** @type {AlbumRequestPayload} */ (payload)
+    const { name, year } = payload
 
     await this.service.editAlbumById(id, { name, year })
 
@@ -104,6 +108,7 @@ class AlbumsHandler {
    * Handles `DELETE` request to delete an {@link Album album} with {@link Album.id id}
    *
    * @type {LifecycleMethod}
+   * @returns {Promise<ResponseObject>} Response
    */
   deleteAlbumByIdHandler = async (request, h) => {
     const { id } = request.params

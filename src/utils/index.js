@@ -1,4 +1,4 @@
-const { LifecycleMethod } = require('~types/api')
+const { LifecycleMethod, ResponseObject } = require('~types/api')
 const ClientError = require('@exceptions/client_error')
 
 /**
@@ -11,6 +11,7 @@ const ClientError = require('@exceptions/client_error')
  * Generic `onPreResponse` handler
  *
  * @type {LifecycleMethod}
+ * @returns {(ResponseObject | symbol)} Response
  */
 exports.genericPreResponseHandler = (request, h) => {
   const response = request.response

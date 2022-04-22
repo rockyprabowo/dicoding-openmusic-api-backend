@@ -11,7 +11,7 @@
  */
 
 /**
- * @typedef {object} AlbumSongListItem
+ * @typedef {object} SongListItem
  * @property {string} [id] ID
  * @property {string} title Title
  * @property {string} performer Performer

@@ -1,7 +1,7 @@
 const { nanoid } = require('nanoid')
 const Song = require('@data/song/song')
 const { AlbumRequestPayload } = require('~types/data/album')
-const { AlbumSongListItem } = require('~types/data/song')
+const { SongListItem } = require('~types/data/song')
 /**
  * OpenMusic API - Album data model
  *
@@ -17,7 +17,7 @@ class Album {
   id
   name
   year
-  /** @type {(Song[] | AlbumSongListItem[])}  */
+  /** @type {(Song[] | SongListItem[])}  */
   #songs = []
 
   /**
