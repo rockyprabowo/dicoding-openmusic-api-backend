@@ -2,38 +2,27 @@
   "compilerOptions": {
     "module": "CommonJS",
     "target": "ES2017",
+    "allowJs": true,
     "checkJs": true,
     "strict": true,
     "resolveJsonModule": true,
     "strictNullChecks": true,
+    "baseUrl": "./",
     "paths": {
-      "@root/*": [
-        "."
-      ],
-      "~/*": [
-        "./src"
-      ],
-      "~types/*": [
-        "./src/types/*"
-      ],
-      "@api/*": [
-        "./src/api/*"
-      ],
-      "@data/*": [
-        "./src/data/*"
-      ],
-      "@exceptions/*": [
-        "./src/exceptions/*"
-      ],
-      "@services/*": [
-        "./src/services/*"
-      ],
-      "@utils/*": [
-        "./src/utils/*"
-      ],
-      "@validators/*": [
-        "./src/validators/*"
-      ]
+      "@root/*": ["."],
+      "~/*": ["./src"],
+      "~types/*": ["./src/types/*"],
+      "@api/*": ["./src/api/*"],
+      "@data/*": ["./src/data/*"],
+      "@exceptions/*": ["./src/exceptions/*"],
+      "@services/*": ["./src/services/*"],
+      "@utils": ["./src/utils/index.js"],
+      "@utils/*": ["./src/utils/*"],
+      "@validators/*": ["./src/validators/*"]
     }
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "public"
+  ]
 }

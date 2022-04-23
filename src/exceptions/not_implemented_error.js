@@ -1,14 +1,11 @@
-/**
- * Error types
- *
- * @module exceptions
- */
+const IFluffedUp = require('./developer_error')
 
 /**
  * Represent an unimplemented error.
  *
+ * @memberof module:exceptions/developer_error
  */
-class NotImplementedError extends Error {
+class NotImplementedError extends IFluffedUp {
   name
 
   /**

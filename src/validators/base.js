@@ -9,6 +9,7 @@ const UnimplementedError = require('@exceptions/not_implemented_error')
 /**
  * Represents a base validator class.
  *
+ * @abstract
  */
 class Validator {
   /**

@@ -2,7 +2,7 @@ const { SongsPluginOptions } = require('~types/api/songs')
 const { Plugin } = require('~types/api')
 const { SongsHandler } = require('./handler')
 const routes = require('./routes')
-const { genericPreResponseHandler } = require('@utils/index')
+const { genericPreResponseHandler } = require('@utils')
 
 /**
  * OpenMusic API - Songs API

@@ -30,7 +30,7 @@ exports.genericPreResponseHandler = (request, h) => {
       return h.continue
     }
 
-    // Unexpected error
+    // Unexpected or developer error
     return h.response({
       status: 'error',
       message: 'Maaf, terjadi kegagalan pada server kami.',
