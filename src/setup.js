@@ -3,16 +3,144 @@
  *
  * @module setup
  */
-
-const { Pool } = require('pg')
-const format = require('pg-format')
+const fs = require('fs')
+const path = require('path')
+const { promises: fsPromise } = require('fs')
 
 /**
- * Create database
+ * Handles arguments sent to application entrypoint
+ *
+ * @type {function(string[]): Promise<number>}
+ */
+const handleCommandArguments = async (argv) => {
+  let commandExecuted = 0
+  const uniqueArgv = [...(new Set(argv.slice(2)))]
+  const commandMap = new Map([
+    ['--create-db', createDatabase],
+    ['--env-generate-keys', generateKeysToEnvFile]
+  ])
+  for (const command of uniqueArgv) {
+    const currentCommand = commandMap.get(command)
+    if (currentCommand) {
+      currentCommand()
+      commandExecuted++
+    } else {
+      console.log(`Warning: invalid command: ${command}`)
+    }
+  }
+
+  return commandExecuted
+}
+
+const keyGeneratorByteCount = 64
+const keyGenerator = () => require('crypto').randomBytes(keyGeneratorByteCount).toString('hex')
+
+/**
+ * Checks .env file existence, copy .env.defaults to .env if it doesn't exists
+ *
+ * @param {string} envFile .env path
+ * @param {string} envDefaultsFile Default .env path
+ * @returns {Promise<void>}
+ */
+const checkEnvFile = async (envFile, envDefaultsFile) => {
+  try {
+    await (await fsPromise.open(envFile, 'r')).close()
+  } catch (error) {
+    console.log(`No ${path.basename(envFile)} file detected.`)
+    try {
+      await (await fsPromise.open(envDefaultsFile, 'r')).close()
+      console.log(`Copying ${path.basename(envDefaultsFile)} to ${path.basename(envFile)}`)
+      await fsPromise.copyFile(envDefaultsFile, envFile)
+    } catch (error) {
+      console.log(`No ${path.basename(envDefaultsFile)} detected`)
+    }
+  }
+}
+
+/**
+ * Generates mandatory secret(s) key and place them into local .env file
+ * Because this function are needed with no packages installed, this function SHOULD NOT depend on external packages.
+ *
+ * @returns {Promise<void>}
+ */
+const generateKeysToEnvFile = async () => {
+  /**
+   * Count RegEx matches against a string
+   *
+   * @param {string} subject A string
+   * @param {RegExp} pattern Regex Pattern
+   * @returns {number} Match count
+   */
+  const count = (subject, pattern) => {
+    const re = pattern
+    return ((subject || '').match(re) || []).length
+  }
+
+  const envFileFd = path.resolve(process.cwd(), '.env')
+  const envFileDefaultsFd = path.resolve(process.cwd(), '.env.defaults')
+  const keys = ['ACCESS_TOKEN_KEY', 'REFRESH_TOKEN_KEY']
+
+  await checkEnvFile(envFileFd, envFileDefaultsFd)
+
+  try {
+    for (const key of keys) {
+      const envFileContent = fs.readFileSync(envFileFd, { encoding: 'utf-8' })
+      const regexEntryExistButEmpty = new RegExp(`${key}=`)
+      const regexEntryExist = new RegExp(`${key}=\\w+`)
+
+      const countEntryExistButEmpty = count(envFileContent, regexEntryExistButEmpty)
+      const countEntryExist = count(envFileContent, regexEntryExist)
+
+      if (countEntryExist) {
+        console.log(`${(countEntryExist > 1 && 'Multiple ') || 'The '}${key} already exists.\n` +
+          `${(countEntryExist > 1 && `Please remove every ${key} except the last one and empty its value first.\n`) || ''}` +
+          `Skipping any modification to ${key} to prevent secret key mismatch.\n`)
+        continue
+      }
+      const generatedKey = keyGenerator()
+
+      if (countEntryExistButEmpty) {
+        if (countEntryExistButEmpty > 1) {
+          console.log(`Multiple empty ${key} detected. Please remove any duplicates of ${key} but the last one after completing this command.\n`)
+        }
+        const newEnvFileContent = envFileContent.replace(regexEntryExistButEmpty, `${key}=${generatedKey}`)
+        fs.writeFileSync(envFileFd, newEnvFileContent, { encoding: 'utf-8' })
+        console.log(`New key for ${key} generated`)
+      } else {
+        console.log(`${key} didn't exist. Appending a new key for ${key} to ${envFileFd}.`)
+        fs.appendFileSync(envFileFd, `\n${key}=${generatedKey}`, { encoding: 'utf-8' })
+      }
+    }
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log(e.message)
+      process.exit(1)
+    }
+  }
+}
+
+const prerequisiteCheck = () => {
+  const SecretsMissing = require('@exceptions/secrets_missing_error')
+
+  if (!process.env.ACCESS_TOKEN_KEY) {
+    throw new SecretsMissing('ACCESS_TOKEN_KEY environment variable is missing')
+  }
+
+  if (!process.env.REFRESH_TOKEN_KEY) {
+    throw new SecretsMissing('REFRESH_TOKEN_KEY environment variable is missing')
+  }
+}
+
+/**
+ * Create database for this application
  *
  * @returns {Promise<void>}
  */
 const createDatabase = async () => {
+  require('dotenv').config()
+  const { Pool } = require('pg')
+  const format = require('pg-format')
+
   // Grab databaseName from PGDATABASE and unset PGDATABASE
   const databaseName = process.env.PGDATABASE
   delete process.env.PGDATABASE
@@ -24,7 +152,7 @@ const createDatabase = async () => {
     const result = await db.query('SELECT FROM pg_database WHERE datname = $1', [databaseName])
     if (result.rowCount === 0) {
       console.log(`Database ${databaseName} did not exists yet. Creating...`)
-      await db.query(format(`CREATE DATABASE ${(databaseName)}`))
+      await db.query(format('CREATE DATABASE %I', databaseName))
       console.log(`Database ${databaseName} created.`)
       return db.end()
     }
@@ -36,4 +164,4 @@ const createDatabase = async () => {
   process.exit(1)
 }
 
-module.exports = { createDatabase }
+module.exports = { prerequisiteCheck, handleCommandArguments }

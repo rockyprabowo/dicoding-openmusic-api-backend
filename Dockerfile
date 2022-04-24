@@ -1,8 +1,12 @@
 FROM node:14-alpine as base
 
 WORKDIR /srv/app
+ADD https://raw.githubusercontent.com/eficode/wait-for/master/wait-for /usr/local/bin/wait-for
 COPY package*.json .
 EXPOSE 5000
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh ; chmod +x /usr/local/bin/wait-for
+ENTRYPOINT [ "docker-entrypoint.sh" ]
 
 FROM base as production
 ENV NODE_ENV=production

@@ -10,7 +10,6 @@ services:
       - db
     volumes:
       - .:/srv/app
-    command: npm run dev
     ports:
       - ${PORT}:${PORT}
     environment:
@@ -34,6 +33,11 @@ services:
       - ${PGPORT}:${PGPORT}
     volumes:
       - db:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "${PGDATABASE}", "-U", "${PGUSER}" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
   pgadmin:
     container_name: openmusic_pgadmin4
     image: dpage/pgadmin4

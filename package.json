@@ -10,6 +10,7 @@
     "docs:dev": "nodemon --exec 'jsdoc -c jsdocs.conf.json' --watch ./src",
     "lint": "eslint ./src",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "keys:generate": "node . --env-generate-keys",
     "db:create": "node . --create-db",
     "migrate": "node-pg-migrate"
   },

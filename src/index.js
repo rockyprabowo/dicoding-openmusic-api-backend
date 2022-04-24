@@ -4,17 +4,17 @@
  * @see https://dev.lazycats.id
  */
 
-require('module-alias/register')
-require('dotenv').config()
+const { prerequisiteCheck, handleCommandArguments } = require('./setup')
 
-const { start } = require('./server')
-const { createDatabase } = require('./setup')
+handleCommandArguments(process.argv).then((commandCount) => {
+  if (commandCount === 0) {
+    require('module-alias/register')
+    require('dotenv').config()
 
-if (process.argv[process.argv.length - 1] === '--create-db') {
-  createDatabase()
-} else {
-  start()
-}
+    prerequisiteCheck()
+    require('./server').start()
+  }
+})
 
 process.on('unhandledRejection', (err) => {
   console.log(err)
