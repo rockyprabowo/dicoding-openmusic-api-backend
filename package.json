@@ -1,7 +1,7 @@
 {
   "name": "dicoding-openmusic-api-backend",
   "version": "1.0.0",
-  "description": "Dicoding Fundamental Backend Class Submission 1 - OpenMusic API",
+  "description": "Dicoding Fundamental Backend Class Submission - OpenMusic API",
   "main": "src/index.js",
   "scripts": {
     "start": "NODE_ENV=production node .",
