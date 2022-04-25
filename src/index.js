@@ -6,8 +6,8 @@
 
 const { prerequisiteCheck, handleCommandArguments } = require('./setup')
 
-handleCommandArguments(process.argv).then((commandCount) => {
-  if (commandCount === 0) {
+handleCommandArguments(process.argv).then((result) => {
+  if (result.commandCount === 0) {
     require('module-alias/register')
     require('dotenv').config()
 

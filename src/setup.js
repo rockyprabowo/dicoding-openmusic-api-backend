@@ -8,28 +8,42 @@ const path = require('path')
 const { promises: fsPromise } = require('fs')
 
 /**
+ *
+ * @typedef {object} CommandCount
+ * @property {number} commandCount Command count
+ * @property {number} validCommandExecuted Valid command executed count
+ */
+/**
  * Handles arguments sent to application entrypoint
  *
- * @type {function(string[]): Promise<number>}
+ *
+ * @type {function(string[]): Promise<CommandCount>}
  */
 const handleCommandArguments = async (argv) => {
-  let commandExecuted = 0
+  let commandCount = 0
+  let validCommandExecuted = 0
   const uniqueArgv = [...(new Set(argv.slice(2)))]
   const commandMap = new Map([
     ['--create-db', createDatabase],
     ['--env-generate-keys', generateKeysToEnvFile]
   ])
+
   for (const command of uniqueArgv) {
     const currentCommand = commandMap.get(command)
     if (currentCommand) {
       currentCommand()
-      commandExecuted++
+      validCommandExecuted++
     } else {
       console.log(`Warning: invalid command: ${command}`)
     }
+    commandCount++
   }
 
-  return commandExecuted
+  if (commandCount >= 1 && validCommandExecuted === 0) {
+    console.log('Valid commands: ', ...commandMap.keys())
+  }
+
+  return { commandCount, validCommandExecuted }
 }
 
 const keyGeneratorByteCount = 64
