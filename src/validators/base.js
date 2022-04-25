@@ -1,4 +1,4 @@
-const UnimplementedError = require('@exceptions/not_implemented_error')
+const NotImplementedError = require('@exceptions/not_implemented_error')
 
 /**
  * Data validation layer
@@ -20,7 +20,7 @@ class Validator {
    * @returns {(void | never)} Throws an exception or nothing
    */
   validate = (payload) => {
-    throw new UnimplementedError()
+    throw new NotImplementedError()
   }
 }
 
