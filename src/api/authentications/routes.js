@@ -2,7 +2,7 @@ const { AuthenticationsHandler } = require('./handler')
 const { ServerRoute } = require('~types/api')
 
 /**
- * Albums Plugin - Routes
+ * Authentication Plugin - Routes
  *
  *  @typedef {import('.')} AuthenticationsPlugin
  */
@@ -12,7 +12,7 @@ const { ServerRoute } = require('~types/api')
  *
  * @param {AuthenticationsHandler} handler {@link AuthenticationsPlugin} handler
  * @returns {ServerRoute[]} Hapi route definitions
- * @memberof module:api/Authentications
+ * @memberof module:api/authentications
  */
 const routes = (handler) => [
   {

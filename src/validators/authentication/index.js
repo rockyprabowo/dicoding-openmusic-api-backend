@@ -59,4 +59,8 @@ class DeleteAuthenticationValidator extends Validator {
   }
 }
 
-module.exports = { PostAuthenticationValidator, PutAuthenticationValidator, DeleteAuthenticationValidator }
+module.exports = {
+  PostAuthentication: new PostAuthenticationValidator(),
+  PutAuthentication: new PutAuthenticationValidator(),
+  DeleteAuthentication: new DeleteAuthenticationValidator()
+}

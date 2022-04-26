@@ -13,11 +13,11 @@ const SecretsMissing = require('@exceptions/secrets_missing_error')
  *
  */
 class TokenManager {
-  static get accessTokenKey () {
+  get accessTokenKey () {
     return /** @type {string} */ (process.env.ACCESS_TOKEN_KEY)
   }
 
-  static get refreshTokenKey () {
+  get refreshTokenKey () {
     return /** @type {string} */ (process.env.REFRESH_TOKEN_KEY)
   }
 
@@ -27,7 +27,7 @@ class TokenManager {
    * @param {{ id: string }} payload Payload
    * @returns {string} Access Token
    */
-  static generateAccessToken = (payload) => Jwt.token.generate(payload, this.accessTokenKey)
+  generateAccessToken = (payload) => Jwt.token.generate(payload, this.accessTokenKey)
 
   /**
    * Generates a new refresh token
@@ -35,7 +35,7 @@ class TokenManager {
    * @param {{ id: string }} payload Payload
    * @returns {string} Access Token
    */
-  static generateRefreshToken = (payload) => Jwt.token.generate(payload, this.refreshTokenKey)
+  generateRefreshToken = (payload) => Jwt.token.generate(payload, this.refreshTokenKey)
 
   /**
    * Verifies a refresh token
@@ -43,7 +43,7 @@ class TokenManager {
    * @param {string} refreshToken Refresh Token
    * @returns {{ id: string }} Payload
    */
-  static verifyRefreshToken = (refreshToken) => {
+  verifyRefreshToken = (refreshToken) => {
     try {
       const artifacts = Jwt.token.decode(refreshToken)
       Jwt.token.verifySignature(artifacts, this.refreshTokenKey)
@@ -53,7 +53,7 @@ class TokenManager {
       if (error instanceof SecretsMissing) {
         throw error
       }
-      throw new InvariantError('Refresh token tidak valid')
+      throw new InvariantError('Refresh token invalid')
     }
   }
 }

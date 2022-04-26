@@ -4,16 +4,16 @@
  *
  * @typedef {import('@api/users')} UsersPlugin
  * @typedef {import('@api/users/handler').UsersHandler} UsersHandler
- * @typedef {import('@services/postgresql/authentication_service')} AuthenticationService
- * @typedef {import('@validators/base')} Validator
+ * @typedef {import('@services/postgresql/users_service')} UsersService
+ * @typedef {import('@validators/user')} UserValidator
  */
 
 /**
  * Represents the options for {@link UsersPlugin}
  *
  * @typedef {object} UsersPluginOptions
- * @property {AuthenticationService} service Service for {@link UsersHandler}
- * @property {Validator} validator Validator for {@link UsersHandler}
+ * @property {UsersService} service Service for {@link UsersHandler}
+ * @property {UserValidator} validator Validator for {@link UsersHandler}
  */
 
 module.exports = {}

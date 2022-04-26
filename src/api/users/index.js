@@ -7,17 +7,17 @@ const { genericPreResponseHandler } = require('@utils')
 /**
  * OpenMusic API - Users API Plugin
  *
- * @module api/Users
+ * @module api/users
  */
 
 /**
  * Users plugin registration object
  *
  * @type {Plugin<UsersPluginOptions>}
- * @memberof module:api/Users
+ * @memberof module:api/users
  */
 const UsersPlugin = {
-  name: 'Users',
+  name: 'users',
   version: '1.0.0',
   register: async (server, options) => {
     server.ext('onPreResponse', genericPreResponseHandler)

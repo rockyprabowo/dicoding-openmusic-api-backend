@@ -1,10 +1,20 @@
 const Hapi = require('@hapi/hapi')
+const Inert = require('@hapi/inert')
+const Jwt = require('@hapi/jwt')
 const path = require('path')
-const AlbumsService = require('@services/postgresql/albums_service')
-const SongsService = require('@services/postgresql/songs_service')
-const AlbumValidator = require('@validators/album')
-const SongValidator = require('@validators/song')
+
 const { printAsciiArtLogo } = require('@utils/index')
+
+const AlbumsService = require('@services/postgresql/albums_service')
+const AlbumValidator = require('@validators/album')
+
+const SongsService = require('@services/postgresql/songs_service')
+const SongValidator = require('@validators/song')
+
+const AuthenticationService = require('@services/postgresql/authentication_service')
+const TokenManager = require('@utils/tokenise/token_manager')
+const UsersService = require('@services/postgresql/users_service')
+const UserValidator = require('@validators/user')
 
 /**
  * Server module
@@ -33,7 +43,30 @@ const server = Hapi.server({
  * @returns {Promise<Hapi.Server>} Hapi server object
  */
 const registerPlugins = async () => {
-  await server.register(require('@hapi/inert'))
+  /**
+   * @param {any} artifacts JWT artifacts
+   * @returns {{isValid: boolean, credentials: {id: string}}} Validation result
+   */
+  const validateJwt = (artifacts) => ({
+    isValid: true,
+    credentials: {
+      id: artifacts.decoded.payload.id
+    }
+  })
+
+  await server.register(Inert)
+  await server.register(Jwt)
+
+  server.auth.strategy('openmusic_jwt', 'jwt', {
+    keys: process.env.ACCESS_TOKEN_KEY,
+    verify: {
+      aud: false,
+      iss: false,
+      sub: false,
+      maxAgeSec: process.env.ACCESS_TOKEN_AGE
+    },
+    validate: validateJwt
+  })
 
   // Documentation Plugin
   server.register({
@@ -43,6 +76,32 @@ const registerPlugins = async () => {
     },
     routes: {
       prefix: '/docs'
+    }
+  })
+
+  // Authentications Plugin
+  server.register({
+    plugin: require('./api/authentications'),
+    options: {
+      authenticationsService: new AuthenticationService(),
+      usersService: new UsersService(),
+      validators: require('@validators/authentication'),
+      tokenManager: new TokenManager()
+    },
+    routes: {
+      prefix: '/authentications'
+    }
+  })
+
+  // Users Plugin
+  server.register({
+    plugin: require('./api/users'),
+    options: {
+      service: new UsersService(),
+      validator: new UserValidator()
+    },
+    routes: {
+      prefix: '/users'
     }
   })
 
