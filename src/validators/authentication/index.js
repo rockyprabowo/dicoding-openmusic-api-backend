@@ -1,66 +1,38 @@
-const {
-  PostAuthenticationPayloadSchema,
-  PutAuthenticationPayloadSchema,
-  DeleteAuthenticationPayloadSchema
-} = require('./schema')
-const InvariantError = require('@exceptions/invariant_error')
 const Validator = require('@validators/base')
+const {
+  UserRegistrationPayloadSchema,
+  RefreshTokenPayloadSchema
+} = require('./schema')
 
 /**
- * Represent the validator for {@link Authentication}.
+ * Authentication Validator
  *
- * @augments Validator
+ * @module validators/authentication
  */
-class PostAuthenticationValidator extends Validator {
-  /**
-   * Validates the {@link payload} against {@link PostAuthenticationPayloadSchema}
-   *
-   * @param {object} payload Object payload
-   * @override
-   */
-  validate = (payload) => {
-    const validationResult = PostAuthenticationPayloadSchema.validate(payload)
-    if (validationResult.error) {
-      throw new InvariantError(validationResult.error.message)
-    }
-    return validationResult
+
+/**
+ * Represent the validator for user registration
+ *
+ * @memberof module:validators/authentication
+ */
+class UserRegistrationValidator extends Validator {
+  constructor () {
+    super(UserRegistrationPayloadSchema)
   }
 }
 
-class PutAuthenticationValidator extends Validator {
-  /**
-   * Validates the {@link payload} against {@link PutAuthenticationPayloadSchema}
-   *
-   * @param {object} payload Object payload
-   * @override
-   */
-  validate = (payload) => {
-    const validationResult = PutAuthenticationPayloadSchema.validate(payload)
-    if (validationResult.error) {
-      throw new InvariantError(validationResult.error.message)
-    }
-    return validationResult
-  }
-}
-
-class DeleteAuthenticationValidator extends Validator {
-  /**
-   * Validates the {@link payload} against {@link DeleteAuthenticationPayloadSchema}
-   *
-   * @param {object} payload Object payload
-   * @override
-   */
-  validate = (payload) => {
-    const validationResult = DeleteAuthenticationPayloadSchema.validate(payload)
-    if (validationResult.error) {
-      throw new InvariantError(validationResult.error.message)
-    }
-    return validationResult
+/**
+ * Represent the validator for refresh token
+ *
+ * @memberof module:validators/authentication
+ */
+class RefreshTokenValidator extends Validator {
+  constructor () {
+    super(RefreshTokenPayloadSchema)
   }
 }
 
 module.exports = {
-  PostAuthentication: new PostAuthenticationValidator(),
-  PutAuthentication: new PutAuthenticationValidator(),
-  DeleteAuthentication: new DeleteAuthenticationValidator()
+  UserRegistrationValidator: new UserRegistrationValidator(),
+  RefreshTokenValidator: new RefreshTokenValidator()
 }

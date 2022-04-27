@@ -1,5 +1,5 @@
-const NotImplementedError = require('@exceptions/not_implemented_error')
-
+const Joi = require('joi')
+const InvariantError = require('@exceptions/invariant_error')
 /**
  * Data validation layer
  *
@@ -7,20 +7,41 @@ const NotImplementedError = require('@exceptions/not_implemented_error')
  */
 
 /**
- * Represents a base validator class.
+ * Represents a validator class.
  *
- * @abstract
  */
 class Validator {
+  #payload
+  #schema
+
+  /**
+   *
+   * @param {Joi.ObjectSchema} schema Joi object schema
+   */
+  constructor (schema) {
+    this.#schema = schema
+    this.#payload = {}
+  }
+
   /**
    * Validates the {@link payload} against a data validation schema.
    *
    * @abstract
    * @param {object} payload Object payload
-   * @returns {(void | never)} Throws an exception or nothing
+   * @returns {Joi.ValidationResult} Validation result
    */
   validate = (payload) => {
-    throw new NotImplementedError()
+    this.#payload = payload
+    return this.#execute()
+  }
+
+  #execute = () => {
+    const validationResult = this.#schema.validate(this.#payload)
+
+    if (validationResult.error) {
+      throw new InvariantError(validationResult.error.message)
+    }
+    return validationResult
   }
 }
 

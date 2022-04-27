@@ -12,7 +12,7 @@
 
 /**
  * @typedef {object} SongListItem
- * @property {string} [id] ID
+ * @property {string} id ID
  * @property {string} title Title
  * @property {string} performer Performer
  * @memberof module:data/song
@@ -32,6 +32,7 @@
 
 /**
  * @typedef {object} SongsFilterPayload
+ * @property {string[]} [ids] Song IDs
  * @property {string} [title] Title
  * @property {string} [performer] Performer
  * @property {string} [albumId] Album ID

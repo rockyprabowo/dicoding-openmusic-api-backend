@@ -1,5 +1,4 @@
 const Validator = require('@validators/base')
-const InvariantError = require('@exceptions/invariant_error')
 const AlbumPayloadSchema = require('./schema')
 
 /**
@@ -7,29 +6,17 @@ const AlbumPayloadSchema = require('./schema')
  *
  * @module validators/album
  */
-
 /**
- * @typedef {import('@data/album/album')} Album
- */
-
-/**
- * Represent the validator for {@link Album}.
+ * Represent the validator for album.
  *
- * @augments Validator
+ * @memberof module:validators/album
  */
 class AlbumValidator extends Validator {
-  /**
-   * Validates the {@link payload} against {@link AlbumPayloadSchema}
-   *
-   * @param {object} payload Object payload
-   * @override
-   */
-  validate = (payload) => {
-    const validationResult = AlbumPayloadSchema.validate(payload)
-    if (validationResult.error) {
-      throw new InvariantError(validationResult.error.message)
-    }
+  constructor () {
+    super(AlbumPayloadSchema)
   }
 }
 
-module.exports = AlbumValidator
+module.exports = {
+  AlbumValidator: new AlbumValidator()
+}

@@ -14,6 +14,7 @@ const { nanoid } = require('nanoid')
  * @memberof module:data/user
  */
 class User {
+  static tableName = 'users'
   username
   fullname
   #password
@@ -76,7 +77,8 @@ class User {
   }
 
   /**
-   * Sets the plaintext password for checking the existing {@link User user} persisted password
+   * Sets the plaintext password for checking the existing {@link User user} persisted password.
+   *
    * Does nothing if {@link User} is not mapped from database.
    *
    * @returns {void}

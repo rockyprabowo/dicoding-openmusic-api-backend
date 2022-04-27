@@ -16,7 +16,7 @@ exports.shorthands = undefined
 exports.up = pgm => {
   pgm.createTable('playlist_song_activities', {
     id: {
-      type: 'VARCHAR(32)',
+      type: 'SERIAL',
       primaryKey: true
     },
     playlist_id: {
@@ -34,7 +34,7 @@ exports.up = pgm => {
     action: {
       type: 'VARCHAR(16)',
       notNull: true,
-      check: "(action in ('add', 'delete'))"
+      check: "action in ('add', 'delete')"
     },
     time: {
       type: 'TIMESTAMP WITH TIME ZONE',

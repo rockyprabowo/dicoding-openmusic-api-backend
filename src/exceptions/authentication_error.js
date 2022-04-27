@@ -1,13 +1,9 @@
 const ClientError = require('./client_error')
 
 /**
- * Client-related error types.
- *
- * @module exceptions/client_error
- */
-
-/**
  * Represent an authentication error
+ *
+ * @memberof module:exceptions/client_error
  */
 class AuthenticationError extends ClientError {
   /**

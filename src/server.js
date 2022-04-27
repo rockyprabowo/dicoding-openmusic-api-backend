@@ -6,15 +6,20 @@ const path = require('path')
 const { printAsciiArtLogo } = require('@utils/index')
 
 const AlbumsService = require('@services/postgresql/albums_service')
-const AlbumValidator = require('@validators/album')
+const { AlbumValidator } = require('@validators/album')
 
 const SongsService = require('@services/postgresql/songs_service')
-const SongValidator = require('@validators/song')
+const { SongValidator } = require('@validators/song')
 
 const AuthenticationService = require('@services/postgresql/authentication_service')
+const AuthenticationValidators = require('@validators/authentication')
 const TokenManager = require('@utils/tokenise/token_manager')
+
 const UsersService = require('@services/postgresql/users_service')
-const UserValidator = require('@validators/user')
+const { UserValidator } = require('@validators/user')
+
+const PlaylistValidators = require('@validators/playlist')
+const PlaylistsService = require('@services/postgresql/playlists_service')
 
 /**
  * Server module
@@ -85,11 +90,23 @@ const registerPlugins = async () => {
     options: {
       authenticationsService: new AuthenticationService(),
       usersService: new UsersService(),
-      validators: require('@validators/authentication'),
+      validators: AuthenticationValidators,
       tokenManager: new TokenManager()
     },
     routes: {
       prefix: '/authentications'
+    }
+  })
+
+  // Authentications Plugin
+  server.register({
+    plugin: require('./api/playlists'),
+    options: {
+      service: new PlaylistsService(),
+      validator: PlaylistValidators
+    },
+    routes: {
+      prefix: '/playlists'
     }
   })
 
@@ -98,7 +115,7 @@ const registerPlugins = async () => {
     plugin: require('./api/users'),
     options: {
       service: new UsersService(),
-      validator: new UserValidator()
+      validator: UserValidator
     },
     routes: {
       prefix: '/users'
@@ -110,7 +127,7 @@ const registerPlugins = async () => {
     plugin: require('./api/albums'),
     options: {
       service: new AlbumsService(),
-      validator: new AlbumValidator()
+      validator: AlbumValidator
     },
     routes: {
       prefix: '/albums'
@@ -122,7 +139,7 @@ const registerPlugins = async () => {
     plugin: require('./api/songs'),
     options: {
       service: new SongsService(),
-      validator: new SongValidator()
+      validator: SongValidator
     },
     routes: {
       prefix: '/songs'

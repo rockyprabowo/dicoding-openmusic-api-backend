@@ -1,4 +1,3 @@
-const InvariantError = require('@exceptions/invariant_error')
 const Validator = require('@validators/base')
 const SongPayloadSchema = require('./schema')
 
@@ -9,27 +8,16 @@ const SongPayloadSchema = require('./schema')
  */
 
 /**
- * @typedef {import('@data/song/song')} Song
- */
-
-/**
- * Represent the validator for {@link Song}.
+ * Represent the validator for song
  *
- * @augments Validator
+ * @memberof module:validators/song
  */
 class SongValidator extends Validator {
-  /**
-   * Validates the {@link payload} against {@link SongPayloadSchema}
-   *
-   * @override
-   * @param {object} payload Object payload
-   */
-  validate = (payload) => {
-    const validationResult = SongPayloadSchema.validate(payload)
-    if (validationResult.error) {
-      throw new InvariantError(validationResult.error.message)
-    }
+  constructor () {
+    super(SongPayloadSchema)
   }
 }
 
-module.exports = SongValidator
+module.exports = {
+  SongValidator: new SongValidator()
+}

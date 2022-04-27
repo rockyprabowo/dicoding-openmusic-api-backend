@@ -67,6 +67,8 @@ class SongsService extends PostgresBase {
     if (filters.albumId) {
       query.text += ' WHERE album_id = $1'
       query.values = [filters.albumId]
+    } else if (filters.ids) {
+      // TODO: Filter songs by ids
     } else {
       let filterCount = 0
 

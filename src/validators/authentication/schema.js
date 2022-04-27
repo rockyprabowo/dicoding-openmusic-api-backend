@@ -1,20 +1,27 @@
 const Joi = require('joi')
 
-const PostAuthenticationPayloadSchema = Joi.object({
+/**
+ * Represents the user registration payload schema.
+ *
+ * @type {Joi.ObjectSchema}
+ * @memberof module:validators/authentication
+ */
+const UserRegistrationPayloadSchema = Joi.object({
   username: Joi.string().required(),
   password: Joi.string().required()
 })
 
-const PutAuthenticationPayloadSchema = Joi.object({
-  refreshToken: Joi.string().required()
-})
-
-const DeleteAuthenticationPayloadSchema = Joi.object({
+/**
+ * Represents the refresh token payload schema.
+ *
+ * @type {Joi.ObjectSchema}
+ * @memberof module:validators/authentication
+ */
+const RefreshTokenPayloadSchema = Joi.object({
   refreshToken: Joi.string().required()
 })
 
 module.exports = {
-  PostAuthenticationPayloadSchema,
-  PutAuthenticationPayloadSchema,
-  DeleteAuthenticationPayloadSchema
+  UserRegistrationPayloadSchema,
+  RefreshTokenPayloadSchema
 }

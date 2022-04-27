@@ -1,11 +1,7 @@
 const Joi = require('joi')
 
 /**
- * @typedef {import('@data/song/song')} Song
- */
-
-/**
- * Represents the {@link Song} payload schema.
+ * Represents the song payload schema.
  *
  * @type {Joi.ObjectSchema}
  * @memberof module:validators/song

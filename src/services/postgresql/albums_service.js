@@ -31,7 +31,7 @@ class AlbumsService extends PostgresBase {
 
     /** @type {QueryConfig} */
     const query = {
-      text: `INSERT INTO ${this.#tableName} (id, name, year) VALUES ($1, $2, $3) RETURNING *`,
+      text: `INSERT INTO ${this.#tableName} (id, name, year) VALUES ($1, $2, $3) RETURNING id`,
       values: [album.id, album.name, album.year]
     }
 
