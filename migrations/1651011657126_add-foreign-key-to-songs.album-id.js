@@ -38,6 +38,11 @@ exports.up = pgm => {
 exports.down = pgm => {
   pgm.dropConstraint('songs', 'fk_songs.album_id_albums.id')
 
+  // Drop songs.album_id default
+  pgm.alterColumn('songs', 'album_id', {
+    default: null
+  })
+
   pgm.sql("UPDATE songs SET album_id = NULL WHERE album_id = 'album-default'")
 
   pgm.sql("DELETE FROM albums WHERE id = 'album-default'")
