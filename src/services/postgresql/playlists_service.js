@@ -5,10 +5,11 @@ const NotFoundError = require('@exceptions/not_found_error')
 const AuthorisationError = require('@exceptions/authorisation_error')
 
 const Playlist = require('@data/playlist/playlist')
+const { PlaylistActivities, PlaylistActivitiesItem } = require('@data/playlist/playlist_activities')
 const User = require('@data/user/user')
 const Song = require('@data/song/song')
 
-const { PlaylistRequestPayload, PlaylistSongRequestPayload } = require('~types/data/playlist')
+const { PlaylistRequestPayload, PlaylistSongRequestPayload, PlaylistActivitiesItemPayload } = require('~types/data/playlist')
 const { QueryConfig } = require('~types/services/postgresql')
 const SongsService = require('./songs_service')
 const ClientError = require('@exceptions/client_error')
@@ -33,11 +34,13 @@ class PlaylistsService extends PostgresBase {
       throw new NotFoundError('Playlist not found')
     }
 
-    const playlist = result.rows.map(Playlist.mapDBToModel)[0]
+    const playlist = result.rows.map(Playlist.mapDBToModelWithUsername)[0]
 
     if (playlist.ownerId !== userId) {
       throw new AuthorisationError('Unauthorised resource access.')
     }
+
+    return playlist
   }
 
   /**
@@ -48,7 +51,7 @@ class PlaylistsService extends PostgresBase {
    */
   verifyPlaylistAccess = async (playlistId, userId) => {
     try {
-      await this.verifyPlaylistOwner(playlistId, userId)
+      return await this.verifyPlaylistOwner(playlistId, userId)
     } catch (error) {
       if (error instanceof ClientError) {
         throw error
@@ -201,6 +204,8 @@ class PlaylistsService extends PostgresBase {
       throw new InvariantError(`Add song ${song.id} to ${playlistId} failed`)
     }
 
+    await this.logActivity({ playlistId, songId, userId, action: 'add' })
+
     return result.rows[0]
   }
 
@@ -229,6 +234,58 @@ class PlaylistsService extends PostgresBase {
 
     if (result.rowCount === 0) {
       throw new InvariantError(`Delete song ${song.id} from ${playlistId} failed`)
+    }
+
+    await this.logActivity({ playlistId, songId, userId, action: 'delete' })
+
+    return result.rows[0]
+  }
+
+  /**
+   * Gets {@link Playlist} {@link PlaylistActivities} from the database.
+   *
+   * @param {string} playlistId Playlist ID
+   * @param {string} userId User ID
+   * @returns {Promise<PlaylistActivities>} Playlist Activities
+   */
+  getPlaylistActivities = async (playlistId, userId) => {
+    await this.verifyPlaylistAccess(playlistId, userId)
+
+    /** @type {QueryConfig} */
+    const query = {
+      text: `SELECT song_id, songs.title, user_id, users.username, action, time
+      FROM playlist_song_activities
+      LEFT JOIN users on playlist_song_activities.user_id = users.id
+      LEFT JOIN songs on playlist_song_activities.song_id = songs.id
+      WHERE playlist_id = $1
+      ORDER BY playlist_song_activities.id`,
+      values: [playlistId]
+    }
+    const result = await this.db.query(query)
+    const activities = result.rows.map(PlaylistActivitiesItem.mapDBToDataModel)
+
+    return new PlaylistActivities({ playlistId, activities })
+  }
+
+  /**
+   * Logs add/delete activity of a {@link Playlist}
+   *
+   * @param {PlaylistActivitiesItemPayload} payload Payload
+   * @returns {Promise<{id: string}>} Newly added {@link PlaylistActivitiesItem playlist activity}
+   */
+  logActivity = async (payload) => {
+    const activity = new PlaylistActivitiesItem(payload)
+
+    /** @type {QueryConfig} */
+    const query = {
+      text: 'INSERT INTO playlist_song_activities (playlist_id, song_id, user_id, action) VALUES ($1, $2, $3, $4) RETURNING id',
+      values: [activity.playlistId, activity.songId, activity.userId, activity.action]
+    }
+
+    const result = await this.db.query(query)
+
+    if (result.rowCount === 0) {
+      throw new InvariantError(`Activity logging of ${activity.playlistId} failed`)
     }
 
     return result.rows[0]

@@ -1,12 +1,13 @@
 const { LifecycleMethod, ResponseObject } = require('~types/api')
 const { PlaylistsPluginOptions } = require('~types/api/playlists')
 const { PlaylistRequestPayload, PlaylistSongRequestPayload } = require('~types/data/playlist')
-
 /**
  * Playlists Plugin - Handler class
  *
  * @typedef {import('./routes')} PlaylistRoutes
  * @typedef {import('@data/playlist/playlist') } Playlist
+ * @typedef {import('@data/song/song') } Song
+ * @typedef {import('@data/playlist/playlist_activities').PlaylistActivities } PlaylistActivities
  */
 
 /**
@@ -130,7 +131,7 @@ class PlaylistsHandler {
   }
 
   /**
-   * Handles `POST` request to add a {@link Song song} to a {@link Playlist}
+   * Handles `DELETE` request to add a {@link Song song} to a {@link Playlist}
    *
    * @type {LifecycleMethod}
    * @returns {Promise<ResponseObject>} Response
@@ -150,6 +151,24 @@ class PlaylistsHandler {
     return h.response({
       status: 'success',
       message: 'Playlist updated successfully'
+    })
+  }
+
+  /**
+   * Handles `GET` request to get {@link PlaylistActivities playlist activities}
+   *
+   * @type {LifecycleMethod}
+   * @returns {Promise<ResponseObject>} Response
+   */
+  getPlaylistActivitiesById = async (request, h) => {
+    const { id: credentialId } = /** @type {{id: string}} */ (request.auth.credentials)
+
+    const { id: playlistId } = request.params
+    const playlistActivities = await this.service.getPlaylistActivities(playlistId, credentialId)
+
+    return h.response({
+      status: 'success',
+      data: { ...playlistActivities }
     })
   }
 }

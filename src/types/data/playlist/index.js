@@ -33,24 +33,34 @@ const User = require('@data/user/user')
  */
 
 /**
- * @typedef {object} PlaylistActivityDbRow
+ * @typedef {object} PlaylistActivitiesDbRow
  * @property {number} id ID
- * @property {string} playlist_id Playlist ID
+ * @property {string} [playlist_id] Playlist ID
  * @property {string} song_id Song ID
+ * @property {string} [title] Song title
  * @property {string} user_id User ID
+ * @property {string} [username] Username
  * @property {("add" | "delete")} action Action
  * @property {Date} time Timestamp
  */
 
 /**
- * @typedef {object} PlaylistActivityPayload
+ * @typedef {object} PlaylistActivitiesItemPayload
  * @property {number} [id] ID
- * @property {string} playlistId Playlist ID
+ * @property {string} [playlistId] Playlist ID
  * @property {string} songId Song ID
+ * @property {string} [title] Song title
  * @property {string} userId User ID
+ * @property {string} [username] Username
  * @property {("add" | "delete")} action Action
- * @property {Date} time Timestamp
- * @property {boolean} __fromDB Identify whether this payload came from database
+ * @property {Date} [time] Timestamp
+ * @property {boolean} [__fromDB] Identify whether this payload came from database
+ */
+
+/**
+ * @typedef {object} PlaylistActivitiesPayload
+ * @property {string} playlistId Playlist ID
+ * @property {PlaylistActivitiesItemPayload[]} activities Activities
  */
 
 module.exports = {}
