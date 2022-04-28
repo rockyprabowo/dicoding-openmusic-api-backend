@@ -11,7 +11,7 @@
  * Represents the options for {@link AlbumsPlugin}
  *
  * @typedef {object} AlbumsPluginOptions
- * @property {AlbumsService} service Service for {@link AlbumsHandler}
+ * @property {AlbumsService} albumsService Service for {@link AlbumsHandler}
  * @property {Validator} validator Validator for {@link AlbumsHandler}
  * @memberof module:api/albums
  */

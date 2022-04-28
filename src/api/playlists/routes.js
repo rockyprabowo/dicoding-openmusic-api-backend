@@ -1,4 +1,5 @@
 const { PlaylistsHandler } = require('./handler')
+const { useRouteAuthStrategy } = require('@utils')
 const { ServerRoute } = require('~types/api')
 
 /**
@@ -19,57 +20,43 @@ const routes = (handler) => [
     method: 'POST',
     path: '/',
     handler: handler.postPlaylistHandler,
-    options: {
-      auth: 'openmusic_jwt'
-    }
+    ...useRouteAuthStrategy('openmusic_jwt')
   },
   {
     method: 'GET',
     path: '/',
     handler: handler.getPlaylistsHandler,
-    options: {
-      auth: 'openmusic_jwt'
-    }
+    ...useRouteAuthStrategy('openmusic_jwt')
   },
   {
     method: 'DELETE',
     path: '/{id}',
     handler: handler.deletePlaylistByIdHandler,
-    options: {
-      auth: 'openmusic_jwt'
-    }
+    ...useRouteAuthStrategy('openmusic_jwt')
   },
   {
     method: 'POST',
     path: '/{id}/songs',
     handler: handler.postPlaylistSongByIdHandler,
-    options: {
-      auth: 'openmusic_jwt'
-    }
+    ...useRouteAuthStrategy('openmusic_jwt')
   },
   {
     method: 'GET',
     path: '/{id}/songs',
     handler: handler.getPlaylistSongsByIdHandler,
-    options: {
-      auth: 'openmusic_jwt'
-    }
+    ...useRouteAuthStrategy('openmusic_jwt')
   },
   {
     method: 'DELETE',
     path: '/{id}/songs',
     handler: handler.deletePlaylistSongByIdHandler,
-    options: {
-      auth: 'openmusic_jwt'
-    }
+    ...useRouteAuthStrategy('openmusic_jwt')
   },
   {
     method: 'GET',
     path: '/{id}/activities',
     handler: handler.getPlaylistActivitiesById,
-    options: {
-      auth: 'openmusic_jwt'
-    }
+    ...useRouteAuthStrategy('openmusic_jwt')
   }
 ]
 

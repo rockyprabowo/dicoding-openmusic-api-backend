@@ -1,8 +1,8 @@
-const { AlbumsPluginOptions } = require('~types/api/albums')
-const { Plugin } = require('~types/api')
 const { AlbumsHandler } = require('./handler')
 const routes = require('./routes')
 const { genericPreResponseHandler } = require('@utils')
+const { Plugin } = require('~types/api')
+const { AlbumsPluginOptions } = require('~types/api/albums')
 
 /**
  * OpenMusic API - Albums API Plugin

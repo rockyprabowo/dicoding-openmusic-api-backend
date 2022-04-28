@@ -18,6 +18,4 @@ class UserValidator extends Validator {
   }
 }
 
-module.exports = {
-  UserValidator: new UserValidator()
-}
+module.exports = UserValidator

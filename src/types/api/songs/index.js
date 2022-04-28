@@ -11,7 +11,7 @@
  * Represents the options for {@link SongsPlugin}.
  *
  * @typedef {object} SongsPluginOptions
- * @property {SongsService} service {@link SongsService}
+ * @property {SongsService} songsService {@link SongsService}
  * @property {Validator} validator Validator for {@link SongsService}
  * @memberof module:api/songs
  */

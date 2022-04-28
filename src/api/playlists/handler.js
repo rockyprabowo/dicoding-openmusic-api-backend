@@ -1,6 +1,7 @@
 const { LifecycleMethod, ResponseObject } = require('~types/api')
 const { PlaylistsPluginOptions } = require('~types/api/playlists')
 const { PlaylistRequestPayload, PlaylistSongRequestPayload } = require('~types/data/playlist')
+
 /**
  * Playlists Plugin - Handler class
  *
@@ -16,16 +17,16 @@ const { PlaylistRequestPayload, PlaylistSongRequestPayload } = require('~types/d
  * @memberof module:api/playlists
  */
 class PlaylistsHandler {
-  service
-  validator
+  playlistsService
+  validators
   /**
    * Construct a new {@link PlaylistsHandler Playlists Handler} with {@link PlaylistsPluginOptions options}
    *
    * @param {PlaylistsPluginOptions} options Playlists plugin options
    */
   constructor (options) {
-    this.service = options.service
-    this.validator = options.validator
+    this.playlistsService = options.playlistsService
+    this.validators = options.validators
   }
 
   /**
@@ -38,11 +39,11 @@ class PlaylistsHandler {
     const payload = /** @type {PlaylistRequestPayload} */ (request.payload)
     const { id: credentialId } = /** @type {{id: string}} */ (request.auth.credentials)
 
-    this.validator.PlaylistValidator.validate(payload)
+    this.validators.PlaylistValidator.validate(payload)
 
     const { name } = payload
 
-    const playlist = await this.service.addPlaylist({ name, ownerId: credentialId })
+    const playlist = await this.playlistsService.addPlaylist({ name, ownerId: credentialId })
 
     return h.response({
       status: 'success',
@@ -62,7 +63,7 @@ class PlaylistsHandler {
   getPlaylistsHandler = async (request, h) => {
     const { id: credentialId } = /** @type {{id: string}} */ (request.auth.credentials)
 
-    const playlists = await this.service.getPlaylists(credentialId)
+    const playlists = await this.playlistsService.getPlaylists(credentialId)
 
     return h.response({
       status: 'success',
@@ -80,7 +81,7 @@ class PlaylistsHandler {
     const { id: playlistId } = request.params
     const { id: credentialId } = /** @type {{id: string}} */ (request.auth.credentials)
 
-    await this.service.deletePlaylistById(playlistId, credentialId)
+    await this.playlistsService.deletePlaylistById(playlistId, credentialId)
 
     return h.response({
       status: 'success',
@@ -98,7 +99,7 @@ class PlaylistsHandler {
     const { id: credentialId } = /** @type {{id: string}} */ (request.auth.credentials)
 
     const { id: playlistId } = request.params
-    const playlist = await this.service.getPlaylistById(playlistId, credentialId)
+    const playlist = await this.playlistsService.getPlaylistById(playlistId, credentialId)
 
     return h.response({
       status: 'success',
@@ -118,11 +119,11 @@ class PlaylistsHandler {
 
     const payload = /** @type {PlaylistSongRequestPayload} */ (request.payload)
 
-    this.validator.PlaylistSongValidator.validate(payload)
+    this.validators.PlaylistSongValidator.validate(payload)
 
     const { songId } = payload
 
-    await this.service.addPlaylistSong(playlistId, credentialId, { songId })
+    await this.playlistsService.addPlaylistSong(playlistId, credentialId, { songId })
 
     return h.response({
       status: 'success',
@@ -142,11 +143,11 @@ class PlaylistsHandler {
 
     const payload = /** @type {PlaylistSongRequestPayload} */ (request.payload)
 
-    this.validator.PlaylistSongValidator.validate(payload)
+    this.validators.PlaylistSongValidator.validate(payload)
 
     const { songId } = payload
 
-    await this.service.deletePlaylistSong(playlistId, credentialId, { songId })
+    await this.playlistsService.deletePlaylistSong(playlistId, credentialId, { songId })
 
     return h.response({
       status: 'success',
@@ -164,11 +165,11 @@ class PlaylistsHandler {
     const { id: credentialId } = /** @type {{id: string}} */ (request.auth.credentials)
 
     const { id: playlistId } = request.params
-    const playlistActivities = await this.service.getPlaylistActivities(playlistId, credentialId)
+    const playlistActivities = await this.playlistsService.getPlaylistActivities(playlistId, credentialId)
 
     return h.response({
       status: 'success',
-      data: { ...playlistActivities }
+      data: playlistActivities
     })
   }
 }

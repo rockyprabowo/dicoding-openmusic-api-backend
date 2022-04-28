@@ -1,6 +1,6 @@
 const PostgresBase = require('./base')
-const { UserRequestPayload } = require('~types/data/user')
 const User = require('@data/user/user')
+const { UserRequestPayload } = require('~types/data/user')
 const InvariantError = require('@exceptions/invariant_error')
 const NotFoundError = require('@exceptions/not_found_error')
 const AuthenticationError = require('@exceptions/authentication_error')
@@ -34,7 +34,7 @@ class UsersService extends PostgresBase {
 
     const result = await this.db.query(query)
 
-    if (!result.rows.length) {
+    if (result.rowCount === 0) {
       throw new InvariantError('Add user failed.')
     }
 
@@ -94,7 +94,7 @@ class UsersService extends PostgresBase {
 
     const result = await this.db.query(query)
 
-    if (!result.rows.length) {
+    if (result.rowCount === 0) {
       throw new AuthenticationError('Credentials given are invalid.')
     }
 

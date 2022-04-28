@@ -18,6 +18,4 @@ class SongValidator extends Validator {
   }
 }
 
-module.exports = {
-  SongValidator: new SongValidator()
-}
+module.exports = SongValidator

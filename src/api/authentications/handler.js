@@ -5,12 +5,12 @@ const { LifecycleMethod, ResponseObject } = require('~types/api')
 /**
  * Authentications Plugin - Route Handler
  *
- * @typedef {import('./routes')} AuthenticationRoutes
+ * @typedef {import('./routes')} AuthenticationsRoutes
  * @typedef {import('@data/user/user')} User
  */
 
 /**
- * Represents a class handling the {@link AuthenticationRoutes routes}
+ * Represents a class handling the {@link AuthenticationsRoutes routes}
  *
  * @memberof module:api/authentications
  */
@@ -20,9 +20,9 @@ class AuthenticationsHandler {
   tokenManager
   validators
   /**
-   * Construct a new {@link AlbumsHandler} with {@link AlbumsPluginOptions}
+   * Construct a new {@link AuthenticationsHandler} with {@link AuthenticationsPluginOptions}
    *
-   * @param {AuthenticationsPluginOptions} options Albums plugin options
+   * @param {AuthenticationsPluginOptions} options Authentications plugin options
    */
   constructor (options) {
     this.authenticationsService = options.authenticationsService
@@ -86,7 +86,7 @@ class AuthenticationsHandler {
   }
 
   /**
-   * Handles `DELETE` request to remove the refresh token of {@link User album}
+   * Handles `DELETE` request to remove the refresh token of {@link User user}
    *
    * @type {LifecycleMethod}
    * @returns {Promise<ResponseObject>} Response

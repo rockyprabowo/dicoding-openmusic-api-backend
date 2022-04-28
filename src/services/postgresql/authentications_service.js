@@ -1,5 +1,6 @@
-const InvariantError = require('@exceptions/invariant_error')
 const PostgresBase = require('./base')
+const InvariantError = require('@exceptions/invariant_error')
+
 /**
  * OpenMusic API - Authentications Service (PostgreSQL Persistence)
  *
@@ -11,7 +12,7 @@ const PostgresBase = require('./base')
  *
  * @augments PostgresBase
  */
-class AuthenticationService extends PostgresBase {
+class AuthenticationsService extends PostgresBase {
   /**
    * Persist refresh token
    *
@@ -39,7 +40,7 @@ class AuthenticationService extends PostgresBase {
 
     const result = await this.db.query(query)
 
-    if (!result.rows.length) {
+    if (result.rowCount === 0) {
       throw new InvariantError('Invalid refresh token')
     }
   }
@@ -61,4 +62,4 @@ class AuthenticationService extends PostgresBase {
   }
 }
 
-module.exports = AuthenticationService
+module.exports = AuthenticationsService

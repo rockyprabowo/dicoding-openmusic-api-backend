@@ -1,6 +1,5 @@
 const Jwt = require('@hapi/jwt')
 const InvariantError = require('@exceptions/invariant_error')
-const SecretsMissing = require('@exceptions/secrets_missing_error')
 
 /**
  * Token manager
@@ -50,9 +49,6 @@ class TokenManager {
       const { payload } = artifacts.decoded
       return payload
     } catch (error) {
-      if (error instanceof SecretsMissing) {
-        throw error
-      }
       throw new InvariantError('Refresh token invalid')
     }
   }

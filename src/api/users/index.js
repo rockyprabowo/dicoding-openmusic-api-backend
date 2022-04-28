@@ -1,8 +1,8 @@
-const { UsersPluginOptions } = require('~types/api/users')
-const { Plugin } = require('~types/api')
 const { UsersHandler } = require('./handler')
 const routes = require('./routes')
 const { genericPreResponseHandler } = require('@utils')
+const { Plugin } = require('~types/api')
+const { UsersPluginOptions } = require('~types/api/users')
 
 /**
  * OpenMusic API - Users API Plugin

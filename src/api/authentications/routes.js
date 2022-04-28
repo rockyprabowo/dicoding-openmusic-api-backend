@@ -2,7 +2,7 @@ const { AuthenticationsHandler } = require('./handler')
 const { ServerRoute } = require('~types/api')
 
 /**
- * Authentication Plugin - Routes
+ * Authentications Plugin - Routes
  *
  *  @typedef {import('.')} AuthenticationsPlugin
  */

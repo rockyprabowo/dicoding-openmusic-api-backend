@@ -18,7 +18,18 @@ const NotFoundError = require('@exceptions/not_found_error')
  * @augments PostgresBase
  */
 class AlbumsService extends PostgresBase {
-  #tableName = Album.tableName
+  #songsService
+
+  /**
+   * Construct an {@link AlbumsService}
+   *
+   * @param {SongsService} songsService Songs Service
+   */
+  constructor (songsService) {
+    super()
+    this.#songsService = songsService
+  }
+
   /**
    * Adds an {@link Album} into database.
    *
@@ -31,7 +42,7 @@ class AlbumsService extends PostgresBase {
 
     /** @type {QueryConfig} */
     const query = {
-      text: `INSERT INTO ${this.#tableName} (id, name, year) VALUES ($1, $2, $3) RETURNING id`,
+      text: `INSERT INTO ${Album.tableName} (id, name, year) VALUES ($1, $2, $3) RETURNING id`,
       values: [album.id, album.name, album.year]
     }
 
@@ -52,10 +63,9 @@ class AlbumsService extends PostgresBase {
    * @async
    */
   getAlbumById = async (id) => {
-    const songsService = new SongsService()
     /** @type {QueryConfig} */
     const query = {
-      text: `SELECT * FROM ${this.#tableName} WHERE id = $1`,
+      text: `SELECT * FROM ${Album.tableName} WHERE id = $1`,
       values: [id]
     }
 
@@ -67,7 +77,7 @@ class AlbumsService extends PostgresBase {
 
     const album = result.rows.map(Album.mapDBToModel)[0]
 
-    album.songs = await songsService.getSongs({ albumId: album.id })
+    album.songs = await this.#songsService.getSongs({ albumId: album.id })
 
     return album
   }
@@ -80,7 +90,7 @@ class AlbumsService extends PostgresBase {
    */
   getAlbums = async () => {
     const result = await this.db.query(
-      `SELECT * FROM ${this.#tableName}`
+      `SELECT * FROM ${Album.tableName}`
     )
 
     return result.rows.map(Album.mapDBToModel)
@@ -96,7 +106,7 @@ class AlbumsService extends PostgresBase {
    */
   editAlbumById = async (id, payload) => {
     const query = {
-      text: `UPDATE ${this.#tableName} SET name = $1, year = $2 WHERE id = $3 RETURNING id`,
+      text: `UPDATE ${Album.tableName} SET name = $1, year = $2 WHERE id = $3 RETURNING id`,
       values: [payload.name, payload.year, id]
     }
 
@@ -119,7 +129,7 @@ class AlbumsService extends PostgresBase {
   deleteAlbumById = async (id) => {
     /** @type {QueryConfig} */
     const query = {
-      text: `DELETE FROM ${this.#tableName} WHERE id = $1 RETURNING id`,
+      text: `DELETE FROM ${Album.tableName} WHERE id = $1 RETURNING id`,
       values: [id]
     }
 

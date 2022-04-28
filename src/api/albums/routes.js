@@ -1,5 +1,5 @@
-const { ServerRoute } = require('~types/api')
 const { AlbumsHandler } = require('./handler')
+const { ServerRoute } = require('~types/api')
 
 /**
  * Albums Plugin - Routes

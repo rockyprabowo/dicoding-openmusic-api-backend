@@ -17,6 +17,4 @@ class AlbumValidator extends Validator {
   }
 }
 
-module.exports = {
-  AlbumValidator: new AlbumValidator()
-}
+module.exports = AlbumValidator

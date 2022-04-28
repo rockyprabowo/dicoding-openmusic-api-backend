@@ -45,15 +45,14 @@ class Song {
     return `song-${nanoid(16)}`
   }
 
+  /* eslint-disable camelcase */
+
   /**
    * Maps database result(s) to this data model
    *
    * @param {SongDbRow}  dbRow Item from database
    * @returns {Song} This data model
    */
-
-  /* eslint-disable camelcase */
-
   static mapDBToModel =
     ({ id, title, year, performer, genre, duration, album_id }) =>
       new Song({ id, title, year, performer, genre, duration, albumId: album_id })
@@ -61,8 +60,10 @@ class Song {
   /* eslint-enable camelcase */
 
   /**
-   * @param {SongListItem} obj Album Song List Item
-   * @returns {SongListItem} Album Song List Item
+   * Maps database result(s) to Album Song List
+   *
+   * @param {SongDbRow} dbRow Item from database
+   * @returns {SongListItem} An album song list item
    */
   static mapDBToSongListItem = ({ id, title, performer }) => ({ id, title, performer })
 }

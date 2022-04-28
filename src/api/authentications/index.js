@@ -1,8 +1,8 @@
+const { AuthenticationsHandler } = require('./handler')
+const routes = require('./routes')
 const { genericPreResponseHandler } = require('@utils')
 const { Plugin } = require('~types/api')
 const { AuthenticationsPluginOptions } = require('~types/api/authentications')
-const { AuthenticationsHandler } = require('./handler')
-const routes = require('./routes')
 
 /**
  * OpenMusic API - Authentications API Plugin

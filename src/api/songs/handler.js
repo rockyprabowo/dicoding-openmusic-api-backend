@@ -15,7 +15,7 @@ const { SongRequestPayload } = require('~types/data/song')
  * @memberof module:api/songs
  */
 class SongsHandler {
-  service
+  songsService
   validator
   /**
    * Construct a new {@link SongsHandler Songs Handler} with {@link SongsPluginOptions options}
@@ -23,7 +23,7 @@ class SongsHandler {
    * @param {SongsPluginOptions} options Songs plugin options
    */
   constructor (options) {
-    this.service = options.service
+    this.songsService = options.songsService
     this.validator = options.validator
   }
 
@@ -40,7 +40,7 @@ class SongsHandler {
 
     const { title, year, performer, genre, duration, albumId } = payload
 
-    const song = await this.service.addSong({ title, year, performer, genre, duration, albumId })
+    const song = await this.songsService.addSong({ title, year, performer, genre, duration, albumId })
 
     return h.response({
       status: 'success',
@@ -59,7 +59,7 @@ class SongsHandler {
    */
   getSongsHandler = async (request, h) => {
     const { performer, title } = request.query
-    const songs = await this.service.getSongs({ performer, title })
+    const songs = await this.songsService.getSongs({ performer, title })
 
     return h.response({
       status: 'success',
@@ -75,7 +75,7 @@ class SongsHandler {
    */
   getSongByIdHandler = async (request, h) => {
     const { id } = request.params
-    const song = await this.service.getSongById(id)
+    const song = await this.songsService.getSongById(id)
 
     return h.response({
       status: 'success',
@@ -97,7 +97,7 @@ class SongsHandler {
 
     const { title, genre, performer, year, duration, albumId } = payload
 
-    await this.service.editSongById(id, { title, genre, performer, year, duration, albumId })
+    await this.songsService.editSongById(id, { title, genre, performer, year, duration, albumId })
 
     return h.response({
       status: 'success',
@@ -114,7 +114,7 @@ class SongsHandler {
   deleteSongByIdHandler = async (request, h) => {
     const { id } = request.params
 
-    await this.service.deleteSongById(id)
+    await this.songsService.deleteSongById(id)
 
     return h.response({
       status: 'success',

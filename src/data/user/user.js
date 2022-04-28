@@ -132,6 +132,7 @@ class User {
   }
 
   /**
+   * Maps database result(s) to this data model
    *
    * @param {UserDbRow} dbRow Item from database
    * @returns {User} This data model
@@ -139,6 +140,7 @@ class User {
   static mapDBToModel = ({ id, username, fullname, password }) => new User({ id, username, fullname, hashedPassword: password, __fromDb: true })
 
   /**
+   * Maps database result(s) to this data model, without hashed password
    *
    * @param {UserDbRowWithoutPassword} dbRow Item from database
    * @returns {User} This data model

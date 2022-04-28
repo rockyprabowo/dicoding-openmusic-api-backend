@@ -8,14 +8,61 @@ const path = require('path')
 const { promises: fsPromise } = require('fs')
 
 /**
- *
  * @typedef {object} CommandCount
  * @property {number} commandCount Command count
  * @property {number} validCommandExecuted Valid command executed count
  */
+
+/** Byte count for {@link keyGenerator} */
+const keyGeneratorByteCount = 64
+
+/**
+ * Generates a new key for tokens
+ *
+ * @returns {string} Generated key
+ */
+const keyGenerator = () => require('crypto').randomBytes(keyGeneratorByteCount).toString('hex')
+
+/**
+ * Count RegEx matches against a string
+ *
+ * @param {string} subject A string
+ * @param {RegExp} pattern RegEx Pattern
+ * @returns {number} Match count
+ */
+const countRegExMatches = (subject, pattern) => {
+  const regex = pattern
+  return ((subject || '').match(regex) || []).length
+}
+
+/**
+ * Prerequisite checks
+ */
+const prerequisiteCheck = () => {
+  const SecretsMissing = require('@exceptions/secrets_missing_error')
+  const ConfigurationMissing = require('@exceptions/configuration_missing_error')
+
+  const requiredConfigurations = [
+    'HOST', 'PORT', 'PGHOST', 'PGPORT', 'PGUSER', 'PGPASSWORD', 'PGDATABASE', 'ACCESS_TOKEN_AGE'
+  ]
+
+  if (!process.env.ACCESS_TOKEN_KEY) {
+    throw new SecretsMissing('ACCESS_TOKEN_KEY environment variable is missing')
+  }
+
+  if (!process.env.REFRESH_TOKEN_KEY) {
+    throw new SecretsMissing('REFRESH_TOKEN_KEY environment variable is missing')
+  }
+
+  for (const configurationName of requiredConfigurations) {
+    if (!process.env[configurationName]) {
+      throw new ConfigurationMissing(`${configurationName} environment variable is missing`)
+    }
+  }
+}
+
 /**
  * Handles arguments sent to application entrypoint
- *
  *
  * @type {function(string[]): Promise<CommandCount>}
  */
@@ -46,9 +93,6 @@ const handleCommandArguments = async (argv) => {
   return { commandCount, validCommandExecuted }
 }
 
-const keyGeneratorByteCount = 64
-const keyGenerator = () => require('crypto').randomBytes(keyGeneratorByteCount).toString('hex')
-
 /**
  * Checks .env file existence, copy .env.defaults to .env if it doesn't exists
  *
@@ -78,18 +122,6 @@ const checkEnvFile = async (envFile, envDefaultsFile) => {
  * @returns {Promise<void>}
  */
 const generateKeysToEnvFile = async () => {
-  /**
-   * Count RegEx matches against a string
-   *
-   * @param {string} subject A string
-   * @param {RegExp} pattern Regex Pattern
-   * @returns {number} Match count
-   */
-  const count = (subject, pattern) => {
-    const re = pattern
-    return ((subject || '').match(re) || []).length
-  }
-
   const envFileFd = path.resolve(process.cwd(), '.env')
   const envFileDefaultsFd = path.resolve(process.cwd(), '.env.defaults')
   const keys = ['ACCESS_TOKEN_KEY', 'REFRESH_TOKEN_KEY']
@@ -102,8 +134,8 @@ const generateKeysToEnvFile = async () => {
       const regexEntryExistButEmpty = new RegExp(`${key}=`)
       const regexEntryExist = new RegExp(`${key}=\\w+`)
 
-      const countEntryExistButEmpty = count(envFileContent, regexEntryExistButEmpty)
-      const countEntryExist = count(envFileContent, regexEntryExist)
+      const countEntryExistButEmpty = countRegExMatches(envFileContent, regexEntryExistButEmpty)
+      const countEntryExist = countRegExMatches(envFileContent, regexEntryExist)
 
       if (countEntryExist) {
         console.log(`${(countEntryExist > 1 && 'Multiple ') || 'The '}${key} already exists.\n` +
@@ -130,18 +162,6 @@ const generateKeysToEnvFile = async () => {
       console.log(e.message)
       process.exit(1)
     }
-  }
-}
-
-const prerequisiteCheck = () => {
-  const SecretsMissing = require('@exceptions/secrets_missing_error')
-
-  if (!process.env.ACCESS_TOKEN_KEY) {
-    throw new SecretsMissing('ACCESS_TOKEN_KEY environment variable is missing')
-  }
-
-  if (!process.env.REFRESH_TOKEN_KEY) {
-    throw new SecretsMissing('REFRESH_TOKEN_KEY environment variable is missing')
   }
 }
 

@@ -1,5 +1,5 @@
-const { ServerRoute } = require('~types/api')
 const { SongsHandler } = require('./handler')
+const { ServerRoute } = require('~types/api')
 
 /**
  * Songs Plugin - Routes

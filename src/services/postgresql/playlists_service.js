@@ -1,21 +1,36 @@
 const PostgresBase = require('./base')
 
+const SongsService = require('./songs_service')
+const CollaborationsService = require('./collaborations_service')
+
+const User = require('@data/user/user')
+const Song = require('@data/song/song')
+const Collaboration = require('@data/collaboration/collaboration')
+const { Playlist, PlaylistSong } = require('@data/playlist/playlist')
+const { PlaylistActivities, PlaylistActivitiesItem } = require('@data/playlist/playlist_activities')
+
+const { PlaylistRequestPayload, PlaylistSongRequestPayload, PlaylistActivitiesItemPayload } = require('~types/data/playlist')
+const { QueryConfig } = require('~types/services/postgresql')
+
 const InvariantError = require('@exceptions/invariant_error')
 const NotFoundError = require('@exceptions/not_found_error')
 const AuthorisationError = require('@exceptions/authorisation_error')
 
-const Playlist = require('@data/playlist/playlist')
-const { PlaylistActivities, PlaylistActivitiesItem } = require('@data/playlist/playlist_activities')
-const User = require('@data/user/user')
-const Song = require('@data/song/song')
-
-const { PlaylistRequestPayload, PlaylistSongRequestPayload, PlaylistActivitiesItemPayload } = require('~types/data/playlist')
-const { QueryConfig } = require('~types/services/postgresql')
-const SongsService = require('./songs_service')
-const ClientError = require('@exceptions/client_error')
-
 class PlaylistsService extends PostgresBase {
-  #tableName = Playlist.tableName
+  #collaborationService
+  #songsService
+
+  /**
+   * Constructs Playlists Service
+   *
+   * @param {CollaborationsService} collaborationsService Collaborations Service
+   * @param {SongsService} songsService Songs Service
+   */
+  constructor (collaborationsService, songsService) {
+    super()
+    this.#collaborationService = collaborationsService
+    this.#songsService = songsService
+  }
 
   /**
    * Verifies playlist ownership
@@ -25,12 +40,12 @@ class PlaylistsService extends PostgresBase {
    */
   verifyPlaylistOwner = async (playlistId, userId) => {
     const query = {
-      text: `SELECT * FROM ${this.#tableName} WHERE id = $1`,
+      text: `SELECT * FROM ${Playlist.tableName} WHERE id = $1`,
       values: [playlistId]
     }
     const result = await this.db.query(query)
 
-    if (!result.rows.length) {
+    if (result.rowCount === 0) {
       throw new NotFoundError('Playlist not found')
     }
 
@@ -53,10 +68,14 @@ class PlaylistsService extends PostgresBase {
     try {
       return await this.verifyPlaylistOwner(playlistId, userId)
     } catch (error) {
-      if (error instanceof ClientError) {
+      if (error instanceof NotFoundError) {
         throw error
       }
-      // TODO: Collaboration support in the future
+      try {
+        await this.#collaborationService.verifyCollaborator(playlistId, userId)
+      } catch {
+        throw error
+      }
     }
   }
 
@@ -72,7 +91,7 @@ class PlaylistsService extends PostgresBase {
 
     /** @type {QueryConfig} */
     const query = {
-      text: `INSERT INTO ${this.#tableName} (id, name, owner) VALUES ($1, $2, $3) RETURNING id`,
+      text: `INSERT INTO ${Playlist.tableName} (id, name, owner) VALUES ($1, $2, $3) RETURNING id`,
       values: [newPlaylist.id, newPlaylist.name, newPlaylist.ownerId]
     }
 
@@ -95,10 +114,11 @@ class PlaylistsService extends PostgresBase {
   getPlaylists = async (userId) => {
     /** @type {QueryConfig} */
     const query = {
-      text: `SELECT ${this.#tableName}.id, ${this.#tableName}.name, ${User.tableName}.username AS username
-        FROM ${this.#tableName}
-        LEFT JOIN ${User.tableName} ON ${this.#tableName}.owner = ${User.tableName}.id
-        WHERE ${this.#tableName}.owner = $1`,
+      text: `SELECT ${Playlist.tableName}.id, ${Playlist.tableName}.name, ${User.tableName}.username
+        FROM ${Playlist.tableName}
+        LEFT JOIN ${User.tableName} ON ${Playlist.tableName}.owner = ${User.tableName}.id
+        LEFT JOIN ${Collaboration.tableName} ON ${Collaboration.tableName}.playlist_id = ${Playlist.tableName}.id
+        WHERE ${Playlist.tableName}.owner = $1 OR ${Collaboration.tableName}.user_id = $1`,
       values: [userId]
     }
     const result = await this.db.query(query)
@@ -120,10 +140,10 @@ class PlaylistsService extends PostgresBase {
 
     /** @type {QueryConfig} */
     const playlistQuery = {
-      text: `SELECT ${this.#tableName}.id, ${this.#tableName}.name, ${User.tableName}.username AS username
-        FROM ${this.#tableName}
-        LEFT JOIN ${User.tableName} ON ${this.#tableName}.owner = ${User.tableName}.id
-        WHERE ${this.#tableName}.id = $1`,
+      text: `SELECT ${Playlist.tableName}.id, ${Playlist.tableName}.name, ${User.tableName}.username
+        FROM ${Playlist.tableName}
+        LEFT JOIN ${User.tableName} ON ${Playlist.tableName}.owner = ${User.tableName}.id
+        WHERE ${Playlist.tableName}.id = $1`,
       values: [playlistId]
     }
 
@@ -136,10 +156,10 @@ class PlaylistsService extends PostgresBase {
     const playlist = playlistResult.rows.map(Playlist.mapDBToPlaylistListItem)[0]
 
     const playlistSongsQuery = {
-      text: `SELECT playlists_songs.song_id as id, songs.id, songs.title, songs.performer
-        FROM playlists_songs
-        LEFT JOIN songs ON playlists_songs.song_id = songs.id
-        WHERE playlists_songs.playlist_id = $1`,
+      text: `SELECT ${PlaylistSong.tableName}.song_id as id, ${Song.tableName}.id, ${Song.tableName}.title, ${Song.tableName}.performer
+        FROM ${PlaylistSong.tableName}
+        LEFT JOIN ${Song.tableName} ON ${PlaylistSong.tableName}.song_id = ${Song.tableName}.id
+        WHERE ${PlaylistSong.tableName}.playlist_id = $1`,
       values: [playlistId]
     }
 
@@ -163,7 +183,7 @@ class PlaylistsService extends PostgresBase {
 
     /** @type {QueryConfig} */
     const query = {
-      text: `DELETE FROM ${this.#tableName} WHERE id = $1 RETURNING id`,
+      text: `DELETE FROM ${Playlist.tableName} WHERE id = $1 RETURNING id`,
       values: [playlistId]
     }
 
@@ -190,11 +210,11 @@ class PlaylistsService extends PostgresBase {
 
     const { songId } = payload
 
-    const song = await (new SongsService()).getSongById(songId)
+    const song = await this.#songsService.getSongById(songId)
 
     /** @type {QueryConfig} */
     const query = {
-      text: 'INSERT INTO playlists_songs (playlist_id, song_id) VALUES ($1, $2) RETURNING id',
+      text: `INSERT INTO ${PlaylistSong.tableName} (playlist_id, song_id) VALUES ($1, $2) RETURNING id`,
       values: [playlistId, song.id]
     }
 
@@ -226,7 +246,7 @@ class PlaylistsService extends PostgresBase {
 
     /** @type {QueryConfig} */
     const query = {
-      text: 'DELETE FROM playlists_songs WHERE playlist_id = $1 AND song_id = $2 RETURNING id',
+      text: `DELETE FROM ${PlaylistSong.tableName} WHERE playlist_id = $1 AND song_id = $2 RETURNING id`,
       values: [playlistId, song.id]
     }
 
@@ -253,12 +273,12 @@ class PlaylistsService extends PostgresBase {
 
     /** @type {QueryConfig} */
     const query = {
-      text: `SELECT song_id, songs.title, user_id, users.username, action, time
-      FROM playlist_song_activities
-      LEFT JOIN users on playlist_song_activities.user_id = users.id
-      LEFT JOIN songs on playlist_song_activities.song_id = songs.id
+      text: `SELECT song_id, ${Song.tableName}.title, user_id, ${User.tableName}.username, action, time
+      FROM ${PlaylistActivities.tableName}
+      LEFT JOIN ${User.tableName} on ${PlaylistActivities.tableName}.user_id = ${User.tableName}.id
+      LEFT JOIN ${Song.tableName} on ${PlaylistActivities.tableName}.song_id = ${Song.tableName}.id
       WHERE playlist_id = $1
-      ORDER BY playlist_song_activities.id`,
+      ORDER BY ${PlaylistActivities.tableName}.id`,
       values: [playlistId]
     }
     const result = await this.db.query(query)
@@ -278,7 +298,9 @@ class PlaylistsService extends PostgresBase {
 
     /** @type {QueryConfig} */
     const query = {
-      text: 'INSERT INTO playlist_song_activities (playlist_id, song_id, user_id, action) VALUES ($1, $2, $3, $4) RETURNING id',
+      text: `INSERT INTO ${PlaylistActivities.tableName} (playlist_id, song_id, user_id, action)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id`,
       values: [activity.playlistId, activity.songId, activity.userId, activity.action]
     }
 

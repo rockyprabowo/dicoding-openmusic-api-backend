@@ -1,11 +1,9 @@
-const IFluffedUp = require('./developer_error')
-
 /**
  * Represent a secrets missing error.
  *
- * @memberof module:exceptions/developer_error
+ * @memberof module:exceptions/runtime_error
  */
-class SecretsMissing extends IFluffedUp {
+class SecretsMissing extends Error {
   name
 
   /**

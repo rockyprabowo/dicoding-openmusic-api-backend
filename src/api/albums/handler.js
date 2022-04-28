@@ -15,7 +15,7 @@ const { AlbumRequestPayload } = require('~types/data/album')
  * @memberof module:api/albums
  */
 class AlbumsHandler {
-  service
+  albumsService
   validator
   /**
    * Construct a new {@link AlbumsHandler} with {@link AlbumsPluginOptions}
@@ -23,7 +23,7 @@ class AlbumsHandler {
    * @param {AlbumsPluginOptions} options Albums plugin options
    */
   constructor (options) {
-    this.service = options.service
+    this.albumsService = options.albumsService
     this.validator = options.validator
   }
 
@@ -40,7 +40,7 @@ class AlbumsHandler {
 
     const { name, year } = payload
 
-    const album = await this.service.addAlbum({ name, year })
+    const album = await this.albumsService.addAlbum({ name, year })
 
     return h.response({
       status: 'success',
@@ -58,7 +58,7 @@ class AlbumsHandler {
    * @returns {Promise<ResponseObject>} Response
    */
   getAlbumsHandler = async (request, h) => {
-    const albums = await this.service.getAlbums()
+    const albums = await this.albumsService.getAlbums()
 
     return h.response({
       status: 'success',
@@ -74,7 +74,7 @@ class AlbumsHandler {
    */
   getAlbumByIdHandler = async (request, h) => {
     const { id } = request.params
-    const album = await this.service.getAlbumById(id)
+    const album = await this.albumsService.getAlbumById(id)
 
     return h.response({
       status: 'success',
@@ -96,7 +96,7 @@ class AlbumsHandler {
 
     const { name, year } = payload
 
-    await this.service.editAlbumById(id, { name, year })
+    await this.albumsService.editAlbumById(id, { name, year })
 
     return h.response({
       status: 'success',
@@ -113,7 +113,7 @@ class AlbumsHandler {
   deleteAlbumByIdHandler = async (request, h) => {
     const { id } = request.params
 
-    await this.service.deleteAlbumById(id)
+    await this.albumsService.deleteAlbumById(id)
 
     return h.response({
       status: 'success',

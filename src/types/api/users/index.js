@@ -12,7 +12,7 @@
  * Represents the options for {@link UsersPlugin}
  *
  * @typedef {object} UsersPluginOptions
- * @property {UsersService} service Service for {@link UsersHandler}
+ * @property {UsersService} usersService Service for {@link UsersHandler}
  * @property {UserValidator} validator Validator for {@link UsersHandler}
  */
 

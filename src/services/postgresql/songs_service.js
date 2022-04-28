@@ -17,8 +17,6 @@ const NotFoundError = require('@exceptions/not_found_error')
  * @augments PostgresBase
  */
 class SongsService extends PostgresBase {
-  #tableName = Song.tableName
-
   /**
    * Adds a {@link Song} into the database.
    *
@@ -31,7 +29,7 @@ class SongsService extends PostgresBase {
 
     /** @type {QueryConfig} */
     const query = {
-      text: `INSERT INTO ${this.#tableName} (id, title, year, genre, performer, duration, album_id)
+      text: `INSERT INTO ${Song.tableName} (id, title, year, genre, performer, duration, album_id)
       VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING id`,
       values: [
@@ -58,7 +56,7 @@ class SongsService extends PostgresBase {
   getSongs = async (filters) => {
     /** @type {QueryConfig} */
     const baseQuery = {
-      text: `SELECT * FROM ${this.#tableName}`,
+      text: `SELECT * FROM ${Song.tableName}`,
       values: []
     }
 
@@ -98,7 +96,7 @@ class SongsService extends PostgresBase {
   getSongById = async (id) => {
     /** @type {QueryConfig} */
     const query = {
-      text: `SELECT * FROM ${this.#tableName} WHERE id = $1`,
+      text: `SELECT * FROM ${Song.tableName} WHERE id = $1`,
       values: [id]
     }
 
@@ -121,7 +119,7 @@ class SongsService extends PostgresBase {
    */
   editSongById = async (id, payload) => {
     const query = {
-      text: `UPDATE ${this.#tableName}
+      text: `UPDATE ${Song.tableName}
           SET title = $1, year = $2, genre = $3, performer = $4, duration = $5, album_id = $6
           WHERE id = $7 RETURNING id`,
       values: [payload.title, payload.year, payload.genre, payload.performer, payload.duration, payload.albumId, id]
@@ -146,7 +144,7 @@ class SongsService extends PostgresBase {
   deleteSongById = async (id) => {
     /** @type {QueryConfig} */
     const query = {
-      text: `DELETE FROM ${this.#tableName} WHERE id = $1 RETURNING id`,
+      text: `DELETE FROM ${Song.tableName} WHERE id = $1 RETURNING id`,
       values: [id]
     }
 

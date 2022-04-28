@@ -49,3 +49,15 @@ exports.genericPreResponseHandler = (request, h) => {
 exports.printAsciiArtLogo = () => {
   console.log(require('./ascii_art.json').projectNameArt)
 }
+
+/**
+ * Authentication route options hook
+ *
+ * @param {string} strategyName Authentication Strategy Name
+ * @returns {{options: { auth: string }}} Authentication route options
+ */
+exports.useRouteAuthStrategy = (strategyName) => ({
+  options: {
+    auth: strategyName
+  }
+})

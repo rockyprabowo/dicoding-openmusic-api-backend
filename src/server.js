@@ -6,20 +6,22 @@ const path = require('path')
 const { printAsciiArtLogo } = require('@utils/index')
 
 const AlbumsService = require('@services/postgresql/albums_service')
-const { AlbumValidator } = require('@validators/album')
+const AlbumValidator = require('@validators/album')
 
 const SongsService = require('@services/postgresql/songs_service')
-const { SongValidator } = require('@validators/song')
+const SongValidator = require('@validators/song')
 
-const AuthenticationService = require('@services/postgresql/authentication_service')
+const AuthenticationsService = require('@services/postgresql/authentications_service')
 const AuthenticationValidators = require('@validators/authentication')
 const TokenManager = require('@utils/tokenise/token_manager')
 
 const UsersService = require('@services/postgresql/users_service')
-const { UserValidator } = require('@validators/user')
+const UserValidator = require('@validators/user')
 
-const PlaylistValidators = require('@validators/playlist')
 const PlaylistsService = require('@services/postgresql/playlists_service')
+const PlaylistValidators = require('@validators/playlist')
+const CollaborationsService = require('@services/postgresql/collaborations_service')
+const CollaborationValidator = require('@validators/collaboration')
 
 /**
  * Server module
@@ -48,6 +50,13 @@ const server = Hapi.server({
  * @returns {Promise<Hapi.Server>} Hapi server object
  */
 const registerPlugins = async () => {
+  const songsService = new SongsService()
+  const albumsService = new AlbumsService(songsService)
+  const authenticationsService = new AuthenticationsService()
+  const usersService = new UsersService()
+  const collaborationsService = new CollaborationsService(usersService)
+  const playlistsService = new PlaylistsService(collaborationsService, songsService)
+
   /**
    * @param {any} artifacts JWT artifacts
    * @returns {{isValid: boolean, credentials: {id: string}}} Validation result
@@ -88,8 +97,8 @@ const registerPlugins = async () => {
   server.register({
     plugin: require('./api/authentications'),
     options: {
-      authenticationsService: new AuthenticationService(),
-      usersService: new UsersService(),
+      authenticationsService,
+      usersService,
       validators: AuthenticationValidators,
       tokenManager: new TokenManager()
     },
@@ -98,12 +107,25 @@ const registerPlugins = async () => {
     }
   })
 
-  // Authentications Plugin
+  // Collaborations Plugin
+  server.register({
+    plugin: require('./api/collaborations'),
+    options: {
+      collaborationsService,
+      playlistsService,
+      validator: new CollaborationValidator()
+    },
+    routes: {
+      prefix: '/collaborations'
+    }
+  })
+
+  // Playlist Plugin
   server.register({
     plugin: require('./api/playlists'),
     options: {
-      service: new PlaylistsService(),
-      validator: PlaylistValidators
+      playlistsService,
+      validators: PlaylistValidators
     },
     routes: {
       prefix: '/playlists'
@@ -114,8 +136,8 @@ const registerPlugins = async () => {
   server.register({
     plugin: require('./api/users'),
     options: {
-      service: new UsersService(),
-      validator: UserValidator
+      usersService,
+      validator: new UserValidator()
     },
     routes: {
       prefix: '/users'
@@ -126,8 +148,8 @@ const registerPlugins = async () => {
   server.register({
     plugin: require('./api/albums'),
     options: {
-      service: new AlbumsService(),
-      validator: AlbumValidator
+      albumsService,
+      validator: new AlbumValidator()
     },
     routes: {
       prefix: '/albums'
@@ -138,8 +160,8 @@ const registerPlugins = async () => {
   server.register({
     plugin: require('./api/songs'),
     options: {
-      service: new SongsService(),
-      validator: SongValidator
+      songsService,
+      validator: new SongValidator()
     },
     routes: {
       prefix: '/songs'

@@ -15,13 +15,23 @@ const { SongListItem } = require('~types/data/song')
  */
 
 /**
+ * Represent a Playlist Song
  *
+ * @memberof module:data/playlist
+ */
+class PlaylistSong {
+  static tableName = 'playlists_songs'
+}
+/**
+ * Represents a Playlist
+ *
+ * @memberof module:data/playlist
  */
 class Playlist {
   static tableName = 'playlists'
   id
   name
-  username
+  #ownerUsername
 
   /** @type {(string | undefined)} */
   #ownerId
@@ -66,7 +76,7 @@ class Playlist {
 
   /**
    * Owner setter.
-   * Sets owner and owner ID.
+   * Sets owner, owner ID, and owner username.
    *
    * @param {(User | undefined)} owner Owner user object
    */
@@ -74,7 +84,7 @@ class Playlist {
     if (owner?.id) {
       this.#owner = owner
       this.#ownerId = owner.id
-      this.username = owner.username
+      this.#ownerUsername = owner.username
     }
   }
 
@@ -88,7 +98,7 @@ class Playlist {
     this.name = payload.name
     this.#ownerId = payload.ownerId
     if (payload.username) {
-      this.username = payload.username
+      this.#ownerUsername = payload.username
     }
     this.songs = payload.songs
   }
@@ -129,9 +139,10 @@ class Playlist {
   toJSON () {
     return {
       ...this,
+      username: this.#ownerUsername,
       songs: this.songs
     }
   }
 }
 
-module.exports = Playlist
+module.exports = { Playlist, PlaylistSong }

@@ -1,8 +1,8 @@
-const { PlaylistsPluginOptions } = require('~types/api/playlists')
-const { Plugin } = require('~types/api')
 const { PlaylistsHandler } = require('./handler')
 const routes = require('./routes')
 const { genericPreResponseHandler } = require('@utils')
+const { Plugin } = require('~types/api')
+const { PlaylistsPluginOptions } = require('~types/api/playlists')
 
 /**
  * OpenMusic API - Playlists API
