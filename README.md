@@ -14,6 +14,7 @@ OpenMusic API project submission for Backend Fundamental course on Dicoding.
 Run this command from your terminal/shell:
 
 ```shell
+npm install
 npm run keys:generate
 docker compose up
 ```
