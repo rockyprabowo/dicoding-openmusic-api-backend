@@ -242,7 +242,7 @@ class PlaylistsService extends PostgresBase {
     await this.verifyPlaylistAccess(playlistId, userId)
     const { songId } = payload
 
-    const song = await (new SongsService()).getSongById(songId)
+    const song = await this.#songsService.getSongById(songId)
 
     /** @type {QueryConfig} */
     const query = {

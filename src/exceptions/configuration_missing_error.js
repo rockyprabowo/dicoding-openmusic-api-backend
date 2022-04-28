@@ -3,6 +3,7 @@
  *
  * @module exceptions/runtime_error
  */
+
 /**
  * Represent a secrets missing error.
  *
