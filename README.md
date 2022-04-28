@@ -5,7 +5,7 @@ OpenMusic API project submission for Backend Fundamental course on Dicoding.
 ## Requirements
 
 - Node.js 14.*
-- PostgreSQL >= 9.*
+- PostgreSQL >= 12.*
 
 ## Quick Start
 
@@ -26,8 +26,8 @@ Run these command from your terminal/shell to migrate:
 
 ```shell
 npm install
-npn run keys:generate
-npn run db:create
+npm run keys:generate
+npm run db:create
 npm run migrate up
 ```
 
@@ -37,4 +37,4 @@ Then, run this command to start the development server:
 npm run dev
 ```
 
-Development server will be available to your machine via port set on PORT environment variables.
+Development server will be available on your machine via the port you've set on PORT environment variables.
