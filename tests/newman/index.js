@@ -1,7 +1,7 @@
 const newman = require('newman')
 
 newman.run({
-  collection: require('./collections/Open Music API V2 Test.postman_collection.json'),
+  collection: require('./collections/Open Music API V3 Test.postman_collection.json'),
   environment: require('./collections/OpenMusic API Test.postman_environment.json'),
   reporters: 'cli'
 }).on('start', function (err, args) {
