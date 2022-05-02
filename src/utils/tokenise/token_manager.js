@@ -1,6 +1,8 @@
 const Jwt = require('@hapi/jwt')
 const InvariantError = require('@exceptions/invariant_error')
 
+// TODO: Define JWT Token Payload object typing
+
 /**
  * Token manager
  *

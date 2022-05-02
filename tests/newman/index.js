@@ -3,7 +3,8 @@ const newman = require('newman')
 newman.run({
   collection: require('./collections/Open Music API V3 Test.postman_collection.json'),
   environment: require('./collections/OpenMusic API Test.postman_environment.json'),
-  reporters: 'cli'
+  reporters: 'cli',
+  workingDir: require('path').resolve(__dirname)
 }).on('start', function (err, args) {
   if (err) {
     throw err

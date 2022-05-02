@@ -106,7 +106,7 @@ class SongsHandler {
   }
 
   /**
-   * Handles `DELETE` request to delete an {@link Song song} with {@link Song.id id}
+   * Handles `DELETE` request to delete a {@link Song song} with {@link Song.id id}
    *
    * @type {LifecycleMethod}
    * @returns {Promise<ResponseObject>} Response

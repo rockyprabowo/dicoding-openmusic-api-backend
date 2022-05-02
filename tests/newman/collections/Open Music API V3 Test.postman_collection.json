@@ -8395,7 +8395,7 @@
 								{
 									"key": "cover",
 									"type": "file",
-									"src": []
+									"src": "files/text-small.txt"
 								}
 							]
 						},
@@ -8449,7 +8449,7 @@
 								{
 									"key": "cover",
 									"type": "file",
-									"src": []
+									"src": "files/picture-large.jpg"
 								}
 							]
 						},
@@ -8510,7 +8510,7 @@
 								{
 									"key": "cover",
 									"type": "file",
-									"src": "mGHcq0kx6/picture-small.jpg"
+									"src": "files/picture-small.jpg"
 								}
 							]
 						},

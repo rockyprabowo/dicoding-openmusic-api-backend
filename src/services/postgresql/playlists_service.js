@@ -171,7 +171,7 @@ class PlaylistsService extends PostgresBase {
   }
 
   /**
-   * Delete an {@link Playlist} with {@link Playlist.id id} from database.
+   * Delete a {@link Playlist} with {@link Playlist.id id} from database.
    *
    * @param {string} playlistId Playlist {@link Playlist.id id}
    * @param {string} userId Owner {@link User.id id}

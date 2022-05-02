@@ -15,6 +15,7 @@ class Validator {
   #schema
 
   /**
+   * Construct a validator
    *
    * @param {Joi.ObjectSchema} schema Joi object schema
    */

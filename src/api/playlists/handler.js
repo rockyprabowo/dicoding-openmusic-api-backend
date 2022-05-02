@@ -19,6 +19,7 @@ const { PlaylistRequestPayload, PlaylistSongRequestPayload } = require('~types/d
 class PlaylistsHandler {
   playlistsService
   validators
+
   /**
    * Construct a new {@link PlaylistsHandler Playlists Handler} with {@link PlaylistsPluginOptions options}
    *
@@ -72,7 +73,7 @@ class PlaylistsHandler {
   }
 
   /**
-   * Handles `DELETE` request to delete an {@link Playlist playlist} with {@link Playlist.id id}
+   * Handles `DELETE` request to delete a {@link Playlist playlist} with {@link Playlist.id id}
    *
    * @type {LifecycleMethod}
    * @returns {Promise<ResponseObject>} Response
