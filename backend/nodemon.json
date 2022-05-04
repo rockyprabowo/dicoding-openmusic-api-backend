@@ -1,0 +1,4 @@
+{
+  "watch": ["../common/src/", "src/"],
+  "ext": "js,mjs,cjs,json"
+}

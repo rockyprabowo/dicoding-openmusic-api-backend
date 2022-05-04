@@ -4,13 +4,15 @@
   ],
   "source": {
     "include": [
-      "src"
+      "./backend/src",
+      "./common/src",
+      "./consumer/src"
     ]
   },
   "opts": {
     "encoding": "utf8",
     "private": true,
-    "destination": "./public/docs/",
+    "destination": "./backend/public/devdocs/",
     "recurse": true,
     "readme": "./README.md"
   }

@@ -8,6 +8,9 @@ services:
     restart: always
     depends_on:
       - db
+      - rabbitmq
+      - mail
+      - redis
     volumes:
       - .:/srv/app
     ports:
@@ -21,8 +24,18 @@ services:
       PGUSER: ${PGUSER}
       PGPASSWORD: ${PGPASSWORD}
       PGDATABASE: ${PGDATABASE}
+      RABBITMQ_SERVER: "amqp://${RABBITMQ_DOCKER_SERVICE_NAME}"
+      RABBITMQ_PORT : ${RABBITMQ_PORT}
+      RABBITMQ_MANAGEMENT_PORT : ${RABBITMQ_MANAGEMENT_PORT}
+      REDIS_SERVER: ${REDIS_DOCKER_SERVICE_NAME}
+      REDIS_PORT : ${REDIS_PORT}
+      MAIL_HOST: ${MAIL_DOCKER_SERVICE_NAME}
+      MAIL_PORT : ${MAIL_PORT}
+      MAIL_ADDRESS  : ${MAIL_ADDRESS}
+      MAIL_PASSWORD : ${MAIL_PASSWORD}
+      MAILHOG_PORT: ${MAILHOG_PORT}
   db:
-    container_name: openmusic_postgres
+    container_name: openmusic_postgresql
     image: postgres:14-alpine
     restart: always
     environment:
@@ -30,7 +43,7 @@ services:
       POSTGRES_PASSWORD: ${PGPASSWORD}
       POSTGRES_DB: ${PGDATABASE}
     ports:
-      - ${PGPORT}:${PGPORT}
+      - ${PGPORT:-5432}:5432
     volumes:
       - db:/var/lib/postgresql/data
     healthcheck:
@@ -45,14 +58,59 @@ services:
     depends_on:
       - db
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMINEMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGPASSWORD}
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_CONFIG_CONSOLE_LOG_LEVEL: 40 # Show error only
     ports:
-      - 5050:80
+      - ${PGADMIN_PORT:-5050}:80
     volumes:
       - pgadmin:/var/lib/pgadmin
+  rabbitmq:
+    container_name: openmusic_rabbitmq
+    image: rabbitmq:3-management-alpine
+    restart: always
+    ports:
+      - ${RABBITMQ_PORT:-5672}:5672
+      - ${RABBITMQ_MANAGEMENT_PORT:-15672}:15672
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq
+      - type: bind
+        source: ./__docker/etc/rabbitmq/conf.d/99-log-level-error.conf
+        target: /etc/rabbitmq/conf.d/99-log-level-error.conf
+        read_only: true
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 5s
+      timeout: 10s
+      retries: 10
+  mail:
+    container_name: openmusic_mailhog
+    image: 'mailhog/mailhog:latest'
+    logging:
+      driver: none
+    restart: always
+    ports:
+      - '${MAIL_PORT:-1025}:1025'
+      - '${MAILHOG_PORT:-8025}:8025'
+  redis:
+    container_name: openmusic_redis
+    image: redis:6-alpine
+    restart: always
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    command: redis-server --save 120 1 --loglevel warning
+    volumes:
+      - redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      retries: 3
+      timeout: 5s
 volumes:
   db:
     driver: local
   pgadmin:
+    driver: local
+  rabbitmq:
+    driver: local
+  redis:
     driver: local

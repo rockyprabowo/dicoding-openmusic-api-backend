@@ -5,6 +5,7 @@ OpenMusic API project submission for Backend Fundamental course on Dicoding.
 ## Requirements
 
 - Node.js 14.*
+- yarn 1.*
 - PostgreSQL >= 12.*
 
 ## Quick Start
@@ -14,8 +15,8 @@ OpenMusic API project submission for Backend Fundamental course on Dicoding.
 Run this command from your terminal/shell:
 
 ```shell
-npm install
-npm run keys:generate
+yarn install
+yarn workspace "@openmusic/api" run keys:generate
 docker compose up
 ```
 
@@ -26,16 +27,16 @@ Make sure that you have all of the requirements installed first and you have set
 Run these command from your terminal/shell to migrate:
 
 ```shell
-npm install
-npm run keys:generate
-npm run db:create
-npm run migrate up
+yarn install
+yarn workspace "@openmusic/api" run keys:generate
+yarn workspace "@openmusic/api" run db:create
+yarn workspace "@openmusic/api" run migrate up
 ```
 
 Then, run this command to start the development server:
 
 ```shell
-npm run dev
+yarn run dev
 ```
 
 Development server will be available on your machine via the port you've set on PORT environment variables.

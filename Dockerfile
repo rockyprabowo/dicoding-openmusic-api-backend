@@ -1,21 +1,21 @@
 FROM node:14-alpine as base
 
 WORKDIR /srv/app
-ADD https://raw.githubusercontent.com/eficode/wait-for/master/wait-for /usr/local/bin/wait-for
-COPY package*.json .
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh ; chmod +x /usr/local/bin/wait-for
 EXPOSE 5000
+COPY package.json yarn.lock ./
+COPY docker-entrypoint.sh /usr/local/bin/
+ADD https://raw.githubusercontent.com/eficode/wait-for/501e6d97c55c7a0880de36d7147283f568b9170f/wait-for /usr/local/bin/wait-for
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh ; chmod +x /usr/local/bin/wait-for
 ENTRYPOINT [ "docker-entrypoint.sh" ]
 
 FROM base as production
 ENV NODE_ENV=production
-RUN npm ci
+RUN yarn install --frozen-lockfile
 COPY . .
-CMD ["node", "."]
+CMD ["yarn", "run", "start"]
 
 FROM base as dev
 ENV NODE_ENV=development
-RUN npm install
+RUN yarn install
 COPY . .
-CMD ["npm", "run", "dev"]
+CMD ["yarn", "run", "dev"]

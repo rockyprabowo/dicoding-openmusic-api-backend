@@ -1,0 +1,36 @@
+{
+  "name": "@openmusic/common",
+  "private": true,
+  "version": "3.0.0",
+  "description": "Dicoding Fundamental Backend Class Submission - OpenMusic API - Shared Codebase",
+  "exports": {
+    "./data/*": "./src/data/*.js",
+    "./exceptions/*": "./src/exceptions/*.js",
+    "./services/*": "./src/services/*.js",
+    "./types/*": "./src/types/*.js"
+  },
+  "scripts": {
+    "start": "echo \"No entrypoint for this package\"",
+    "dev": "echo \"No entrypoint for this package\"",
+    "lint": "eslint ./src",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rockyprabowo/dicoding-openmusic-api-backend.git"
+  },
+  "keywords": [
+    "dicoding",
+    "backend-course"
+  ],
+  "author": "Rocky Prabowo <rocky@lazycats.id>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rockyprabowo/dicoding-openmusic-api-backend/issues"
+  },
+  "homepage": "https://github.com/rockyprabowo/dicoding-openmusic-api-backend#readme",
+  "dependencies": {
+    "nanoid": "^3.3.4",
+    "pg": "^8.7.3"
+  }
+}
