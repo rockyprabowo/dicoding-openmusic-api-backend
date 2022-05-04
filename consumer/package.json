@@ -25,6 +25,10 @@
   },
   "homepage": "https://github.com/rockyprabowo/dicoding-openmusic-api-backend#readme",
   "dependencies": {
-    "@openmusic/common": "^1.0.0"
+    "@openmusic/common": "^3.0.0",
+    "nodemailer": "^6.7.5"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^6.4.4"
   }
 }
