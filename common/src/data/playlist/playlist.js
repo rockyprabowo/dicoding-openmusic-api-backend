@@ -89,6 +89,13 @@ class Playlist {
   }
 
   /**
+   * Omits username from this object
+   */
+  omitUsername = () => {
+    this.#ownerUsername = undefined
+  }
+
+  /**
    * Construct a new {@link Playlist}
    *
    * @param {PlaylistRequestPayload} payload Object payload
