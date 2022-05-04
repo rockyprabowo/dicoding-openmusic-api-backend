@@ -9,11 +9,11 @@ class CollaborationsService extends PostgresBase {
   /**
    * Construct a {@link CollaborationsService}
    *
-   * @param {UsersService} usersService Users services
+   * @param {UsersService} [usersService] Users services
    */
   constructor (usersService) {
     super()
-    this.#usersService = usersService
+    this.#usersService = usersService ?? new UsersService()
   }
 
   /**

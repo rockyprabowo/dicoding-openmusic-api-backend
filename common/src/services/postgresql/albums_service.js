@@ -23,11 +23,11 @@ class AlbumsService extends PostgresBase {
   /**
    * Construct an {@link AlbumsService}
    *
-   * @param {SongsService} songsService Songs Service
+   * @param {SongsService} [songsService] Songs Service
    */
   constructor (songsService) {
     super()
-    this.#songsService = songsService
+    this.#songsService = songsService ?? new SongsService()
   }
 
   /**

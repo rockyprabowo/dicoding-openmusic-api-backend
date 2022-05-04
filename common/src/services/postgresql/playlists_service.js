@@ -23,13 +23,13 @@ class PlaylistsService extends PostgresBase {
   /**
    * Constructs Playlists Service
    *
-   * @param {CollaborationsService} collaborationsService Collaborations Service
-   * @param {SongsService} songsService Songs Service
+   * @param {CollaborationsService} [collaborationsService] Collaborations Service
+   * @param {SongsService} [songsService] Songs Service
    */
   constructor (collaborationsService, songsService) {
     super()
-    this.#collaborationService = collaborationsService
-    this.#songsService = songsService
+    this.#collaborationService = collaborationsService ?? new CollaborationsService()
+    this.#songsService = songsService ?? new SongsService()
   }
 
   /**
@@ -167,6 +167,20 @@ class PlaylistsService extends PostgresBase {
 
     playlist.songs = playlistSongsResult.rows.map(Song.mapDBToSongListItem)
 
+    return playlist
+  }
+
+  /**
+   * Get a {@link Playlist} with its {@link Song songs} by its {@link Playlist.id id} from the database for exporting.
+   *
+   * @param {string} playlistId Owner ID
+   * @param {string} userId User ID
+   * @returns {Promise<Playlist>} Playlist with {@link Playlist,id id}
+   * @async
+   */
+  getPlaylistByIdForExport = async (playlistId, userId) => {
+    const playlist = await this.getPlaylistById(playlistId, userId)
+    playlist.omitUsername()
     return playlist
   }
 
