@@ -48,7 +48,8 @@ const prerequisiteCheck = () => {
     'ACCESS_TOKEN_AGE',
     'RABBITMQ_SERVER',
     'MAIL_HOST', 'MAIL_PORT', 'MAIL_ADDRESS', 'MAIL_PASSWORD',
-    'REDIS_SERVER'
+    'REDIS_SERVER',
+    'STORAGE_MODE'
   ]
 
   const missingConfigurations = []
@@ -66,6 +67,19 @@ const prerequisiteCheck = () => {
       missingConfigurations.push(configurationName)
     }
   }
+
+  if (process.env.STORAGE_MODE === 's3') {
+    if (!process.env.AWS_ACCESS_KEY_ID) {
+      throw new SecretsMissing('AWS_ACCESS_KEY_ID environment variable is missing')
+    }
+    if (!process.env.AWS_SECRET_ACCESS_KEY) {
+      throw new SecretsMissing('AWS_SECRET_ACCESS_KEY environment variable is missing')
+    }
+    if (!process.env.AWS_BUCKET_NAME) {
+      missingConfigurations.push('AWS_BUCKET_NAME')
+    }
+  }
+
   if (missingConfigurations.length > 0) {
     throw new ConfigurationMissing(`Environment variable is missing: \n\t${missingConfigurations.join('\n\t')}`)
   }
