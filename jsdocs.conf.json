@@ -1,6 +1,7 @@
 {
   "plugins": [
-    "jsdoc-ts-utils"
+    "jsdoc-ts-utils",
+    "jsdoc-plugin-intersection"
   ],
   "source": {
     "include": [
