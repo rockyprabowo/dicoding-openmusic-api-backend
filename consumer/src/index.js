@@ -1,3 +1,5 @@
+require('dotenv').config({ path: require('path').join(__dirname, '../../.env') })
+
 const amqp = require('amqplib')
 const PlaylistService = require('@openmusic/common/services/postgresql/playlists_service')
 const PlaylistExportMailer = require('./mailers/playlist_export_mailer')
