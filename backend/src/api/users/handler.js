@@ -1,6 +1,6 @@
 const { LifecycleMethod, ResponseObject } = require('~types/api')
 const { UsersPluginOptions } = require('~types/api/users')
-const { UserRequestPayload } = require('@openmusic/common/types/data/user/index')
+const { UserRequestPayload } = require('@openmusic/common/types/data/user')
 /**
  * Users Plugin - Handler class
  *

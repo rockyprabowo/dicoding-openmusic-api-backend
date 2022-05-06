@@ -1,7 +1,11 @@
 const Song = require('../../data/song/song')
 const User = require('../../data/user/user')
 const { nanoid } = require('nanoid')
-const { PlaylistRequestPayload, PlaylistDbRow, PlaylistDbRowWithUsername } = require('../../types/data/playlist')
+const {
+  PlaylistRequestPayload,
+  PlaylistDbRow,
+  PlaylistDbRowWithUsername
+} = require('../../types/data/playlist')
 const { SongListItem } = require('../../types/data/song')
 
 /**

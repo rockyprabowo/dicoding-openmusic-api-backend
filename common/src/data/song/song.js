@@ -1,5 +1,9 @@
 const { nanoid } = require('nanoid')
-const { SongRequestPayload, SongDbRow, SongListItem } = require('../../types/data/song')
+const {
+  SongRequestPayload,
+  SongDbRow,
+  SongListItem
+} = require('../../types/data/song')
 
 /**
  * OpenMusic API - Song data model

@@ -1,8 +1,8 @@
 {
   "name": "@openmusic/common",
-  "private": true,
   "version": "3.0.0",
   "description": "Dicoding Fundamental Backend Class Submission - OpenMusic API - Shared Codebase",
+  "private": true,
   "exports": {
     "./data/*": "./src/data/*.js",
     "./exceptions/*": "./src/exceptions/*.js",

@@ -1,6 +1,6 @@
 const { nanoid } = require('nanoid')
 const Song = require('../../data/song/song')
-const { AlbumRequestPayload } = require('../../types/data/album')
+const { AlbumRequestPayload, AlbumDbRow } = require('../../types/data/album')
 const { SongListItem } = require('../../types/data/song')
 /**
  * OpenMusic API - Album data model
@@ -17,6 +17,7 @@ class Album {
   id
   name
   year
+  coverUrl
   /** @type {(Song[] | SongListItem[])}  */
   #songs = []
 
@@ -25,10 +26,11 @@ class Album {
    *
    * @param {AlbumRequestPayload} obj Object payload
    */
-  constructor ({ id, name, year }) {
+  constructor ({ id, name, year, coverUrl }) {
     this.id = id ?? Album.generateId()
     this.name = name
     this.year = year
+    this.coverUrl = coverUrl ?? null
   }
 
   get songs () { return this.#songs }
@@ -43,13 +45,17 @@ class Album {
     return `album-${nanoid(16)}`
   }
 
+  /* eslint-disable camelcase */
+
   /**
    * Maps database result(s) to this data model
    *
-   * @param {AlbumRequestPayload} dbRow Item from database
+   * @param {AlbumDbRow} dbRow Item from database
    * @returns {Album} This data model
    */
-  static mapDBToModel = ({ id, name, year }) => new Album({ id, name, year })
+  static mapDBToModel = ({ id, name, year, cover_url }) => new Album({ id, name, year, coverUrl: cover_url })
+
+  /* eslint-enable camelcase */
 
   toJSON () {
     return {

@@ -1,15 +1,19 @@
 const PostgresBase = require('./base')
 
 const SongsService = require('./songs_service')
-const CollaborationsService = require('./collaborations_service')
+const PlaylistsCollaborationsService = require('./playlists_collaborations_service')
 
 const User = require('../../data/user/user')
 const Song = require('../../data/song/song')
-const Collaboration = require('../../data/collaboration/collaboration')
+const PlaylistCollaboration = require('../../data/playlist/playlist_collaboration')
 const { Playlist, PlaylistSong } = require('../../data/playlist/playlist')
 const { PlaylistActivities, PlaylistActivitiesItem } = require('../../data/playlist/playlist_activities')
 
-const { PlaylistRequestPayload, PlaylistSongRequestPayload, PlaylistActivitiesItemPayload } = require('../../types/data/playlist')
+const {
+  PlaylistRequestPayload,
+  PlaylistSongRequestPayload,
+  PlaylistActivitiesItemPayload
+} = require('../../types/data/playlist')
 const { QueryConfig } = require('../../types/services/postgresql')
 
 const InvariantError = require('../../exceptions/invariant_error')
@@ -17,18 +21,18 @@ const NotFoundError = require('../../exceptions/not_found_error')
 const AuthorisationError = require('../../exceptions/authorisation_error')
 
 class PlaylistsService extends PostgresBase {
-  #collaborationService
+  #playlistsCollaborationService
   #songsService
 
   /**
    * Constructs Playlists Service
    *
-   * @param {CollaborationsService} [collaborationsService] Collaborations Service
+   * @param {PlaylistsCollaborationsService} [collaborationsService] PlaylistsCollaborations Service
    * @param {SongsService} [songsService] Songs Service
    */
   constructor (collaborationsService, songsService) {
     super()
-    this.#collaborationService = collaborationsService ?? new CollaborationsService()
+    this.#playlistsCollaborationService = collaborationsService ?? new PlaylistsCollaborationsService()
     this.#songsService = songsService ?? new SongsService()
   }
 
@@ -72,7 +76,7 @@ class PlaylistsService extends PostgresBase {
         throw error
       }
       try {
-        await this.#collaborationService.verifyCollaborator(playlistId, userId)
+        await this.#playlistsCollaborationService.verifyCollaborator(playlistId, userId)
       } catch {
         throw error
       }
@@ -117,8 +121,8 @@ class PlaylistsService extends PostgresBase {
       text: `SELECT ${Playlist.tableName}.id, ${Playlist.tableName}.name, ${User.tableName}.username
         FROM ${Playlist.tableName}
         LEFT JOIN ${User.tableName} ON ${Playlist.tableName}.owner = ${User.tableName}.id
-        LEFT JOIN ${Collaboration.tableName} ON ${Collaboration.tableName}.playlist_id = ${Playlist.tableName}.id
-        WHERE ${Playlist.tableName}.owner = $1 OR ${Collaboration.tableName}.user_id = $1`,
+        LEFT JOIN ${PlaylistCollaboration.tableName} ON ${PlaylistCollaboration.tableName}.playlist_id = ${Playlist.tableName}.id
+        WHERE ${Playlist.tableName}.owner = $1 OR ${PlaylistCollaboration.tableName}.user_id = $1`,
       values: [userId]
     }
     const result = await this.db.query(query)

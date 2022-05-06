@@ -141,6 +141,29 @@ class AlbumsService extends PostgresBase {
 
     return result.rows[0]
   }
+
+  /**
+   * Edit an {@link Album} cover art URL with {@link Album.id id} from database.
+   *
+   * @param {number} id Album {@link Album.id id}
+   * @param {string} coverArtUrl Cover Art URL
+   * @returns {Promise<{id: string}>} Updated Album {@link Album.id id}
+   * @async
+   */
+  editAlbumCoverArtById = async (id, coverArtUrl) => {
+    const query = {
+      text: `UPDATE ${Album.tableName} SET cover_url = $1 WHERE id = $2 RETURNING id`,
+      values: [coverArtUrl, id]
+    }
+
+    const result = await this.db.query(query)
+
+    if (result.rowCount === 0) {
+      throw new NotFoundError(`Album ${id} update failed. Can't find an album with id ${id}`)
+    }
+
+    return result.rows[0]
+  }
 }
 
 module.exports = AlbumsService

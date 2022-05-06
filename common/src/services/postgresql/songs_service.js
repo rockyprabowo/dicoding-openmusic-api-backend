@@ -1,6 +1,10 @@
 const PostgresBase = require('./base')
 const Song = require('../../data/song/song')
-const { SongRequestPayload, SongsFilterPayload, SongListItem } = require('../../types/data/song')
+const {
+  SongRequestPayload,
+  SongsFilterPayload,
+  SongListItem
+} = require('../../types/data/song')
 const { QueryConfig } = require('../../types/services/postgresql')
 const InvariantError = require('../../exceptions/invariant_error')
 const NotFoundError = require('../../exceptions/not_found_error')

@@ -1,5 +1,7 @@
 {
   "name": "@openmusic/openmusic",
+  "version": "3.0.0",
+  "description": "Dicoding Fundamental Backend Class Submission - OpenMusic API",
   "private": true,
   "workspaces": [
     "common",
@@ -14,7 +16,7 @@
     "docs:build": "jsdoc -c jsdocs.conf.json",
     "docs:dev": "nodemon --exec 'jsdoc -c jsdocs.conf.json'",
     "dev": "concurrently -n dev: -c 'bgBlue.bold.black,bgGreen.bold.black,bgCyan.bold.black' 'yarn:*(!docs):dev'",
-    "start": "concurrently -n : -c 'bgBlue.bold.black,bgGreen.bold.black,bgCyan.bold.black' 'yarn:*(!docs):start'"
+    "start": "concurrently -n prod: -c 'bgBlue.bold.black,bgGreen.bold.black,bgCyan.bold.black' 'yarn:*(!docs):start'"
   },
   "devDependencies": {
     "@types/amqplib": "^0.8.2",

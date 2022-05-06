@@ -1,4 +1,8 @@
-const { PlaylistActivitiesPayload, PlaylistActivitiesItemPayload, PlaylistActivitiesDbRow } = require('../../types/data/playlist')
+const {
+  PlaylistActivitiesPayload,
+  PlaylistActivitiesItemPayload,
+  PlaylistActivitiesDbRow
+} = require('../../types/data/playlist')
 
 /**
  * Represents a Playlist Activities

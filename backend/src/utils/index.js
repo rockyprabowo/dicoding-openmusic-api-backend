@@ -54,10 +54,18 @@ exports.printAsciiArtLogo = () => {
  * Authentication route options hook
  *
  * @param {string} strategyName Authentication Strategy Name
- * @returns {{options: { auth: string }}} Authentication route options
+ * @returns {{ auth: string }}} Authentication route options
  */
-exports.useRouteAuthStrategy = (strategyName) => ({
-  options: {
+exports.useRouteAuthStrategy = (strategyName) => (
+  {
     auth: strategyName
   }
-})
+)
+
+/**
+ * Public URL generator for album cover art
+ *
+ * @param {string} filename Local file name
+ * @returns {string}} Authentication route options
+ */
+exports.publicCoverArtUrlGenerator = (filename) => (`http://${process.env.HOST}:${process.env.PORT}/uploads/images/${filename}`)

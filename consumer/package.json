@@ -1,8 +1,8 @@
 {
   "name": "@openmusic/consumer",
   "version": "1.0.0",
+  "description": "Dicoding Fundamental Backend Class Submission - OpenMusic API - Message Consumer Component",
   "private": true,
-  "description": "Dicoding Fundamental Backend Class Submission - OpenMusic API - Message Consumer",
   "main": "src/index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=production node .",

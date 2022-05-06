@@ -1,6 +1,10 @@
 const { nanoid } = require('nanoid')
 const bcrypt = require('bcrypt')
-const { UserRequestPayload, UserDbRow, UserDbRowWithoutPassword } = require('../../types/data/user')
+const {
+  UserRequestPayload,
+  UserDbRow,
+  UserDbRowWithoutPassword
+} = require('../../types/data/user')
 
 /**
  * OpenMusic API - User data model

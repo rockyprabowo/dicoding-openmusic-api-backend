@@ -1,4 +1,4 @@
-const { AuthenticationRequestPayload, RefreshTokenRequestPayload } = require('@openmusic/common/types/data/authentication/index')
+const { AuthenticationRequestPayload, RefreshTokenRequestPayload } = require('@openmusic/common/types/data/authentication')
 const { AuthenticationsPluginOptions } = require('~types/api/authentications')
 const { LifecycleMethod, ResponseObject } = require('~types/api')
 
@@ -15,20 +15,20 @@ const { LifecycleMethod, ResponseObject } = require('~types/api')
  * @memberof module:api/authentications
  */
 class AuthenticationsHandler {
-  authenticationsService
-  usersService
-  tokenManager
-  validators
+  #authenticationsService
+  #usersService
+  #tokenManager
+  #validators
   /**
    * Construct a new {@link AuthenticationsHandler} with {@link AuthenticationsPluginOptions}
    *
    * @param {AuthenticationsPluginOptions} options Authentications plugin options
    */
   constructor (options) {
-    this.authenticationsService = options.authenticationsService
-    this.usersService = options.usersService
-    this.tokenManager = options.tokenManager
-    this.validators = options.validators
+    this.#authenticationsService = options.authenticationsService
+    this.#usersService = options.usersService
+    this.#tokenManager = options.tokenManager
+    this.#validators = options.validators
   }
 
   /**
@@ -40,15 +40,15 @@ class AuthenticationsHandler {
   postAuthenticationHandler = async (request, h) => {
     const payload = /** @type {AuthenticationRequestPayload} */ (request.payload)
 
-    this.validators.UserRegistrationValidator.validate(payload)
+    this.#validators.UserRegistrationValidator.validate(payload)
 
     const { username, password } = payload
-    const { id } = await this.usersService.verifyUserCredential(username, password)
+    const { id } = await this.#usersService.verifyUserCredential(username, password)
 
-    const accessToken = this.tokenManager.generateAccessToken({ id })
-    const refreshToken = this.tokenManager.generateRefreshToken({ id })
+    const accessToken = this.#tokenManager.generateAccessToken({ id })
+    const refreshToken = this.#tokenManager.generateRefreshToken({ id })
 
-    await this.authenticationsService.addRefreshToken(refreshToken)
+    await this.#authenticationsService.addRefreshToken(refreshToken)
 
     return h.response({
       status: 'success',
@@ -68,13 +68,13 @@ class AuthenticationsHandler {
    */
   putAuthenticationHandler = async (request, h) => {
     const payload = /** @type {RefreshTokenRequestPayload} */ (request.payload)
-    this.validators.RefreshTokenValidator.validate(payload)
+    this.#validators.RefreshTokenValidator.validate(payload)
 
     const { refreshToken } = payload
-    await this.authenticationsService.verifyRefreshToken(refreshToken)
-    const { id } = this.tokenManager.verifyRefreshToken(refreshToken)
+    await this.#authenticationsService.verifyRefreshToken(refreshToken)
+    const { id } = this.#tokenManager.verifyRefreshToken(refreshToken)
 
-    const accessToken = this.tokenManager.generateAccessToken({ id })
+    const accessToken = this.#tokenManager.generateAccessToken({ id })
 
     return h.response({
       status: 'success',
@@ -94,11 +94,11 @@ class AuthenticationsHandler {
   deleteAuthenticationHandler = async (request, h) => {
     const payload = /** @type {RefreshTokenRequestPayload} */ (request.payload)
 
-    this.validators.RefreshTokenValidator.validate(payload)
+    this.#validators.RefreshTokenValidator.validate(payload)
 
     const { refreshToken } = payload
-    await this.authenticationsService.verifyRefreshToken(refreshToken)
-    await this.authenticationsService.deleteRefreshToken(refreshToken)
+    await this.#authenticationsService.verifyRefreshToken(refreshToken)
+    await this.#authenticationsService.deleteRefreshToken(refreshToken)
 
     return h.response({
       status: 'success',

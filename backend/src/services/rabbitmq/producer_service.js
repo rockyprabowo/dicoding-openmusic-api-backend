@@ -8,13 +8,13 @@ class ProducerService {
    * @param {string} message Message
    */
   sendMessage = async (queue, message) => {
-    const connection = await amqp.connect(process.env.RABBITMQ_SERVER)
+    const connection = await amqp.connect(/** @type {string} */ (process.env.RABBITMQ_SERVER))
     const channel = await connection.createChannel()
     await channel.assertQueue(queue, {
       durable: true
     })
 
-    await channel.sendToQueue(queue, Buffer.from(message))
+    channel.sendToQueue(queue, Buffer.from(message))
 
     setTimeout(() => {
       connection.close()

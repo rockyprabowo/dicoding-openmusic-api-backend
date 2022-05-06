@@ -3,7 +3,7 @@ const Inert = require('@hapi/inert')
 const Jwt = require('@hapi/jwt')
 const path = require('path')
 
-const { printAsciiArtLogo } = require('~utils/index')
+const { printAsciiArtLogo, publicCoverArtUrlGenerator } = require('~utils/index')
 
 const AlbumsService = require('@openmusic/common/services/postgresql/albums_service')
 const AlbumValidator = require('~validators/album')
@@ -20,8 +20,18 @@ const UserValidator = require('~validators/user')
 
 const PlaylistsService = require('@openmusic/common/services/postgresql/playlists_service')
 const PlaylistValidators = require('~validators/playlist')
-const CollaborationsService = require('@openmusic/common/services/postgresql/collaborations_service')
-const CollaborationValidator = require('~validators/collaboration')
+
+const PlaylistsCollaborationsService = require('@openmusic/common/services/postgresql/playlists_collaborations_service')
+const PlaylistCollaborationValidator = require('~validators/playlist_collaboration')
+
+const ProducerService = require('~services/rabbitmq/producer_service')
+
+const ExportPlaylistValidator = require('~validators/export_playlist')
+
+const ImageUploadValidator = require('~validators/image_upload')
+
+const S3StorageService = require('~services/s3/s3_storage_service')
+const LocalStorageService = require('~services/local_storage/local_storage_service')
 
 /**
  * Server module
@@ -54,8 +64,16 @@ const registerPlugins = async () => {
   const albumsService = new AlbumsService(songsService)
   const authenticationsService = new AuthenticationsService()
   const usersService = new UsersService()
-  const collaborationsService = new CollaborationsService(usersService)
-  const playlistsService = new PlaylistsService(collaborationsService, songsService)
+  const playlistsCollaborationsService = new PlaylistsCollaborationsService(usersService)
+  const playlistsService = new PlaylistsService(playlistsCollaborationsService, songsService)
+  const producerService = new ProducerService()
+  const localImageUploadTarget = path.resolve(__dirname, '../public/uploads/images/')
+  const activeStorageService = (process.env.STORAGE_MODE === 's3')
+    ? new S3StorageService()
+    : new LocalStorageService(
+      localImageUploadTarget,
+      publicCoverArtUrlGenerator
+    )
 
   /**
    * @param {any} artifacts JWT artifacts
@@ -82,89 +100,125 @@ const registerPlugins = async () => {
     validate: validateJwt
   })
 
-  // Developers Documentation Plugin
-  server.register({
-    plugin: require('./api/devdocs'),
-    options: {
-      docsPath: path.resolve(__dirname, '../public/devdocs')
+  await server.register([
+    // Developers Documentation Plugin
+    {
+      plugin: require('./api/devdocs'),
+      options: {
+        docsPath: path.resolve(__dirname, '../public/devdocs')
+      },
+      routes: {
+        prefix: '/devdocs'
+      }
     },
-    routes: {
-      prefix: '/devdocs'
+    // Authentications Plugin
+    {
+      plugin: require('./api/authentications'),
+      options: {
+        authenticationsService,
+        usersService,
+        validators: AuthenticationValidators,
+        tokenManager: new TokenManager()
+      },
+      routes: {
+        prefix: '/authentications'
+      }
+    },
+    // Users Plugin
+    {
+      plugin: require('./api/users'),
+      options: {
+        usersService,
+        validator: new UserValidator()
+      },
+      routes: {
+        prefix: '/users'
+      }
+    },
+    // Albums Plugin
+    {
+      plugin: require('./api/albums'),
+      options: {
+        albumsService,
+        validator: new AlbumValidator()
+      },
+      routes: {
+        prefix: '/albums'
+      }
+    },
+    // Album cover art Plugin
+    {
+      plugin: require('./api/albums/cover_art'),
+      options: {
+        albumsService,
+        storageService: activeStorageService,
+        validator: new ImageUploadValidator()
+      }
+    },
+    // Songs Plugin
+    {
+      plugin: require('./api/songs'),
+      options: {
+        songsService,
+        validator: new SongValidator()
+      },
+      routes: {
+        prefix: '/songs'
+      }
+    },
+    // Playlists Collaborations Plugin
+    {
+      plugin: require('./api/playlists/collaborations'),
+      options: {
+        playlistsCollaborationsService,
+        playlistsService,
+        validator: new PlaylistCollaborationValidator()
+      },
+      routes: {
+        prefix: '/collaborations'
+      }
+    },
+    // Export Playlist Plugin
+    {
+      plugin: require('./api/exports/playlists'),
+      options: {
+        producerService,
+        playlistsService,
+        validator: new ExportPlaylistValidator()
+      },
+      routes: {
+        prefix: '/export/playlists'
+      }
     }
-  })
+  ])
 
-  // Authentications Plugin
-  server.register({
-    plugin: require('./api/authentications'),
-    options: {
-      authenticationsService,
-      usersService,
-      validators: AuthenticationValidators,
-      tokenManager: new TokenManager()
+  // Playlists Plugins
+  await server.register([
+    {
+      plugin: require('./api/playlists'),
+      options: {
+        playlistsService,
+        validators: PlaylistValidators
+      }
     },
-    routes: {
-      prefix: '/authentications'
+    {
+      plugin: require('./api/playlists/songs'),
+      options: {
+        playlistsService,
+        validators: PlaylistValidators
+      }
+    },
+    {
+      plugin: require('./api/playlists/activities'),
+      options: {
+        playlistsService,
+        validators: PlaylistValidators
+      }
     }
-  })
-
-  // Collaborations Plugin
-  server.register({
-    plugin: require('./api/collaborations'),
-    options: {
-      collaborationsService,
-      playlistsService,
-      validator: new CollaborationValidator()
-    },
-    routes: {
-      prefix: '/collaborations'
-    }
-  })
-
-  // Playlist Plugin
-  server.register({
-    plugin: require('./api/playlists'),
-    options: {
-      playlistsService,
-      validators: PlaylistValidators
-    },
+  ],
+  {
     routes: {
       prefix: '/playlists'
-    }
-  })
-
-  // Users Plugin
-  server.register({
-    plugin: require('./api/users'),
-    options: {
-      usersService,
-      validator: new UserValidator()
-    },
-    routes: {
-      prefix: '/users'
-    }
-  })
-
-  // Albums Plugin
-  server.register({
-    plugin: require('./api/albums'),
-    options: {
-      albumsService,
-      validator: new AlbumValidator()
-    },
-    routes: {
-      prefix: '/albums'
-    }
-  })
-
-  // Songs Plugin
-  server.register({
-    plugin: require('./api/songs'),
-    options: {
-      songsService,
-      validator: new SongValidator()
-    },
-    routes: {
-      prefix: '/songs'
     }
   })
 

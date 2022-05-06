@@ -1,4 +1,4 @@
 {
-  "watch": ["../common/src/", "src/"],
+  "watch": ["../common/src/", "src/", "../.env"],
   "ext": "js,mjs,cjs,json"
 }

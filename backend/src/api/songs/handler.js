@@ -1,6 +1,6 @@
 const { LifecycleMethod, ResponseObject } = require('~types/api')
 const { SongsPluginOptions } = require('~types/api/songs')
-const { SongRequestPayload } = require('@openmusic/common/types/data/song/index')
+const { SongRequestPayload } = require('@openmusic/common/types/data/song')
 
 /**
  * Songs Plugin - Handler class
