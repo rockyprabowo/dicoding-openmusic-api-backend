@@ -1,5 +1,6 @@
 const { LifecycleMethod, ResponseObject } = require('~types/api')
 const { PlaylistsPluginOptions } = require('~types/api/playlists')
+const { JWTTokenPayload } = require('~types/utils/tokenise')
 
 /**
  * Playlists Activities Plugin - Handler class
@@ -33,7 +34,7 @@ class PlaylistsActivitiesHandler {
    * @returns {Promise<ResponseObject>} Response
    */
   getPlaylistActivitiesById = async (request, h) => {
-    const { id: credentialId } = /** @type {{id: string}} */ (request.auth.credentials)
+    const { id: credentialId } = /** @type {JWTTokenPayload} */ (request.auth.credentials)
     const { id: playlistId } = request.params
 
     const playlistActivities = await this.#playlistsService.getPlaylistActivities(playlistId, credentialId)

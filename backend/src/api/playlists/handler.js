@@ -1,6 +1,7 @@
 const { LifecycleMethod, ResponseObject } = require('~types/api')
 const { PlaylistsPluginOptions } = require('~types/api/playlists')
 const { PlaylistRequestPayload } = require('@openmusic/common/types/data/playlist')
+const { JWTTokenPayload } = require('~types/utils/tokenise')
 
 /**
  * Playlists Plugin - Handler class
@@ -38,7 +39,7 @@ class PlaylistsHandler {
    */
   postPlaylistHandler = async (request, h) => {
     const payload = /** @type {PlaylistRequestPayload} */ (request.payload)
-    const { id: credentialId } = /** @type {{id: string}} */ (request.auth.credentials)
+    const { id: credentialId } = /** @type {JWTTokenPayload} */ (request.auth.credentials)
 
     this.validators.PlaylistValidator.validate(payload)
 
@@ -62,7 +63,7 @@ class PlaylistsHandler {
    * @returns {Promise<ResponseObject>} Response
    */
   getPlaylistsHandler = async (request, h) => {
-    const { id: credentialId } = /** @type {{id: string}} */ (request.auth.credentials)
+    const { id: credentialId } = /** @type {JWTTokenPayload} */ (request.auth.credentials)
 
     const playlists = await this.playlistsService.getPlaylists(credentialId)
 
@@ -80,7 +81,7 @@ class PlaylistsHandler {
    */
   deletePlaylistByIdHandler = async (request, h) => {
     const { id: playlistId } = request.params
-    const { id: credentialId } = /** @type {{id: string}} */ (request.auth.credentials)
+    const { id: credentialId } = /** @type {JWTTokenPayload} */ (request.auth.credentials)
 
     await this.playlistsService.deletePlaylistById(playlistId, credentialId)
 

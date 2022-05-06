@@ -81,6 +81,7 @@ class UsersService extends PostgresBase {
   }
 
   /**
+   * Verifies user credentials
    *
    * @param {string} username Username
    * @param {string} password Password

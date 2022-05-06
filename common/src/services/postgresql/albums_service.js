@@ -58,7 +58,7 @@ class AlbumsService extends PostgresBase {
   /**
    * Get an {@link Album} by its {@link Album.id id} from database.
    *
-   * @param {number} id Album {@link Album.id id}
+   * @param {string} id Album {@link Album.id id}
    * @returns {Promise<Album>} Album
    * @async
    */
@@ -99,7 +99,7 @@ class AlbumsService extends PostgresBase {
   /**
    * Edit an {@link Album} with {@link Album.id id} from database.
    *
-   * @param {number} id Album {@link Album.id id}
+   * @param {string} id Album {@link Album.id id}
    * @param {AlbumRequestPayload} payload Request Payload
    * @returns {Promise<{id: string}>} Updated Album {@link Album.id id}
    * @async
@@ -122,7 +122,7 @@ class AlbumsService extends PostgresBase {
   /**
    * Delete an {@link Album} with {@link Album.id id} from database.
    *
-   * @param {number} id Album {@link Album.id id}
+   * @param {string} id Album {@link Album.id id}
    * @returns {Promise<{id: string}>} Deleted Album {@link Album.id id}
    * @async
    */
@@ -145,7 +145,7 @@ class AlbumsService extends PostgresBase {
   /**
    * Edit an {@link Album} cover art URL with {@link Album.id id} from database.
    *
-   * @param {number} id Album {@link Album.id id}
+   * @param {string} id Album {@link Album.id id}
    * @param {string} coverArtUrl Cover Art URL
    * @returns {Promise<{id: string}>} Updated Album {@link Album.id id}
    * @async
@@ -163,6 +163,31 @@ class AlbumsService extends PostgresBase {
     }
 
     return result.rows[0]
+  }
+
+  /**
+   * Gets an {@link Album} information by its {@link Album.id id} from database.
+   *
+   * @param {string} id Album {@link Album.id id}
+   * @returns {Promise<Album>} Album
+   * @async
+   */
+  getAlbumInformationById = async (id) => {
+    /** @type {QueryConfig} */
+    const query = {
+      text: `SELECT * FROM ${Album.tableName} WHERE id = $1`,
+      values: [id]
+    }
+
+    const result = await this.db.query(query)
+
+    if (result.rowCount === 0) {
+      throw new NotFoundError(`Can't find an album with id ${id}`)
+    }
+
+    const album = result.rows.map(Album.mapDBToModel)[0]
+
+    return album
   }
 }
 

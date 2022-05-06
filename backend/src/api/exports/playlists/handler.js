@@ -1,6 +1,7 @@
 const { LifecycleMethod, ResponseObject } = require('~types/api')
 const { ExportsPlaylistsPluginOptions } = require('~types/api/exports')
 const { ExportPlaylistRequestPayload, ExportPlaylistQueueMessage } = require('@openmusic/common/types/data/export_playlist')
+const { JWTTokenPayload } = require('~types/utils/tokenise')
 
 class ExportsPlaylistsHandler {
   #producerService
@@ -31,7 +32,7 @@ class ExportsPlaylistsHandler {
 
     const { targetEmail } = payload
     const { id: playlistId } = request.params
-    const { id: userId } = /** @type {{id: string}} */ (request.auth.credentials)
+    const { id: userId } = /** @type {JWTTokenPayload} */ (request.auth.credentials)
 
     await this.#playlistsService.verifyPlaylistOwner(playlistId, userId)
 

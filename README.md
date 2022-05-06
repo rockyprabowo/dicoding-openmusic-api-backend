@@ -7,6 +7,8 @@ OpenMusic API project submission for Backend Fundamental course on Dicoding.
 - Node.js 14.*
 - yarn 1.*
 - PostgreSQL >= 12.*
+- Redis 6
+- RabbitMQ 3
 
 ## Quick Start
 
@@ -19,6 +21,13 @@ yarn install
 yarn workspace "@openmusic/api" run keys:generate
 docker compose up
 ```
+
+Included services
+
+- PostgreSQL 14
+- RabbitMQ 3 with management console
+- MailHog
+- Redis 6
 
 ### Native
 

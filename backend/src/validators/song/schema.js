@@ -8,7 +8,7 @@ const Joi = require('joi')
  */
 const SongPayloadSchema = Joi.object({
   title: Joi.string().required(),
-  year: Joi.number().min(1900).max(2022).required(), // TODO: Cache current year
+  year: Joi.number().min(1900).max(2022).required(),
   genre: Joi.string().required(),
   performer: Joi.string().required(),
   duration: Joi.number(),

@@ -6,6 +6,7 @@ const path = require('path')
 const { printAsciiArtLogo, publicCoverArtUrlGenerator } = require('~utils/index')
 
 const AlbumsService = require('@openmusic/common/services/postgresql/albums_service')
+const AlbumsLikesService = require('@openmusic/common/services/postgresql/albums_likes_service')
 const AlbumValidator = require('~validators/album')
 
 const SongsService = require('@openmusic/common/services/postgresql/songs_service')
@@ -32,6 +33,8 @@ const ImageUploadValidator = require('~validators/image_upload')
 
 const S3StorageService = require('~services/s3/s3_storage_service')
 const LocalStorageService = require('~services/local_storage/local_storage_service')
+
+const CacheService = require('@openmusic/common/services/redis/cache_service')
 
 /**
  * Server module
@@ -60,8 +63,10 @@ const server = Hapi.server({
  * @returns {Promise<Hapi.Server>} Hapi server object
  */
 const registerPlugins = async () => {
+  const cacheService = new CacheService()
   const songsService = new SongsService()
   const albumsService = new AlbumsService(songsService)
+  const albumsLikesService = new AlbumsLikesService(cacheService, albumsService)
   const authenticationsService = new AuthenticationsService()
   const usersService = new UsersService()
   const playlistsCollaborationsService = new PlaylistsCollaborationsService(usersService)
@@ -146,13 +151,23 @@ const registerPlugins = async () => {
         prefix: '/albums'
       }
     },
-    // Album cover art Plugin
+    // Album Cover Art Plugin
     {
       plugin: require('./api/albums/cover_art'),
       options: {
         albumsService,
         storageService: activeStorageService,
         validator: new ImageUploadValidator()
+      }
+    },
+    // Albums Likes Plugin
+    {
+      plugin: require('./api/albums/likes'),
+      options: {
+        albumsLikesService
+      },
+      routes: {
+        prefix: '/albums'
       }
     },
     // Songs Plugin

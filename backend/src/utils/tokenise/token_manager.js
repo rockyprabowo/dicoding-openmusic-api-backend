@@ -1,7 +1,6 @@
 const Jwt = require('@hapi/jwt')
 const InvariantError = require('@openmusic/common/exceptions/invariant_error')
-
-// TODO: Define JWT Token Payload object typing
+const { JWTTokenPayload } = require('~types/utils/tokenise')
 
 /**
  * Token manager
@@ -25,7 +24,7 @@ class TokenManager {
   /**
    * Generates a new access token
    *
-   * @param {{ id: string }} payload Payload
+   * @param {JWTTokenPayload} payload Payload
    * @returns {string} Access Token
    */
   generateAccessToken = (payload) => Jwt.token.generate(payload, this.accessTokenKey)
@@ -33,7 +32,7 @@ class TokenManager {
   /**
    * Generates a new refresh token
    *
-   * @param {{ id: string }} payload Payload
+   * @param {JWTTokenPayload} payload Payload
    * @returns {string} Access Token
    */
   generateRefreshToken = (payload) => Jwt.token.generate(payload, this.refreshTokenKey)
@@ -42,7 +41,7 @@ class TokenManager {
    * Verifies a refresh token
    *
    * @param {string} refreshToken Refresh Token
-   * @returns {{ id: string }} Payload
+   * @returns {JWTTokenPayload} Payload
    */
   verifyRefreshToken = (refreshToken) => {
     try {

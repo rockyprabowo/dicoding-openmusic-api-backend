@@ -1,6 +1,7 @@
 const { LifecycleMethod, ResponseObject } = require('~types/api')
 const { PlaylistsCollaborationsPluginOptions } = require('~types/api/playlists/collaborations')
 const { PlaylistCollaborationRequestPayload } = require('@openmusic/common/types/data/playlist_collaboration')
+const { JWTTokenPayload } = require('~types/utils/tokenise')
 
 /**
  * Playlists Collaborations Plugin - Route Handler
@@ -41,7 +42,7 @@ class PlaylistsCollaborationsHandler {
 
     this.#validator.validate(payload)
 
-    const { id: credentialId } = /** @type {{id: string}} */ (request.auth.credentials)
+    const { id: credentialId } = /** @type {JWTTokenPayload} */ (request.auth.credentials)
     const { playlistId, userId } = payload
 
     await this.#playlistsService.verifyPlaylistOwner(playlistId, credentialId)
@@ -68,7 +69,7 @@ class PlaylistsCollaborationsHandler {
 
     this.#validator.validate(payload)
 
-    const { id: credentialId } = /** @type {{id: string}} */ (request.auth.credentials)
+    const { id: credentialId } = /** @type {JWTTokenPayload} */ (request.auth.credentials)
     const { playlistId, userId } = payload
 
     await this.#playlistsService.verifyPlaylistOwner(playlistId, credentialId)
