@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "ES2017",
+    "allowJs": true,
+    "checkJs": true,
+    "strict": true,
+    "resolveJsonModule": true,
+    "strictNullChecks": true,
+    "baseUrl": "./",
+    "paths": {
+      "@openmusic/common/*": ["../common/src/*"]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "public"
+  ]
+}

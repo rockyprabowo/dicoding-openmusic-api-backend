@@ -1,39 +1,26 @@
 {
-  "name": "dicoding-openmusic-api-backend",
-  "version": "1.0.0",
+  "name": "@openmusic/openmusic",
+  "version": "3.0.0",
   "description": "Dicoding Fundamental Backend Class Submission - OpenMusic API",
-  "main": "src/index.js",
-  "scripts": {
-    "start": "NODE_ENV=production node .",
-    "dev": "nodemon -w src",
-    "docs:build": "jsdoc -c jsdocs.conf.json",
-    "docs:dev": "nodemon --exec 'jsdoc -c jsdocs.conf.json' --watch ./src",
-    "lint": "eslint ./src",
-    "test": "node tests/newman",
-    "keys:generate": "node . --env-generate-keys",
-    "db:create": "node . --create-db",
-    "migrate": "node-pg-migrate"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/rockyprabowo/dicoding-openmusic-api-backend.git"
-  },
-  "keywords": [
-    "dicoding",
-    "backend-course"
+  "private": true,
+  "workspaces": [
+    "common",
+    "consumer",
+    "backend"
   ],
-  "author": "Rocky Prabowo <rocky@lazycats.id>",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/rockyprabowo/dicoding-openmusic-api-backend/issues"
+  "scripts": {
+    "backend:start": "yarn workspace @openmusic/api start",
+    "backend:dev": "yarn workspace @openmusic/api run dev",
+    "consumer:start": "yarn workspace @openmusic/consumer start",
+    "consumer:dev": "yarn workspace @openmusic/consumer run dev",
+    "docs:build": "jsdoc -c jsdocs.conf.json",
+    "docs:dev": "nodemon --exec 'jsdoc -c jsdocs.conf.json'",
+    "dev": "concurrently -n dev: -c 'bgBlue.bold.black,bgGreen.bold.black,bgCyan.bold.black' 'yarn:*(!docs):dev'",
+    "start": "concurrently -n prod: -c 'bgBlue.bold.black,bgGreen.bold.black,bgCyan.bold.black' 'yarn:*(!docs):start'"
   },
-  "homepage": "https://github.com/rockyprabowo/dicoding-openmusic-api-backend#readme",
   "devDependencies": {
+    "@types/amqplib": "^0.8.2",
     "@types/bcrypt": "^5.0.0",
-    "@types/hapi__hapi": "^20.0.10",
-    "@types/hapi__inert": "^5.2.3",
-    "@types/hapi__jwt": "^2.0.1",
-    "@types/newman": "^5.3.0",
     "eslint": "^8.14.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.25.4",
@@ -41,33 +28,16 @@
     "eslint-plugin-n": "^15.2.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.0.0",
-    "newman": "^5.3.2",
-    "nodemon": "^2.0.15"
+    "jsdoc": "^3.6.10",
+    "jsdoc-plugin-intersection": "^1.0.4",
+    "jsdoc-ts-utils": "^2.0.1",
+    "nodemon": "^2.0.16"
   },
   "dependencies": {
-    "@hapi/hapi": "^20.2.1",
-    "@hapi/inert": "^6.0.5",
-    "@hapi/jwt": "^2.1.1",
+    "amqplib": "^0.8.0",
     "bcrypt": "^5.0.1",
+    "concurrently": "^7.1.0",
     "dotenv": "^16.0.0",
-    "joi": "^17.6.0",
-    "jsdoc": "^3.6.10",
-    "jsdoc-ts-utils": "^2.0.1",
-    "module-alias": "^2.2.2",
-    "nanoid": "^3.3.3",
-    "node-pg-migrate": "^6.2.1",
-    "pg": "^8.7.3",
-    "pg-format": "^1.0.4"
-  },
-  "_moduleAliases": {
-    "@root": ".",
-    "~": "./src",
-    "~types": "./src/types",
-    "@api": "./src/api",
-    "@data": "./src/data",
-    "@exceptions": "./src/exceptions",
-    "@services": "./src/services",
-    "@utils": "./src/utils",
-    "@validators": "./src/validators"
+    "module-alias": "^2.2.2"
   }
 }
