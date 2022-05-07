@@ -64,13 +64,13 @@ const server = Hapi.server({
  */
 const registerPlugins = async () => {
   const cacheService = new CacheService()
-  const songsService = new SongsService()
-  const albumsService = new AlbumsService(songsService)
+  const songsService = new SongsService(cacheService)
+  const albumsService = new AlbumsService(cacheService, songsService)
   const albumsLikesService = new AlbumsLikesService(cacheService, albumsService)
   const authenticationsService = new AuthenticationsService()
-  const usersService = new UsersService()
+  const usersService = new UsersService(cacheService)
   const playlistsCollaborationsService = new PlaylistsCollaborationsService(usersService)
-  const playlistsService = new PlaylistsService(playlistsCollaborationsService, songsService)
+  const playlistsService = new PlaylistsService(songsService, playlistsCollaborationsService)
   const producerService = new ProducerService()
   const localImageUploadTarget = path.resolve(__dirname, '../public/uploads/images/')
   const activeStorageService = (process.env.STORAGE_MODE === 's3')

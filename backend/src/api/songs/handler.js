@@ -59,12 +59,12 @@ class SongsHandler {
    */
   getSongsHandler = async (request, h) => {
     const { performer, title } = request.query
-    const songs = await this.songsService.getSongs({ performer, title })
+    const { songs, __fromCache: cached } = await this.songsService.getSongs({ performer, title })
 
     return h.response({
       status: 'success',
       data: { songs }
-    })
+    }).header('X-Data-Source', cached ? 'cache' : 'database')
   }
 
   /**
@@ -75,12 +75,12 @@ class SongsHandler {
    */
   getSongByIdHandler = async (request, h) => {
     const { id } = request.params
-    const song = await this.songsService.getSongById(id)
+    const { song, __fromCache: cached } = await this.songsService.getSongById(id)
 
     return h.response({
       status: 'success',
       data: { song }
-    })
+    }).header('X-Data-Source', cached ? 'cache' : 'database')
   }
 
   /**

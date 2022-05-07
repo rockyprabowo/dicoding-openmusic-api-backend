@@ -1,7 +1,12 @@
 const PostgresBase = require('./base')
 const SongsService = require('./songs_service')
+const CacheService = require('../redis/cache_service')
 const Album = require('../../data/album/album')
-const { AlbumRequestPayload } = require('../../types/data/album')
+const {
+  AlbumRequestPayload,
+  CacheableAlbumCollection,
+  CacheableAlbum
+} = require('../../types/data/album')
 const { QueryConfig } = require('../../types/services/postgresql')
 const InvariantError = require('../../exceptions/invariant_error')
 const NotFoundError = require('../../exceptions/not_found_error')
@@ -15,20 +20,40 @@ const NotFoundError = require('../../exceptions/not_found_error')
 /**
  * Represents a service class related to {@link Album}.
  *
- * @augments PostgresBase
  */
 class AlbumsService extends PostgresBase {
+  #cacheService
   #songsService
 
   /**
    * Construct an {@link AlbumsService}
    *
-   * @param {SongsService} [songsService] Songs Service
+   * @param {CacheService} cacheService Cache Service
+   * @param {SongsService} songsService Songs Service
    */
-  constructor (songsService) {
+  constructor (cacheService, songsService) {
     super()
-    this.#songsService = songsService ?? new SongsService()
+    this.#cacheService = cacheService
+    this.#songsService = songsService
   }
+
+  albumsCacheKey = 'albums'
+
+  /**
+   * Album cache key
+   *
+   * @param {string} id ID
+   * @returns {string} Cache key
+   */
+  albumCacheKey = (id) => (`albums:${id}`)
+
+  /**
+   * Album songs cache key
+   *
+   * @param {string} id ID
+   * @returns {string} Cache key
+   */
+  albumSongsCacheKey = (id) => (`albums:${id}:songs`)
 
   /**
    * Adds an {@link Album} into database.
@@ -52,6 +77,8 @@ class AlbumsService extends PostgresBase {
       throw new InvariantError('Add new album failed')
     }
 
+    await this.#cacheService.delete(this.albumsCacheKey)
+
     return result.rows[0]
   }
 
@@ -59,41 +86,48 @@ class AlbumsService extends PostgresBase {
    * Get an {@link Album} by its {@link Album.id id} from database.
    *
    * @param {string} id Album {@link Album.id id}
-   * @returns {Promise<Album>} Album
+   * @returns {Promise<CacheableAlbum>} Album
    * @async
    */
   getAlbumById = async (id) => {
-    /** @type {QueryConfig} */
-    const query = {
-      text: `SELECT * FROM ${Album.tableName} WHERE id = $1`,
-      values: [id]
+    const { album, __fromCache: albumCached } = await this.getAlbumInformationById(id)
+    const { songs, __fromCache: songsCached } = await this.#songsService.getSongs({ albumId: album.id })
+
+    album.songs = songs
+
+    return {
+      album,
+      __fromCache: albumCached && songsCached
     }
-
-    const result = await this.db.query(query)
-
-    if (result.rowCount === 0) {
-      throw new NotFoundError(`Can't find an album with id ${id}`)
-    }
-
-    const album = result.rows.map(Album.mapDBToModel)[0]
-
-    album.songs = await this.#songsService.getSongs({ albumId: album.id })
-
-    return album
   }
 
   /**
    * Get all {@link Album} from database.
    *
-   * @returns {Promise<Album[]>} Albums
+   * @returns {Promise<CacheableAlbumCollection>} Albums
    * @async
    */
   getAlbums = async () => {
-    const result = await this.db.query(
-      `SELECT * FROM ${Album.tableName}`
-    )
+    try {
+      const cachedAlbums = await this.#cacheService.get(this.albumsCacheKey)
+      return {
+        albums: JSON.parse(cachedAlbums),
+        __fromCache: true
+      }
+    } catch (error) {
+      const queryResult = await this.db.query(
+        `SELECT * FROM ${Album.tableName}`
+      )
 
-    return result.rows.map(Album.mapDBToModel)
+      const albums = queryResult.rows.map(Album.mapDBToModel)
+
+      await this.#cacheService.set(this.albumsCacheKey, JSON.stringify(albums), 60 * 30)
+
+      return {
+        albums,
+        __fromCache: false
+      }
+    }
   }
 
   /**
@@ -115,6 +149,9 @@ class AlbumsService extends PostgresBase {
     if (result.rowCount === 0) {
       throw new NotFoundError(`Album ${id} update failed. Can't find an album with id ${id}`)
     }
+
+    await this.#cacheService.delete(this.albumsCacheKey)
+    await this.#cacheService.delete(this.albumCacheKey(id))
 
     return result.rows[0]
   }
@@ -139,6 +176,10 @@ class AlbumsService extends PostgresBase {
       throw new NotFoundError(`Album ${id} delete failed.`)
     }
 
+    await this.#cacheService.delete(this.albumsCacheKey)
+    await this.#cacheService.delete(this.albumCacheKey(id))
+    await this.#cacheService.delete(this.albumSongsCacheKey(id))
+
     return result.rows[0]
   }
 
@@ -162,6 +203,9 @@ class AlbumsService extends PostgresBase {
       throw new NotFoundError(`Album ${id} update failed. Can't find an album with id ${id}`)
     }
 
+    await this.#cacheService.delete(this.albumsCacheKey)
+    await this.#cacheService.delete(this.albumCacheKey(id))
+
     return result.rows[0]
   }
 
@@ -169,25 +213,39 @@ class AlbumsService extends PostgresBase {
    * Gets an {@link Album} information by its {@link Album.id id} from database.
    *
    * @param {string} id Album {@link Album.id id}
-   * @returns {Promise<Album>} Album
+   * @returns {Promise<CacheableAlbum>} Album
    * @async
    */
   getAlbumInformationById = async (id) => {
+    try {
+      const cachedAlbum = await this.#cacheService.get(this.albumCacheKey(id))
+
+      return {
+        album: JSON.parse(cachedAlbum),
+        __fromCache: true
+      }
+    } catch (error) {
     /** @type {QueryConfig} */
-    const query = {
-      text: `SELECT * FROM ${Album.tableName} WHERE id = $1`,
-      values: [id]
+      const query = {
+        text: `SELECT * FROM ${Album.tableName} WHERE id = $1`,
+        values: [id]
+      }
+
+      const result = await this.db.query(query)
+
+      if (result.rowCount === 0) {
+        throw new NotFoundError(`Can't find an album with id ${id}`)
+      }
+
+      const album = result.rows.map(Album.mapDBToModel)[0]
+
+      await this.#cacheService.set(this.albumCacheKey(id), JSON.stringify(album), 60 * 30)
+
+      return {
+        album,
+        __fromCache: false
+      }
     }
-
-    const result = await this.db.query(query)
-
-    if (result.rowCount === 0) {
-      throw new NotFoundError(`Can't find an album with id ${id}`)
-    }
-
-    const album = result.rows.map(Album.mapDBToModel)[0]
-
-    return album
   }
 }
 

@@ -58,12 +58,12 @@ class AlbumsHandler {
    * @returns {Promise<ResponseObject>} Response
    */
   getAlbumsHandler = async (request, h) => {
-    const albums = await this.#albumsService.getAlbums()
+    const { albums, __fromCache: cached } = await this.#albumsService.getAlbums()
 
     return h.response({
       status: 'success',
       data: { albums }
-    })
+    }).header('X-Data-Source', cached ? 'cache' : 'database')
   }
 
   /**
@@ -74,12 +74,12 @@ class AlbumsHandler {
    */
   getAlbumByIdHandler = async (request, h) => {
     const { id } = request.params
-    const album = await this.#albumsService.getAlbumById(id)
+    const { album, __fromCache: cached } = await this.#albumsService.getAlbumById(id)
 
     return h.response({
       status: 'success',
       data: { album }
-    })
+    }).header('X-Data-Source', cached ? 'cache' : 'database')
   }
 
   /**

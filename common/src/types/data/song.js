@@ -1,3 +1,5 @@
+const Song = require('../../data/song/song')
+
 /**
  * @typedef {object} SongDbRow
  * @property {string} id ID
@@ -36,6 +38,20 @@
  * @property {string} [title] Title
  * @property {string} [performer] Performer
  * @property {string} [albumId] Album ID
+ * @memberof module:data/song
+ */
+
+/**
+ * @typedef {object} CacheableSongCollection
+ * @property {Song[] | SongListItem[]} songs Song collection
+ * @property {boolean} __fromCache Taken from cache
+ * @memberof module:data/song
+ */
+
+/**
+ * @typedef {object} CacheableSong
+ * @property {Song} song Song collection
+ * @property {boolean} __fromCache Taken from cache
  * @memberof module:data/song
  */
 

@@ -18,22 +18,29 @@ const CacheService = require('../redis/cache_service')
 /**
  * Represents a service class related to {@link Album} likes.
  *
- * @augments PostgresBase
  */
 class AlbumsLikesService extends PostgresBase {
   #albumsService
   #cacheService
 
   /**
+   * Like count cache key
+   *
+   * @param {string} id ID
+   * @returns {string} Cache key
+   */
+  likeCountCacheKey = (id) => `likeCount:${id}`
+
+  /**
    * Construct an {@link AlbumsLikesService}
    *
    * @param {CacheService} cacheService Cache service
-   * @param {AlbumsService} [albumsService] Songs Service
+   * @param {AlbumsService} albumsService Songs Service
    */
   constructor (cacheService, albumsService) {
     super()
     this.#cacheService = cacheService
-    this.#albumsService = albumsService ?? new AlbumsService()
+    this.#albumsService = albumsService
   }
 
   /**
@@ -44,29 +51,27 @@ class AlbumsLikesService extends PostgresBase {
    * @async
    */
   getAlbumLikeCountById = async (albumId) => {
-    const likeCountCacheKey = `likeCount:${albumId}`
-
     try {
-      const result = await this.#cacheService.get(likeCountCacheKey)
+      const result = await this.#cacheService.get(this.likeCountCacheKey(albumId))
 
       return {
         ...JSON.parse(result),
         __fromCache: true
       }
     } catch (error) {
-      const album = await this.#albumsService.getAlbumInformationById(albumId)
+      const albumData = await this.#albumsService.getAlbumInformationById(albumId)
 
       /** @type {QueryConfig} */
       const query = {
         text: `SELECT count(*) as likes FROM ${AlbumLike.tableName} WHERE album_id = $1`,
-        values: [album.id]
+        values: [albumData.album.id]
       }
 
       const queryResult = await this.db.query(query)
 
       const result = queryResult.rows.map(AlbumLike.mapLikesCount)[0]
 
-      await this.#cacheService.set(likeCountCacheKey, JSON.stringify(result), 60 * 30)
+      await this.#cacheService.set(this.likeCountCacheKey(albumId), JSON.stringify(result), 60 * 30)
 
       return {
         ...result,
@@ -106,8 +111,7 @@ class AlbumsLikesService extends PostgresBase {
    */
   toggleUserLikeAlbumById = async (albumId, userId) => {
     let queryText = ''
-    const likeCountCacheKey = `likeCount:${albumId}`
-    const album = await this.#albumsService.getAlbumInformationById(albumId)
+    const albumData = await this.#albumsService.getAlbumInformationById(albumId)
     const { liked } = await this.getUserLikeAlbumById(albumId, userId)
 
     if (liked) {
@@ -119,11 +123,11 @@ class AlbumsLikesService extends PostgresBase {
     /** @type {QueryConfig} */
     const query = {
       text: queryText,
-      values: [userId, album.id]
+      values: [userId, albumData.album.id]
     }
 
     await this.db.query(query)
-    await this.#cacheService.delete(likeCountCacheKey)
+    await this.#cacheService.delete(this.likeCountCacheKey(albumId))
     return { liked: !liked }
   }
 }

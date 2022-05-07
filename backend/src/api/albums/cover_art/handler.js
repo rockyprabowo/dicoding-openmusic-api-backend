@@ -49,12 +49,12 @@ class AlbumCoverArtHandler {
 
     this.#validator.validate(payload.cover.hapi.headers)
 
-    const album = await this.#albumsService.getAlbumById(albumId)
+    const albumData = await this.#albumsService.getAlbumById(albumId)
 
     const { cover } = payload
 
     const fileFormat = require('path').extname(cover.hapi.filename)
-    const finalFileName = `${album.id}-cover${fileFormat}`
+    const finalFileName = `${albumData.album.id}-cover${fileFormat}`
     const url = await this.#storageService.writeFile(cover, cover.hapi, finalFileName)
     const result = await this.#albumsService.editAlbumCoverArtById(albumId, url)
 
