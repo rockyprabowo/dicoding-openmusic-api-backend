@@ -41,7 +41,7 @@ class SongsService extends PostgresBase {
    * @param {string} id ID
    * @returns {string} Cache key
    */
-  songCacheKey = (id) => `song:${id}`
+  static songCacheKey = (id) => `song:${id}`
 
   /**
    * Album songs cache key
@@ -49,9 +49,11 @@ class SongsService extends PostgresBase {
    * @param {string} id ID
    * @returns {string} Cache key
    */
-  albumSongsCacheKey = (id) => `albums:${id}:songs`
+  static albumSongsCacheKey = (id) => `albums:${id}:songs`
 
-  songsCacheKey = 'songs'
+  static songsCacheKey = 'songs'
+
+  static songFilterCacheKey = 'songs:filters'
 
   /**
    * Adds a {@link Song} into the database.
@@ -79,7 +81,12 @@ class SongsService extends PostgresBase {
       throw new InvariantError('Adding the new song failed')
     }
 
-    await this.#cacheService.delete(this.songsCacheKey)
+    await this.#cacheService.dropCaches([
+      SongsService.songsCacheKey,
+      SongsService.songFilterCacheKey,
+      SongsService.songCacheKey(song.id),
+      ...(song.albumId) ? [SongsService.albumSongsCacheKey(song.albumId)] : []
+    ])
 
     return result.rows[0]
   }
@@ -94,18 +101,34 @@ class SongsService extends PostgresBase {
   getSongs = async (filters) => {
     try {
       if (filters.albumId) {
-        const cachedSongsByAlbumId = await this.#cacheService.get(this.albumSongsCacheKey(filters.albumId))
+        const cachedSongsByAlbumId = await this.#cacheService.get(SongsService.albumSongsCacheKey(filters.albumId))
         return {
           songs: JSON.parse(cachedSongsByAlbumId),
           __fromCache: true
         }
       } else {
-        if (filters.title || filters.performer) {
-          /// https://stackoverflow.com/questions/4006324/how-to-atomically-delete-keys-matching-a-pattern-using-redis
-          throw new Error('Filter with title/performer is not cacheable.')
+        let cacheFilterFieldTarget = ''
+        let cachedSongs
+        let filterCount = 0
+
+        if (filters.title) {
+          const titleTermLowerCase = filters.title.toLowerCase()
+          cacheFilterFieldTarget += `title=${encodeURIComponent(titleTermLowerCase)}`
+          ++filterCount
         }
 
-        const cachedSongs = await this.#cacheService.get(this.songsCacheKey)
+        if (filters.performer) {
+          const performerTermLowerCase = filters.performer.toLowerCase()
+          cacheFilterFieldTarget += `${(filterCount !== 0) ? ':' : ''}performer=${encodeURIComponent(performerTermLowerCase)}`
+          ++filterCount
+        }
+
+        if (cacheFilterFieldTarget) {
+          cachedSongs = await this.#cacheService.hGet(SongsService.songFilterCacheKey, cacheFilterFieldTarget)
+        } else {
+          cachedSongs = await this.#cacheService.get(SongsService.songsCacheKey)
+        }
+
         return {
           songs: JSON.parse(cachedSongs),
           __fromCache: true
@@ -129,7 +152,8 @@ class SongsService extends PostgresBase {
    */
   getSongsFromDb = async (filters) => {
     /** @type {(string | null)} */
-    let cacheKeyTarget = this.songsCacheKey
+    let cacheKeyTarget = SongsService.songsCacheKey
+    let cacheFilterFieldTarget = ''
 
     /** @type {QueryConfig} */
     const baseQuery = {
@@ -142,20 +166,26 @@ class SongsService extends PostgresBase {
     if (filters.albumId) {
       query.text += ' WHERE album_id = $1'
       query.values = [filters.albumId]
-      cacheKeyTarget = this.albumSongsCacheKey(filters.albumId)
+      cacheKeyTarget = SongsService.albumSongsCacheKey(filters.albumId)
     } else {
       let filterCount = 0
 
       if (filters.title) {
+        const titleTermLowerCase = filters.title.toLowerCase()
         query.text += ` WHERE lower(title) LIKE $${++filterCount}`
-        query.values?.push(`%${filters.title.toLowerCase()}%`)
-        cacheKeyTarget = null
+        query.values?.push(`%${titleTermLowerCase}%`)
+        cacheFilterFieldTarget += `title=${encodeURIComponent(titleTermLowerCase)}`
       }
 
       if (filters.performer) {
+        const performerTermLowerCase = filters.performer.toLowerCase()
         query.text += ` ${(filterCount !== 0) ? 'AND' : 'WHERE'} lower(performer) LIKE $${++filterCount}`
-        query.values?.push(`%${filters.performer.toLowerCase()}%`)
-        cacheKeyTarget = null
+        query.values?.push(`%${performerTermLowerCase}%`)
+        cacheFilterFieldTarget += `${(filterCount !== 0) ? ':' : ''}performer=${encodeURIComponent(performerTermLowerCase)}`
+      }
+
+      if (filterCount > 0) {
+        cacheKeyTarget = SongsService.songFilterCacheKey
       }
     }
 
@@ -163,7 +193,12 @@ class SongsService extends PostgresBase {
     const songs = queryResult.rows.map(Song.mapDBToSongListItem)
 
     if (cacheKeyTarget) {
-      await this.#cacheService.set(cacheKeyTarget, JSON.stringify(songs), 60 * 30)
+      if (cacheFilterFieldTarget) {
+        await this.#cacheService.hSet(cacheKeyTarget, cacheFilterFieldTarget, JSON.stringify(songs))
+        await this.#cacheService.expire(cacheKeyTarget, 1800)
+      } else {
+        await this.#cacheService.set(cacheKeyTarget, JSON.stringify(songs), 1800)
+      }
     }
 
     return songs
@@ -178,13 +213,13 @@ class SongsService extends PostgresBase {
    */
   getSongById = async (id) => {
     try {
-      const cachedSong = await this.#cacheService.get(this.songCacheKey(id))
+      const cachedSong = await this.#cacheService.get(SongsService.songCacheKey(id))
       return {
         song: JSON.parse(cachedSong),
         __fromCache: true
       }
     } catch (error) {
-    /** @type {QueryConfig} */
+      /** @type {QueryConfig} */
       const query = {
         text: `SELECT * FROM ${Song.tableName} WHERE id = $1`,
         values: [id]
@@ -198,7 +233,7 @@ class SongsService extends PostgresBase {
 
       const song = queryResult.rows.map(Song.mapDBToModel)[0]
 
-      await this.#cacheService.set(this.songCacheKey(id), JSON.stringify(song), 30 * 60)
+      await this.#cacheService.set(SongsService.songCacheKey(id), JSON.stringify(song), 1800)
 
       return {
         song,
@@ -216,7 +251,9 @@ class SongsService extends PostgresBase {
    * @async
    */
   editSongById = async (id, payload) => {
-    const songData = await this.getSongById(id)
+    const { song } = await this.getSongById(id)
+
+    /** @type {QueryConfig} */
     const query = {
       text: `UPDATE ${Song.tableName}
           SET title = $1, year = $2, genre = $3, performer = $4, duration = $5, album_id = $6
@@ -230,11 +267,13 @@ class SongsService extends PostgresBase {
       throw new NotFoundError(`Song ${id} update has failed.`)
     }
 
-    await this.#cacheService.delete(this.songsCacheKey)
-    await this.#cacheService.delete(this.songCacheKey(id))
-    if (songData.song.albumId) {
-      await this.#cacheService.delete(this.albumSongsCacheKey(songData.song.albumId))
-    }
+    await this.#cacheService.dropCaches([
+      SongsService.songsCacheKey,
+      SongsService.songFilterCacheKey,
+      SongsService.songCacheKey(id),
+      ...(song.albumId) ? [SongsService.albumSongsCacheKey(song.albumId)] : []
+
+    ])
 
     return result.rows[0]
   }
@@ -247,7 +286,7 @@ class SongsService extends PostgresBase {
    * @async
    */
   deleteSongById = async (id) => {
-    const songData = await this.getSongById(id)
+    const { song } = await this.getSongById(id)
 
     /** @type {QueryConfig} */
     const query = {
@@ -261,11 +300,12 @@ class SongsService extends PostgresBase {
       throw new NotFoundError(`Song ${id} delete has failed.`)
     }
 
-    await this.#cacheService.delete(this.songsCacheKey)
-    await this.#cacheService.delete(this.songCacheKey(id))
-    if (songData.song.albumId) {
-      await this.#cacheService.delete(this.albumSongsCacheKey(songData.song.albumId))
-    }
+    await this.#cacheService.dropCaches([
+      SongsService.songsCacheKey,
+      SongsService.songFilterCacheKey,
+      SongsService.songCacheKey(id),
+      ...(song.albumId) ? [SongsService.albumSongsCacheKey(song.albumId)] : []
+    ])
 
     return result.rows[0]
   }

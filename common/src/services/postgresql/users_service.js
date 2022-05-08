@@ -13,9 +13,16 @@ const AuthenticationError = require('../../exceptions/authentication_error')
 /**
  * Represents a service class related to {@link Users}.
  *
- * @augments PostgresBase
  */
 class UsersService extends PostgresBase {
+  /**
+   * User Playlists cache key
+   *
+   * @param {string} userId ID
+   * @returns {string} Cache key
+   */
+  static userPlaylistsCacheKey = (userId) => (`users:${userId}:playlists`)
+
   /**
    * Adds a user
    *
@@ -54,7 +61,7 @@ class UsersService extends PostgresBase {
 
     const result = await this.db.query(query)
 
-    if (result.rows.length > 0) {
+    if (result.rowCount > 0) {
       throw new InvariantError('Add user failed. Username already taken.')
     }
   }

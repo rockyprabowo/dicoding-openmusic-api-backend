@@ -90,7 +90,7 @@ class AlbumsService extends PostgresBase {
    * @async
    */
   getAlbumById = async (id) => {
-    const { album, __fromCache: albumCached } = await this.getAlbumInformationById(id)
+    const { album, __fromCache: albumCached } = await this.getAlbumDataById(id)
     const { songs, __fromCache: songsCached } = await this.#songsService.getSongs({ albumId: album.id })
 
     album.songs = songs
@@ -121,7 +121,7 @@ class AlbumsService extends PostgresBase {
 
       const albums = queryResult.rows.map(Album.mapDBToModel)
 
-      await this.#cacheService.set(this.albumsCacheKey, JSON.stringify(albums), 60 * 30)
+      await this.#cacheService.set(this.albumsCacheKey, JSON.stringify(albums), 1800)
 
       return {
         albums,
@@ -216,7 +216,7 @@ class AlbumsService extends PostgresBase {
    * @returns {Promise<CacheableAlbum>} Album
    * @async
    */
-  getAlbumInformationById = async (id) => {
+  getAlbumDataById = async (id) => {
     try {
       const cachedAlbum = await this.#cacheService.get(this.albumCacheKey(id))
 
@@ -239,7 +239,7 @@ class AlbumsService extends PostgresBase {
 
       const album = result.rows.map(Album.mapDBToModel)[0]
 
-      await this.#cacheService.set(this.albumCacheKey(id), JSON.stringify(album), 60 * 30)
+      await this.#cacheService.set(this.albumCacheKey(id), JSON.stringify(album), 1800)
 
       return {
         album,

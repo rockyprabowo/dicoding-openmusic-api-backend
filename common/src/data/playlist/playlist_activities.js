@@ -1,7 +1,8 @@
 const {
   PlaylistActivitiesPayload,
   PlaylistActivitiesItemPayload,
-  PlaylistActivitiesDbRow
+  PlaylistActivitiesDbRow,
+  PlaylistActivitiesItemOutput
 } = require('../../types/data/playlist')
 
 /**
@@ -74,6 +75,14 @@ class PlaylistActivitiesItem {
     })
 
   /* eslint-enable camelcase */
+
+  /**
+   * Maps database result(s) to this data model
+   *
+   * @param {PlaylistActivitiesDbRow} payload Payload
+   * @returns {PlaylistActivitiesItemOutput} This data model
+   */
+  static mapDataToOutput = ({ username, title, action, time }) => ({ username, title, action, time })
 }
 
 module.exports = { PlaylistActivitiesItem, PlaylistActivities }

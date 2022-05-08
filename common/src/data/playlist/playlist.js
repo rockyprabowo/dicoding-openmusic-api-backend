@@ -15,10 +15,6 @@ const { SongListItem } = require('../../types/data/song')
  */
 
 /**
- * @typedef {(Song[] | SongListItem[] | undefined)} SongsData
- */
-
-/**
  * Represent a Playlist Song
  *
  * @memberof module:data/playlist
@@ -44,7 +40,7 @@ class Playlist {
 
   /** @type {(string[] | undefined)} */
   #songIds
-  /** @type {SongsData} */
+  /** @type {(Song[] | SongListItem[] | undefined)} */
   #songs
 
   #newlyCreated = true
@@ -69,7 +65,7 @@ class Playlist {
    * Songs setter.
    * Sets songs and song IDs.
    *
-   * @param {SongsData} songs Songs
+   * @param {(Song[] | SongListItem[] | undefined)} songs Songs
    */
   set songs (songs) {
     if (songs && songs?.length > 0) {
@@ -90,13 +86,6 @@ class Playlist {
       this.#ownerId = owner.id
       this.#ownerUsername = owner.username
     }
-  }
-
-  /**
-   * Omits username from this object
-   */
-  omitUsername = () => {
-    this.#ownerUsername = undefined
   }
 
   /**
@@ -146,6 +135,14 @@ class Playlist {
    * @returns {Playlist} This data model
    */
   static mapDBToPlaylistListItem = ({ id, name, username }) => new Playlist({ id, name, username })
+
+  /**
+   * Maps database result(s) to this data model, replace owner ID with username via join
+   *
+   * @param {PlaylistDbRowWithUsername} dbRowWithUsername Playlist item from database
+   * @returns {Playlist} This data model
+   */
+  static mapDataToExportOutput = ({ id, name }) => new Playlist({ id, name })
 
   toJSON () {
     return {

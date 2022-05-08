@@ -6,6 +6,7 @@
 const fs = require('fs')
 const path = require('path')
 const { promises: fsPromise } = require('fs')
+const CacheService = require('@openmusic/common/services/redis/cache_service')
 
 /**
  * @typedef {object} CommandCount
@@ -96,13 +97,18 @@ const handleCommandArguments = async (argv) => {
   const uniqueArgv = [...(new Set(argv.slice(2)))]
   const commandMap = new Map([
     ['--create-db', createDatabase],
-    ['--env-generate-keys', generateKeysToEnvFile]
+    ['--env-generate-keys', generateKeysToEnvFile],
+    ['--redis-flushdb', redisFlushDb]
   ])
 
   for (const command of uniqueArgv) {
     const currentCommand = commandMap.get(command)
     if (currentCommand) {
-      currentCommand()
+      if (currentCommand.constructor.name === 'AsyncFunction') {
+        await currentCommand()
+      } else {
+        currentCommand()
+      }
       validCommandExecuted++
     } else {
       console.log(`Warning: invalid command: ${command}`)
@@ -115,6 +121,20 @@ const handleCommandArguments = async (argv) => {
   }
 
   return { commandCount, validCommandExecuted }
+}
+
+const redisFlushDb = async () => {
+  const cacheService = new CacheService()
+  try {
+    const result = await cacheService.flushDb()
+    console.log(`Redis database flushed. result = ${result}`)
+    await cacheService.disconnect()
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log(e.message)
+      process.exit(1)
+    }
+  }
 }
 
 /**

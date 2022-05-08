@@ -59,7 +59,7 @@ class AlbumsLikesService extends PostgresBase {
         __fromCache: true
       }
     } catch (error) {
-      const albumData = await this.#albumsService.getAlbumInformationById(albumId)
+      const albumData = await this.#albumsService.getAlbumDataById(albumId)
 
       /** @type {QueryConfig} */
       const query = {
@@ -71,7 +71,7 @@ class AlbumsLikesService extends PostgresBase {
 
       const result = queryResult.rows.map(AlbumLike.mapLikesCount)[0]
 
-      await this.#cacheService.set(this.likeCountCacheKey(albumId), JSON.stringify(result), 60 * 30)
+      await this.#cacheService.set(this.likeCountCacheKey(albumId), JSON.stringify(result), 1800)
 
       return {
         ...result,
@@ -111,7 +111,7 @@ class AlbumsLikesService extends PostgresBase {
    */
   toggleUserLikeAlbumById = async (albumId, userId) => {
     let queryText = ''
-    const albumData = await this.#albumsService.getAlbumInformationById(albumId)
+    const albumData = await this.#albumsService.getAlbumDataById(albumId)
     const { liked } = await this.getUserLikeAlbumById(albumId, userId)
 
     if (liked) {

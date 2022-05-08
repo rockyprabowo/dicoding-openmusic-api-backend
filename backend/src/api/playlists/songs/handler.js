@@ -40,12 +40,12 @@ class PlaylistsSongsHandler {
     const { id: credentialId } = /** @type {JWTTokenPayload} */ (request.auth.credentials)
 
     const { id: playlistId } = request.params
-    const playlist = await this.playlistsService.getPlaylistById(playlistId, credentialId)
+    const { playlist, __fromCache: cached } = await this.playlistsService.getPlaylistById(playlistId, credentialId)
 
     return h.response({
       status: 'success',
       data: { playlist }
-    })
+    }).header('X-Data-Source', cached ? 'cache' : 'database')
   }
 
   /**

@@ -1,7 +1,9 @@
 const PostgresBase = require('./base')
 
 const SongsService = require('./songs_service')
+const UsersService = require('./users_service')
 const PlaylistsCollaborationsService = require('./playlists_collaborations_service')
+const CacheService = require('../redis/cache_service')
 
 const User = require('../../data/user/user')
 const Song = require('../../data/song/song')
@@ -12,8 +14,13 @@ const { PlaylistActivities, PlaylistActivitiesItem } = require('../../data/playl
 const {
   PlaylistRequestPayload,
   PlaylistSongRequestPayload,
-  PlaylistActivitiesItemPayload
+  PlaylistActivitiesItemPayload,
+  CacheablePlaylist,
+  CacheablePlaylistActivities,
+  CacheablePlaylists
 } = require('../../types/data/playlist')
+
+const { CacheableSongCollection, SongListItem } = require('../../types/data/song')
 const { QueryConfig } = require('../../types/services/postgresql')
 
 const InvariantError = require('../../exceptions/invariant_error')
@@ -23,18 +30,53 @@ const AuthorisationError = require('../../exceptions/authorisation_error')
 class PlaylistsService extends PostgresBase {
   #playlistsCollaborationService
   #songsService
+  #cacheService
 
   /**
    * Constructs Playlists Service
    *
-   * @param {PlaylistsCollaborationsService} [collaborationsService] PlaylistsCollaborations Service
-   * @param {SongsService} [songsService] Songs Service
+   * @param {CacheService} cacheService Cache service
+   * @param {SongsService} songsService Songs Service
+   * @param {PlaylistsCollaborationsService} collaborationsService PlaylistsCollaborations Service
    */
-  constructor (collaborationsService, songsService) {
+  constructor (cacheService, songsService, collaborationsService) {
     super()
-    this.#playlistsCollaborationService = collaborationsService ?? new PlaylistsCollaborationsService()
-    this.#songsService = songsService ?? new SongsService()
+    this.#cacheService = cacheService
+    this.#songsService = songsService
+    this.#playlistsCollaborationService = collaborationsService
   }
+
+  /**
+   * Playlist cache key
+   *
+   * @param {string} id ID
+   * @returns {string} Cache key
+   */
+  static playlistCacheKey = (id) => (`playlists:${id}`)
+
+  /**
+   * Playlist owner key
+   *
+   * @param {string} id ID
+   * @returns {string} Cache key
+   */
+  static playlistOwnerCacheKey = (id) => (`playlists:${id}:owner`)
+
+  /**
+   * Playlist songs cache key
+   *
+   * @param {string} id ID
+   * @returns {string} Cache key
+   */
+  static playlistSongsCacheKey = (id) => (`playlists:${id}:songs`)
+
+  /**
+   * Playlist activities cache key
+   *
+   * @param {string} id ID
+   * @returns {string} Cache key
+   */
+  static playlistActivitiesCacheKey = (id) => (`playlists:${id}:activities`)
 
   /**
    * Verifies playlist ownership
@@ -43,23 +85,11 @@ class PlaylistsService extends PostgresBase {
    * @param {string} userId User {@link User.id id}
    */
   verifyPlaylistOwner = async (playlistId, userId) => {
-    const query = {
-      text: `SELECT * FROM ${Playlist.tableName} WHERE id = $1`,
-      values: [playlistId]
-    }
-    const result = await this.db.query(query)
+    const ownerId = await this.getPlaylistOwnerById(playlistId)
 
-    if (result.rowCount === 0) {
-      throw new NotFoundError('Playlist not found')
-    }
-
-    const playlist = result.rows.map(Playlist.mapDBToModelWithUsername)[0]
-
-    if (playlist.ownerId !== userId) {
+    if (ownerId !== userId) {
       throw new AuthorisationError('Unauthorised resource access.')
     }
-
-    return playlist
   }
 
   /**
@@ -70,7 +100,7 @@ class PlaylistsService extends PostgresBase {
    */
   verifyPlaylistAccess = async (playlistId, userId) => {
     try {
-      return await this.verifyPlaylistOwner(playlistId, userId)
+      await this.verifyPlaylistOwner(playlistId, userId)
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw error
@@ -105,6 +135,12 @@ class PlaylistsService extends PostgresBase {
       throw new InvariantError('Add new playlist failed')
     }
 
+    const ownerId = /** @type {string} */ (newPlaylist.ownerId)
+
+    await this.#cacheService.dropCaches([
+      UsersService.userPlaylistsCacheKey(ownerId)
+    ])
+
     return result.rows[0]
   }
 
@@ -112,23 +148,38 @@ class PlaylistsService extends PostgresBase {
    * Get all {@link Playlist} from the database.
    *
    * @param {string} userId Owner ID
-   * @returns {Promise<Playlist[]>} {@link Playlist} owned by {@link User user}
+   * @returns {Promise<CacheablePlaylists>} {@link Playlist} owned by {@link User user}
    * @async
    */
   getPlaylists = async (userId) => {
-    /** @type {QueryConfig} */
-    const query = {
-      text: `SELECT ${Playlist.tableName}.id, ${Playlist.tableName}.name, ${User.tableName}.username
+    try {
+      const cachedPlaylists = await this.#cacheService.get(UsersService.userPlaylistsCacheKey(userId))
+      return {
+        playlists: Array.from(JSON.parse(cachedPlaylists)).map(Playlist.mapDBToPlaylistListItem),
+        __fromCache: true
+      }
+    } catch (error) {
+      /** @type {QueryConfig} */
+      const query = {
+        text: `SELECT ${Playlist.tableName}.id, ${Playlist.tableName}.name, ${Playlist.tableName}.owner, ${User.tableName}.username
         FROM ${Playlist.tableName}
         LEFT JOIN ${User.tableName} ON ${Playlist.tableName}.owner = ${User.tableName}.id
         LEFT JOIN ${PlaylistCollaboration.tableName} ON ${PlaylistCollaboration.tableName}.playlist_id = ${Playlist.tableName}.id
         WHERE ${Playlist.tableName}.owner = $1 OR ${PlaylistCollaboration.tableName}.user_id = $1`,
-      values: [userId]
-    }
-    const result = await this.db.query(query)
-    const playlists = result.rows.map(Playlist.mapDBToPlaylistListItem)
+        values: [userId]
+      }
+      const result = await this.db.query(query)
 
-    return playlists
+      const playlists = result.rows.map(Playlist.mapDBToPlaylistListItem)
+      const cachedPlaylists = result.rows.map(Playlist.mapDBToModelWithUsername)
+
+      await this.#cacheService.set(UsersService.userPlaylistsCacheKey(userId), JSON.stringify(cachedPlaylists), 1800)
+
+      return {
+        playlists,
+        __fromCache: false
+      }
+    }
   }
 
   /**
@@ -136,42 +187,148 @@ class PlaylistsService extends PostgresBase {
    *
    * @param {string} playlistId Owner ID
    * @param {string} userId User ID
-   * @returns {Promise<Playlist>} Playlist with {@link Playlist,id id}
+   * @param {function(any): Playlist} playlistMapper Playlist mapper function
+   * @param {function(any): SongListItem} songsMapper Playlist songs mapper function
+   * @returns {Promise<CacheablePlaylist>} Playlist with {@link Playlist,id id}
    * @async
    */
-  getPlaylistById = async (playlistId, userId) => {
+  getPlaylistById = async (playlistId, userId,
+    playlistMapper = Playlist.mapDBToModelWithUsername,
+    songsMapper = Song.mapDBToSongListItem) => {
     await this.verifyPlaylistAccess(playlistId, userId)
 
-    /** @type {QueryConfig} */
-    const playlistQuery = {
-      text: `SELECT ${Playlist.tableName}.id, ${Playlist.tableName}.name, ${User.tableName}.username
+    try {
+      const cachedPlaylist = await this.#cacheService.get(PlaylistsService.playlistCacheKey(playlistId))
+      const cachedSongs = await this.#cacheService.get(PlaylistsService.playlistSongsCacheKey(playlistId))
+      /** @type {Playlist} */
+      const playlist = playlistMapper(JSON.parse(cachedPlaylist))
+      playlist.songs = Array.from(JSON.parse(cachedSongs)).map(songsMapper) ?? []
+
+      return {
+        playlist,
+        __fromCache: true
+      }
+    } catch (error) {
+      const { playlist, __fromCache: playlistCached } = await this.getPlaylistDataById(playlistId, playlistMapper)
+      const { songs, __fromCache: songsCached } = await this.getPlaylistSongsById(playlistId, songsMapper)
+
+      playlist.songs = songs
+      return {
+        playlist,
+        __fromCache: playlistCached && songsCached
+      }
+    }
+  }
+
+  /**
+   * Get a {@link Playlist} with its {@link Song songs} by its {@link Playlist.id id} from the database.
+   *
+   * @param {string} playlistId Owner ID
+   * @returns {Promise<string>} Playlist with {@link Playlist.id id}
+   * @async
+   */
+  getPlaylistOwnerById = async (playlistId) => {
+    try {
+      const cachedPlaylistOwner = await this.#cacheService.get(PlaylistsService.playlistOwnerCacheKey(playlistId))
+      return cachedPlaylistOwner
+    } catch (error) {
+      /** @type {QueryConfig} */
+      const query = {
+        text: `SELECT * FROM ${Playlist.tableName} WHERE id = $1`,
+        values: [playlistId]
+      }
+      const result = await this.db.query(query)
+
+      if (result.rowCount === 0) {
+        throw new NotFoundError('Playlist not found')
+      }
+      const playlist = result.rows.map(Playlist.mapDBToModelWithUsername)[0]
+
+      if (playlist.ownerId) {
+        await this.#cacheService.set(PlaylistsService.playlistOwnerCacheKey(playlistId), playlist.ownerId, 1800)
+      }
+      return /** @type {string} */ (playlist.ownerId)
+    }
+  }
+
+  /**
+   * Get a {@link Playlist} by its {@link Playlist.id id} from the database.
+   *
+   * @param {string} playlistId Owner ID
+   * @param {function(any): Playlist} playlistMapper Playlist mapper function
+   * @returns {Promise<CacheablePlaylist>} Playlist with {@link Playlist,id id}
+   * @async
+   */
+  getPlaylistDataById = async (playlistId, playlistMapper = Playlist.mapDBToModelWithUsername) => {
+    try {
+      const cachedPlaylist = await this.#cacheService.get(PlaylistsService.playlistCacheKey(playlistId))
+      return {
+        playlist: playlistMapper(JSON.parse(cachedPlaylist)),
+        __fromCache: true
+      }
+    } catch (error) {
+      /** @type {QueryConfig} */
+      const playlistQuery = {
+        text: `SELECT ${Playlist.tableName}.id, ${Playlist.tableName}.name, ${Playlist.tableName}.owner, ${User.tableName}.username
         FROM ${Playlist.tableName}
         LEFT JOIN ${User.tableName} ON ${Playlist.tableName}.owner = ${User.tableName}.id
         WHERE ${Playlist.tableName}.id = $1`,
-      values: [playlistId]
+        values: [playlistId]
+      }
+
+      const playlistResult = await this.db.query(playlistQuery)
+
+      if (playlistResult.rowCount === 0) {
+        throw new NotFoundError('Playlist not found')
+      }
+
+      const playlist = playlistResult.rows.map(playlistMapper)[0]
+      const cachedPlaylist = playlistResult.rows.map(Playlist.mapDBToModelWithUsername)[0]
+
+      await this.#cacheService.set(PlaylistsService.playlistCacheKey(playlistId), JSON.stringify(cachedPlaylist), 1800)
+
+      return {
+        playlist,
+        __fromCache: false
+      }
     }
+  }
 
-    const playlistResult = await this.db.query(playlistQuery)
-
-    if (playlistResult.rowCount === 0) {
-      throw new NotFoundError('Playlist not found')
-    }
-
-    const playlist = playlistResult.rows.map(Playlist.mapDBToPlaylistListItem)[0]
-
-    const playlistSongsQuery = {
-      text: `SELECT ${PlaylistSong.tableName}.song_id as id, ${Song.tableName}.id, ${Song.tableName}.title, ${Song.tableName}.performer
+  /**
+   * Get a {@link Playlist} {@link Song songs} by its {@link Playlist.id id} from the cache or database.
+   *
+   * @param {string} playlistId Owner ID
+   * @param {function(any): SongListItem} songsMapper Playlist songs mapper function
+   * @returns {Promise<CacheableSongCollection>} Playlist with {@link Playlist,id id}
+   * @async
+   */
+  getPlaylistSongsById = async (playlistId, songsMapper = Song.mapDBToSongListItem) => {
+    try {
+      const cachedSongs = await this.#cacheService.get(PlaylistsService.playlistSongsCacheKey(playlistId))
+      return {
+        songs: Array.from(JSON.parse(cachedSongs)).map(songsMapper),
+        __fromCache: true
+      }
+    } catch (error) {
+      const playlistSongsQuery = {
+        text: `SELECT ${PlaylistSong.tableName}.song_id as id,
+          ${Song.tableName}.id, ${Song.tableName}.title, ${Song.tableName}.performer
         FROM ${PlaylistSong.tableName}
         LEFT JOIN ${Song.tableName} ON ${PlaylistSong.tableName}.song_id = ${Song.tableName}.id
         WHERE ${PlaylistSong.tableName}.playlist_id = $1`,
-      values: [playlistId]
+        values: [playlistId]
+      }
+
+      const playlistSongsResult = await this.db.query(playlistSongsQuery)
+      const playlistSongs = playlistSongsResult.rows.map(songsMapper)
+
+      await this.#cacheService.set(PlaylistsService.playlistSongsCacheKey(playlistId), JSON.stringify(playlistSongs), 1800)
+
+      return {
+        songs: playlistSongs,
+        __fromCache: false
+      }
     }
-
-    const playlistSongsResult = await this.db.query(playlistSongsQuery)
-
-    playlist.songs = playlistSongsResult.rows.map(Song.mapDBToSongListItem)
-
-    return playlist
   }
 
   /**
@@ -183,8 +340,7 @@ class PlaylistsService extends PostgresBase {
    * @async
    */
   getPlaylistByIdForExport = async (playlistId, userId) => {
-    const playlist = await this.getPlaylistById(playlistId, userId)
-    playlist.omitUsername()
+    const { playlist } = await this.getPlaylistById(playlistId, userId, Playlist.mapDataToExportOutput)
     return playlist
   }
 
@@ -211,6 +367,14 @@ class PlaylistsService extends PostgresBase {
       throw new NotFoundError(`Playlist ${playlistId} delete failed.`)
     }
 
+    await this.#cacheService.dropCaches([
+      UsersService.userPlaylistsCacheKey(userId),
+      PlaylistsService.playlistCacheKey(playlistId),
+      PlaylistsService.playlistOwnerCacheKey(playlistId),
+      PlaylistsService.playlistSongsCacheKey(playlistId),
+      PlaylistsService.playlistActivitiesCacheKey(playlistId),
+      PlaylistsCollaborationsService.collaborationsCacheKey(playlistId)
+    ])
     return result.rows[0]
   }
 
@@ -228,21 +392,26 @@ class PlaylistsService extends PostgresBase {
 
     const { songId } = payload
 
-    const song = await this.#songsService.getSongById(songId)
+    const songData = await this.#songsService.getSongById(songId)
 
     /** @type {QueryConfig} */
     const query = {
       text: `INSERT INTO ${PlaylistSong.tableName} (playlist_id, song_id) VALUES ($1, $2) RETURNING id`,
-      values: [playlistId, song.id]
+      values: [playlistId, songData.song.id]
     }
 
     const result = await this.db.query(query)
 
     if (result.rowCount === 0) {
-      throw new InvariantError(`Add song ${song.id} to ${playlistId} failed`)
+      throw new InvariantError(`Add song ${songData.song.id} to ${playlistId} failed`)
     }
 
     await this.logActivity({ playlistId, songId, userId, action: 'add' })
+
+    await this.#cacheService.dropCaches([
+      PlaylistsService.playlistSongsCacheKey(playlistId),
+      PlaylistsService.playlistActivitiesCacheKey(playlistId)
+    ])
 
     return result.rows[0]
   }
@@ -260,21 +429,26 @@ class PlaylistsService extends PostgresBase {
     await this.verifyPlaylistAccess(playlistId, userId)
     const { songId } = payload
 
-    const song = await this.#songsService.getSongById(songId)
+    const songData = await this.#songsService.getSongById(songId)
 
     /** @type {QueryConfig} */
     const query = {
       text: `DELETE FROM ${PlaylistSong.tableName} WHERE playlist_id = $1 AND song_id = $2 RETURNING id`,
-      values: [playlistId, song.id]
+      values: [playlistId, songData.song.id]
     }
 
     const result = await this.db.query(query)
 
     if (result.rowCount === 0) {
-      throw new InvariantError(`Delete song ${song.id} from ${playlistId} failed`)
+      throw new InvariantError(`Delete song ${songData.song.id} from ${playlistId} failed`)
     }
 
     await this.logActivity({ playlistId, songId, userId, action: 'delete' })
+
+    await this.#cacheService.dropCaches([
+      PlaylistsService.playlistSongsCacheKey(playlistId),
+      PlaylistsService.playlistActivitiesCacheKey(playlistId)
+    ])
 
     return result.rows[0]
   }
@@ -284,25 +458,40 @@ class PlaylistsService extends PostgresBase {
    *
    * @param {string} playlistId Playlist ID
    * @param {string} userId User ID
-   * @returns {Promise<PlaylistActivities>} Playlist Activities
+   * @returns {Promise<CacheablePlaylistActivities>} Playlist Activities
    */
   getPlaylistActivities = async (playlistId, userId) => {
-    await this.verifyPlaylistAccess(playlistId, userId)
+    try {
+      const cachedPlaylistActivities = await this.#cacheService.get(PlaylistsService.playlistActivitiesCacheKey(playlistId))
+      const activities = Array.from(JSON.parse(cachedPlaylistActivities)).map(PlaylistActivitiesItem.mapDataToOutput)
+      return {
+        playlistActivities: { playlistId, activities },
+        __fromCache: true
+      }
+    } catch (error) {
+      await this.verifyPlaylistAccess(playlistId, userId)
 
-    /** @type {QueryConfig} */
-    const query = {
-      text: `SELECT song_id, ${Song.tableName}.title, user_id, ${User.tableName}.username, action, time
+      /** @type {QueryConfig} */
+      const query = {
+        text: `SELECT song_id, ${Song.tableName}.title, user_id, ${User.tableName}.username, action, time
       FROM ${PlaylistActivities.tableName}
       LEFT JOIN ${User.tableName} on ${PlaylistActivities.tableName}.user_id = ${User.tableName}.id
       LEFT JOIN ${Song.tableName} on ${PlaylistActivities.tableName}.song_id = ${Song.tableName}.id
       WHERE playlist_id = $1
       ORDER BY ${PlaylistActivities.tableName}.id`,
-      values: [playlistId]
-    }
-    const result = await this.db.query(query)
-    const activities = result.rows.map(PlaylistActivitiesItem.mapDBToDataModel)
+        values: [playlistId]
+      }
+      const result = await this.db.query(query)
+      const cachedActivities = result.rows.map(PlaylistActivitiesItem.mapDBToDataModel)
+      const activities = result.rows.map(PlaylistActivitiesItem.mapDataToOutput)
 
-    return new PlaylistActivities({ playlistId, activities })
+      await this.#cacheService.set(PlaylistsService.playlistActivitiesCacheKey(playlistId), JSON.stringify(cachedActivities), 1800)
+
+      return {
+        playlistActivities: { playlistId, activities },
+        __fromCache: false
+      }
+    }
   }
 
   /**
