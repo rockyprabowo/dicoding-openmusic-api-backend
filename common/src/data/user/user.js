@@ -26,6 +26,14 @@ class User {
   #newlyCreated = true
 
   /**
+   * User Playlists cache key
+   *
+   * @param {string} userId ID
+   * @returns {string} Cache key
+   */
+  static userPlaylistsCacheKey = (userId) => (`users:${userId}:playlists`)
+
+  /**
    * Gets the plaintext password set for newly created {@link User user}
    * Does nothing if {@link User} is mapped from database.
    *

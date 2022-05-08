@@ -37,14 +37,33 @@ class CacheService {
   }
 
   /**
+   * Connect to redis database
+   *
+   * @returns {Promise<void>}
+   */
+  async connect () {
+    return await this.#client.connect()
+  }
+
+  /**
+   * Disconnect from redis database
+   *
+   * @returns {Promise<void>}
+   */
+  async disconnect () {
+    return await this.#client.disconnect()
+  }
+
+  /**
    * Caches a value with a key
    *
    * @param {string} key Key
    * @param {string} value Value
-   * @param {*} expirationInSecond Cache expiration in seconds
+   * @param {number} expirationInSecond Cache expiration in seconds
+   * @returns {Promise<(string | null)>} Set command reply
    */
   async set (key, value, expirationInSecond = 3600) {
-    await this.#client.set(key, value, {
+    return await this.#client.set(key, value, {
       EX: expirationInSecond
     })
   }
@@ -52,12 +71,24 @@ class CacheService {
   /**
    * Caches a value with a hashmap
    *
-   * @param {string} key Key
-   * @param {string} field Field
+   * @param {string} hashMapKey Key
+   * @param {string} hashMapField Field
    * @param {string} value Value
+   * @returns {Promise<number>} Field added count
    */
-  async hSet (key, field, value) {
-    await this.#client.hSet(key, field, value)
+  async hSet (hashMapKey, hashMapField, value) {
+    return await this.#client.hSet(hashMapKey, hashMapField, value)
+  }
+
+  /**
+   * Caches a set of values to a set
+   *
+   * @param {string} setKey Key
+   * @param {string} value Value
+   * @returns {Promise<number>} Element added count
+   */
+  async sAdd (setKey, value) {
+    return await this.#client.sAdd(setKey, value)
   }
 
   /**
@@ -77,12 +108,12 @@ class CacheService {
   /**
    * Gets a cached value with its key
    *
-   * @param {string} key Key
-   * @param {string} field Field
+   * @param {string} hashMapKey Key
+   * @param {string} hashMapField Field
    * @returns {Promise<string>} Value
    */
-  async hGet (key, field) {
-    const result = await this.#client.hGet(key, field)
+  async hGet (hashMapKey, hashMapField) {
+    const result = await this.#client.hGet(hashMapKey, hashMapField)
 
     if (result === null) throw new Error('Cache not found')
 
@@ -90,36 +121,60 @@ class CacheService {
   }
 
   /**
-   * Deletes a cached valued with its key
+   * Checks if value is the member of a set
    *
-   * @param {string} key Key
-   * @returns {Promise<number>} Value
+   * @param {string} setKey Key
+   * @param {string} value Value
+   * @returns {Promise<boolean>} Value exists
    */
-  async delete (key) {
-    return await this.#client.del(key)
+  async sIsMember (setKey, value) {
+    return await this.#client.sIsMember(setKey, value)
   }
 
   /**
    * Deletes a cached valued with its key
    *
-   * @param {string} key Key
-   * @param {string} field Field
-   * @returns {Promise<number>} Value
+   * @param {(string | string[])} keys Key(s)
+   * @returns {Promise<number>} Deleted keys count
    */
-  async hDelete (key, field) {
-    return await this.#client.hDel(key, field)
+  async delete (keys) {
+    return await this.#client.del(keys)
+  }
+
+  /**
+   * Deletes a cached valued with its key
+   *
+   * @param {string} hashMapKey Key
+   * @param {string} hashMapField Field
+   * @returns {Promise<number>} Deleted field count
+   */
+  async hDelete (hashMapKey, hashMapField) {
+    return await this.#client.hDel(hashMapKey, hashMapField)
+  }
+
+  /**
+   * Removes a set of values within a set
+   *
+   * @param {string} setKey Key
+   * @param {string} value Value
+   * @returns {Promise<number>} Element removed count
+   */
+  async sRem (setKey, value) {
+    return await this.#client.sRem(setKey, value)
   }
 
   /**
    * Drops caches by keys
    *
-   * @param {Array<string>} cacheKeys Cache keys to delete
-   * @returns {Promise<void>}
+   * @param {Array<string>} keys Cache keys to delete
+   * @returns {Promise<number>} Deleted keys count
    */
-  async dropCaches (cacheKeys) {
-    for (const cacheKey of cacheKeys) {
-      await this.delete(cacheKey)
+  async dropCaches (keys) {
+    let deleted = 0
+    for (const cacheKey of keys) {
+      deleted += await this.delete(cacheKey)
     }
+    return deleted
   }
 
   /**
@@ -127,31 +182,19 @@ class CacheService {
    *
    * @param {string} key Key
    * @param {number} expirationInSecond Cache expiration in seconds
-   * @returns {Promise<void>}
+   * @returns {Promise<boolean>} Status
    */
   async expire (key, expirationInSecond = 3600) {
-    await this.#client.expire(key, expirationInSecond)
+    return await this.#client.expire(key, expirationInSecond)
   }
 
   /**
    * Flushes redis database
+   *
+   * @returns {Promise<string>} Status
    */
   async flushAll () {
     return await this.#client.flushAll()
-  }
-
-  /**
-   * Connect to redis database
-   */
-  async connect () {
-    return await this.#client.connect()
-  }
-
-  /**
-   * Disconnect from redis database
-   */
-  async disconnect () {
-    return await this.#client.disconnect()
   }
 }
 

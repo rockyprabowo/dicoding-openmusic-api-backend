@@ -1,8 +1,9 @@
 const PostgresBase = require('./base')
 const UsersService = require('./users_service')
+const CacheService = require('../redis/cache_service')
+const User = require('../../data/user/user')
 const PlaylistCollaboration = require('../../data/playlist/playlist_collaboration')
 const InvariantError = require('../../exceptions/invariant_error')
-const CacheService = require('../redis/cache_service')
 
 /**
  * OpenMusic API - Playlists Collaborations Service (PostgreSQL Persistence)
@@ -53,7 +54,7 @@ class PlaylistsCollaborationsService extends PostgresBase {
       throw new InvariantError('Add collaboration failed')
     }
 
-    await this.#cacheService.delete(UsersService.userPlaylistsCacheKey(userId))
+    await this.#cacheService.delete(User.userPlaylistsCacheKey(userId))
 
     return result.rows[0]
   }
@@ -77,8 +78,8 @@ class PlaylistsCollaborationsService extends PostgresBase {
       throw new InvariantError('Delete collaboration failed')
     }
 
-    await this.#cacheService.hDelete(PlaylistCollaboration.collaborationsCacheKey(playlistId), userId)
-    await this.#cacheService.delete(UsersService.userPlaylistsCacheKey(userId))
+    await this.#cacheService.sRem(PlaylistCollaboration.collaboratorsCacheKey(playlistId), userId)
+    await this.#cacheService.delete(User.userPlaylistsCacheKey(userId))
 
     return result.rows[0]
   }
@@ -88,12 +89,14 @@ class PlaylistsCollaborationsService extends PostgresBase {
    *
    * @param {string} playlistId Playlist ID
    * @param {string} userId User ID
-   * @returns {Promise<PlaylistCollaboration>} Collaboration {@link PlaylistCollaboration.id id}
+   * @returns {Promise<void>} Has access for collaboration
    */
   async verifyCollaborator (playlistId, userId) {
     try {
-      const cachedCollaboration = await this.#cacheService.hGet(PlaylistCollaboration.collaborationsCacheKey(playlistId), userId)
-      return JSON.parse(cachedCollaboration)
+      const inCachedCollaborators = await this.#cacheService.sIsMember(PlaylistCollaboration.collaboratorsCacheKey(playlistId), userId)
+      if (!inCachedCollaborators) {
+        throw new InvariantError('Kolaborasi gagal diverifikasi')
+      }
     } catch (error) {
       const query = {
         text: `SELECT * FROM ${PlaylistCollaboration.tableName} WHERE playlist_id = $1 AND user_id = $2`,
@@ -105,11 +108,8 @@ class PlaylistsCollaborationsService extends PostgresBase {
       if (result.rowCount === 0) {
         throw new InvariantError('Kolaborasi gagal diverifikasi')
       }
-      const collaboration = result.rows.map(PlaylistCollaboration.mapDBToModel)[0]
 
-      await this.#cacheService.hSet(PlaylistCollaboration.collaborationsCacheKey(playlistId), userId, JSON.stringify(collaboration))
-
-      return collaboration
+      await this.#cacheService.sAdd(PlaylistCollaboration.collaboratorsCacheKey(playlistId), userId)
     }
   }
 }

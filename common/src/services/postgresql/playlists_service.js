@@ -1,7 +1,6 @@
 const PostgresBase = require('./base')
 
 const SongsService = require('./songs_service')
-const UsersService = require('./users_service')
 const PlaylistsCollaborationsService = require('./playlists_collaborations_service')
 const CacheService = require('../redis/cache_service')
 
@@ -117,7 +116,7 @@ class PlaylistsService extends PostgresBase {
     const ownerId = /** @type {string} */ (newPlaylist.ownerId)
 
     await this.#cacheService.dropCaches([
-      UsersService.userPlaylistsCacheKey(ownerId)
+      User.userPlaylistsCacheKey(ownerId)
     ])
 
     return result.rows[0]
@@ -132,7 +131,7 @@ class PlaylistsService extends PostgresBase {
    */
   getPlaylists = async (userId) => {
     try {
-      const cachedPlaylists = await this.#cacheService.get(UsersService.userPlaylistsCacheKey(userId))
+      const cachedPlaylists = await this.#cacheService.get(User.userPlaylistsCacheKey(userId))
       return {
         playlists: Array.from(JSON.parse(cachedPlaylists)).map(Playlist.mapDBToPlaylistListItem),
         __fromCache: true
@@ -152,7 +151,7 @@ class PlaylistsService extends PostgresBase {
       const playlists = result.rows.map(Playlist.mapDBToPlaylistListItem)
       const cachedPlaylists = result.rows.map(Playlist.mapDBToModelWithUsername)
 
-      await this.#cacheService.set(UsersService.userPlaylistsCacheKey(userId), JSON.stringify(cachedPlaylists), 1800)
+      await this.#cacheService.set(User.userPlaylistsCacheKey(userId), JSON.stringify(cachedPlaylists), 1800)
 
       return {
         playlists,
@@ -347,12 +346,12 @@ class PlaylistsService extends PostgresBase {
     }
 
     await this.#cacheService.dropCaches([
-      UsersService.userPlaylistsCacheKey(userId),
+      User.userPlaylistsCacheKey(userId),
       Playlist.playlistCacheKey(playlistId),
       Playlist.playlistOwnerCacheKey(playlistId),
       Playlist.playlistSongsCacheKey(playlistId),
       PlaylistActivities.playlistActivitiesCacheKey(playlistId),
-      PlaylistCollaboration.collaborationsCacheKey(playlistId)
+      PlaylistCollaboration.collaboratorsCacheKey(playlistId)
     ])
     return result.rows[0]
   }

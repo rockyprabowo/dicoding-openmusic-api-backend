@@ -17,14 +17,6 @@ const AuthenticationError = require('../../exceptions/authentication_error')
  */
 class UsersService extends PostgresBase {
   /**
-   * User Playlists cache key
-   *
-   * @param {string} userId ID
-   * @returns {string} Cache key
-   */
-  static userPlaylistsCacheKey = (userId) => (`users:${userId}:playlists`)
-
-  /**
    * Adds a user
    *
    * @param {UserRequestPayload} payload Payload

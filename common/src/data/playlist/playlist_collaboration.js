@@ -27,7 +27,7 @@ class PlaylistCollaboration {
    * @param {string} playlistId ID
    * @returns {string} Cache key
    */
-  static collaborationsCacheKey = (playlistId) => (`playlists:${playlistId}:collaborations`)
+  static collaboratorsCacheKey = (playlistId) => (`playlists:${playlistId}:collaborators`)
 
   /**
    * Construct a new {@link PlaylistCollaboration}
