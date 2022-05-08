@@ -1,3 +1,4 @@
+const path = require('path')
 const { LifecycleMethod, ResponseObject } = require('~types/api')
 const { AlbumCoverArtPluginOptions } = require('~types/api/albums')
 const { AlbumCoverArtRequestPayload } = require('@openmusic/common/types/data/album_cover_art')
@@ -53,9 +54,10 @@ class AlbumCoverArtHandler {
 
     const { cover } = payload
 
-    const fileFormat = require('path').extname(cover.hapi.filename)
-    const finalFileName = `${albumData.album.id}-cover${fileFormat}`
-    const url = await this.#storageService.writeFile(cover, cover.hapi, finalFileName)
+    const fileFormat = path.extname(cover.hapi.filename)
+    const outputFileName = `${albumData.album.id}-cover${fileFormat}`
+
+    const url = await this.#storageService.writeFile(cover, cover.hapi, outputFileName)
     const result = await this.#albumsService.editAlbumCoverArtById(albumId, url)
 
     return h.response({

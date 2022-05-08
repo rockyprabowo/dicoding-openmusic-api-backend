@@ -29,7 +29,7 @@ class AlbumsLikesService extends PostgresBase {
    * @param {string} id ID
    * @returns {string} Cache key
    */
-  likeCountCacheKey = (id) => `likeCount:${id}`
+  static likeCountCacheKey = (id) => `albums:${id}:likes`
 
   /**
    * Construct an {@link AlbumsLikesService}
@@ -52,7 +52,7 @@ class AlbumsLikesService extends PostgresBase {
    */
   getAlbumLikeCountById = async (albumId) => {
     try {
-      const result = await this.#cacheService.get(this.likeCountCacheKey(albumId))
+      const result = await this.#cacheService.get(AlbumsLikesService.likeCountCacheKey(albumId))
 
       return {
         ...JSON.parse(result),
@@ -69,12 +69,12 @@ class AlbumsLikesService extends PostgresBase {
 
       const queryResult = await this.db.query(query)
 
-      const result = queryResult.rows.map(AlbumLike.mapLikesCount)[0]
+      const { likes } = queryResult.rows.map(AlbumLike.mapLikesCount)[0]
 
-      await this.#cacheService.set(this.likeCountCacheKey(albumId), JSON.stringify(result), 1800)
+      await this.#cacheService.set(AlbumsLikesService.likeCountCacheKey(albumId), JSON.stringify({ likes }), 1800)
 
       return {
-        ...result,
+        likes,
         __fromCache: false
       }
     }
@@ -127,7 +127,7 @@ class AlbumsLikesService extends PostgresBase {
     }
 
     await this.db.query(query)
-    await this.#cacheService.delete(this.likeCountCacheKey(albumId))
+    await this.#cacheService.delete(AlbumsLikesService.likeCountCacheKey(albumId))
     return { liked: !liked }
   }
 }

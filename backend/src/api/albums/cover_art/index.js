@@ -5,13 +5,13 @@ const { Plugin } = require('~types/api')
 const { AlbumCoverArtPluginOptions } = require('~types/api/albums')
 
 /**
- * OpenMusic API - Album Activities API
+ * OpenMusic API - Album Cover Art API
  *
  * @module api/albums/cover_art
  */
 
 /**
- * Album plugin registration object
+ * Album Cover Art plugin registration object
  *
  * @type {Plugin<AlbumCoverArtPluginOptions>}
  * @memberof module:api/albums/cover_art
