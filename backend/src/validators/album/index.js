@@ -1,11 +1,12 @@
 const Validator = require('~validators/base')
-const AlbumPayloadSchema = require('./schema')
+const { AlbumPayloadSchema } = require('./schema')
 
 /**
  * Album Validator
  *
  * @module validators/album
  */
+
 /**
  * Represent the validator for album.
  *

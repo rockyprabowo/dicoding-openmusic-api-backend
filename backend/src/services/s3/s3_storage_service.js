@@ -3,6 +3,11 @@ const stream = require('stream')
 const BaseStorageService = require('@openmusic/common/services/storage/base')
 
 /**
+ * OpenMusic API - S3 Storage Service
+ *
+ * @module services/s3/s3_storage_service
+ */
+/**
  * @typedef {import('aws-sdk').S3.ManagedUpload} ManagedUpload
  * @typedef {import('aws-sdk').S3.ManagedUpload.SendData} SendData
  */
@@ -10,7 +15,7 @@ const BaseStorageService = require('@openmusic/common/services/storage/base')
 /**
  * Represent a S3 storage service
  *
- * @module service/s3/s3_storage_service
+ * @memberof module:services/s3/s3_storage_service
  */
 class S3StorageService extends BaseStorageService {
   #S3

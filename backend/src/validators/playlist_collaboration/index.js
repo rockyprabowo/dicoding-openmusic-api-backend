@@ -4,13 +4,13 @@ const { PlaylistCollaborationPayloadSchema } = require('./schema')
 /**
  * Playlist Collaboration Validator
  *
- * @module validators/user
+ * @module validators/playlist/collaboration
  */
 
 /**
- * Represent the validator for PlaylistCollaboration
+ * Represent the validator for Playlist Collaboration
  *
- * @memberof module:validators/user
+ * @memberof module:validators/playlist/collaboration
  */
 class PlaylistCollaborationValidator extends Validator {
   constructor () {

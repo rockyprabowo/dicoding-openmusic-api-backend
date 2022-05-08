@@ -1,19 +1,19 @@
 const Validator = require('~validators/base')
-const ExportPayloadSchema = require('./schema')
+const { ExportPlaylistPayloadSchema } = require('./schema')
 
 /**
  * Export Playlist Validator
  *
- * @module validators/export
+ * @module validators/export/playlist
  */
 /**
  * Represent the validator for export playlist.
  *
- * @memberof module:validators/export
+ * @memberof module:validators/export/playlist
  */
 class ExportPlaylistValidator extends Validator {
   constructor () {
-    super(ExportPayloadSchema)
+    super(ExportPlaylistPayloadSchema)
   }
 }
 

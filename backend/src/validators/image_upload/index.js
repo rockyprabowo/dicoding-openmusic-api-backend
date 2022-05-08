@@ -1,5 +1,5 @@
 const Validator = require('~validators/base')
-const ImageHeadersSchema = require('./schema')
+const { ImageHeadersSchema } = require('./schema')
 
 /**
  * Image Upload Validator

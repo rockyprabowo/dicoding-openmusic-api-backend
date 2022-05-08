@@ -1,5 +1,11 @@
 const Joi = require('joi')
 
+/**
+ * Represents the export playlist payload schema.
+ *
+ * @type {Joi.ObjectSchema}
+ * @memberof module:validators/export/playlist
+ */
 const ExportPlaylistPayloadSchema = Joi.object({
   targetEmail: Joi.string().email({
     tlds: {
@@ -8,4 +14,4 @@ const ExportPlaylistPayloadSchema = Joi.object({
   }).required()
 })
 
-module.exports = ExportPlaylistPayloadSchema
+module.exports = { ExportPlaylistPayloadSchema }

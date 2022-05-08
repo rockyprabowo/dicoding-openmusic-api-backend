@@ -1,5 +1,5 @@
 const Validator = require('~validators/base')
-const SongPayloadSchema = require('./schema')
+const { SongPayloadSchema } = require('./schema')
 
 /**
  * Song Validator

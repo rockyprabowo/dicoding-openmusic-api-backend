@@ -165,7 +165,7 @@ const checkEnvFile = async (envFile, envDefaultsFile) => {
 }
 
 /**
- * Generates mandatory secret(s) key and place them into local .env file
+ * Generates mandatory secret(s) key and place them into local .env file.
  * Because this function are needed with no packages installed, this function SHOULD NOT depend on external packages.
  *
  * @returns {Promise<void>}
