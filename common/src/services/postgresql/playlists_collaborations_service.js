@@ -32,14 +32,6 @@ class PlaylistsCollaborationsService extends PostgresBase {
   }
 
   /**
-   * Playlist collaboration cache key
-   *
-   * @param {string} playlistId ID
-   * @returns {string} Cache key
-   */
-  static collaborationsCacheKey = (playlistId) => (`playlists:${playlistId}:collaborations`)
-
-  /**
    * Adds {@link Collaboration} of {@link Playlist} with a {@link User} to the database.
    *
    * @param {string} playlistId Playlist ID
@@ -85,7 +77,7 @@ class PlaylistsCollaborationsService extends PostgresBase {
       throw new InvariantError('Delete collaboration failed')
     }
 
-    await this.#cacheService.hDelete(PlaylistsCollaborationsService.collaborationsCacheKey(playlistId), userId)
+    await this.#cacheService.hDelete(PlaylistCollaboration.collaborationsCacheKey(playlistId), userId)
     await this.#cacheService.delete(UsersService.userPlaylistsCacheKey(userId))
 
     return result.rows[0]
@@ -100,7 +92,7 @@ class PlaylistsCollaborationsService extends PostgresBase {
    */
   async verifyCollaborator (playlistId, userId) {
     try {
-      const cachedCollaboration = await this.#cacheService.hGet(PlaylistsCollaborationsService.collaborationsCacheKey(playlistId), userId)
+      const cachedCollaboration = await this.#cacheService.hGet(PlaylistCollaboration.collaborationsCacheKey(playlistId), userId)
       return JSON.parse(cachedCollaboration)
     } catch (error) {
       const query = {
@@ -115,7 +107,7 @@ class PlaylistsCollaborationsService extends PostgresBase {
       }
       const collaboration = result.rows.map(PlaylistCollaboration.mapDBToModel)[0]
 
-      await this.#cacheService.hSet(PlaylistsCollaborationsService.collaborationsCacheKey(playlistId), userId, JSON.stringify(collaboration))
+      await this.#cacheService.hSet(PlaylistCollaboration.collaborationsCacheKey(playlistId), userId, JSON.stringify(collaboration))
 
       return collaboration
     }

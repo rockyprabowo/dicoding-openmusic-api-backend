@@ -38,24 +38,6 @@ class AlbumsService extends PostgresBase {
     this.#songsService = songsService
   }
 
-  albumsCacheKey = 'albums'
-
-  /**
-   * Album cache key
-   *
-   * @param {string} id ID
-   * @returns {string} Cache key
-   */
-  albumCacheKey = (id) => (`albums:${id}`)
-
-  /**
-   * Album songs cache key
-   *
-   * @param {string} id ID
-   * @returns {string} Cache key
-   */
-  albumSongsCacheKey = (id) => (`albums:${id}:songs`)
-
   /**
    * Adds an {@link Album} into database.
    *
@@ -78,7 +60,7 @@ class AlbumsService extends PostgresBase {
       throw new InvariantError('Add new album failed')
     }
 
-    await this.#cacheService.delete(this.albumsCacheKey)
+    await this.#cacheService.delete(Album.albumsCacheKey)
 
     return result.rows[0]
   }
@@ -110,7 +92,7 @@ class AlbumsService extends PostgresBase {
    */
   getAlbums = async () => {
     try {
-      const cachedAlbums = await this.#cacheService.get(this.albumsCacheKey)
+      const cachedAlbums = await this.#cacheService.get(Album.albumsCacheKey)
       return {
         albums: JSON.parse(cachedAlbums),
         __fromCache: true
@@ -122,7 +104,7 @@ class AlbumsService extends PostgresBase {
 
       const albums = queryResult.rows.map(Album.mapDBToModel)
 
-      await this.#cacheService.set(this.albumsCacheKey, JSON.stringify(albums), 1800)
+      await this.#cacheService.set(Album.albumsCacheKey, JSON.stringify(albums), 1800)
 
       return {
         albums,
@@ -151,8 +133,10 @@ class AlbumsService extends PostgresBase {
       throw new NotFoundError(`Album ${id} update failed. Can't find an album with id ${id}`)
     }
 
-    await this.#cacheService.delete(this.albumsCacheKey)
-    await this.#cacheService.delete(this.albumCacheKey(id))
+    await this.#cacheService.dropCaches([
+      Album.albumsCacheKey,
+      Album.albumCacheKey(id)
+    ])
 
     return result.rows[0]
   }
@@ -177,9 +161,11 @@ class AlbumsService extends PostgresBase {
       throw new NotFoundError(`Album ${id} delete failed.`)
     }
 
-    await this.#cacheService.delete(this.albumsCacheKey)
-    await this.#cacheService.delete(this.albumCacheKey(id))
-    await this.#cacheService.delete(this.albumSongsCacheKey(id))
+    await this.#cacheService.dropCaches([
+      Album.albumsCacheKey,
+      Album.albumCacheKey(id),
+      Album.albumSongsCacheKey(id)
+    ])
 
     return result.rows[0]
   }
@@ -204,8 +190,10 @@ class AlbumsService extends PostgresBase {
       throw new NotFoundError(`Album ${id} update failed. Can't find an album with id ${id}`)
     }
 
-    await this.#cacheService.delete(this.albumsCacheKey)
-    await this.#cacheService.delete(this.albumCacheKey(id))
+    await this.#cacheService.dropCaches([
+      Album.albumsCacheKey,
+      Album.albumCacheKey(id)
+    ])
 
     return result.rows[0]
   }
@@ -219,14 +207,14 @@ class AlbumsService extends PostgresBase {
    */
   getAlbumDataById = async (id) => {
     try {
-      const cachedAlbum = await this.#cacheService.get(this.albumCacheKey(id))
+      const cachedAlbum = await this.#cacheService.get(Album.albumCacheKey(id))
 
       return {
         album: JSON.parse(cachedAlbum),
         __fromCache: true
       }
     } catch (error) {
-    /** @type {QueryConfig} */
+      /** @type {QueryConfig} */
       const query = {
         text: `SELECT * FROM ${Album.tableName} WHERE id = $1`,
         values: [id]
@@ -240,7 +228,7 @@ class AlbumsService extends PostgresBase {
 
       const album = result.rows.map(Album.mapDBToModel)[0]
 
-      await this.#cacheService.set(this.albumCacheKey(id), JSON.stringify(album), 1800)
+      await this.#cacheService.set(Album.albumCacheKey(id), JSON.stringify(album), 1800)
 
       return {
         album,

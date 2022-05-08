@@ -11,6 +11,7 @@ const {
 const { QueryConfig } = require('../../types/services/postgresql')
 const InvariantError = require('../../exceptions/invariant_error')
 const NotFoundError = require('../../exceptions/not_found_error')
+const Album = require('../../data/album/album')
 
 /**
  * OpenMusic API - Songs Service (PostgreSQL Persistence)
@@ -35,26 +36,6 @@ class SongsService extends PostgresBase {
     super()
     this.#cacheService = cacheService
   }
-
-  /**
-   * Song cache key
-   *
-   * @param {string} id ID
-   * @returns {string} Cache key
-   */
-  static songCacheKey = (id) => `song:${id}`
-
-  /**
-   * Album songs cache key
-   *
-   * @param {string} id ID
-   * @returns {string} Cache key
-   */
-  static albumSongsCacheKey = (id) => `albums:${id}:songs`
-
-  static songsCacheKey = 'songs'
-
-  static songFilterCacheKey = 'songs:filters'
 
   /**
    * Adds a {@link Song} into the database.
@@ -83,10 +64,10 @@ class SongsService extends PostgresBase {
     }
 
     await this.#cacheService.dropCaches([
-      SongsService.songsCacheKey,
-      SongsService.songFilterCacheKey,
-      SongsService.songCacheKey(song.id),
-      ...(song.albumId) ? [SongsService.albumSongsCacheKey(song.albumId)] : []
+      Song.songsCacheKey,
+      Song.songFilterCacheKey,
+      Song.songCacheKey(song.id),
+      ...(song.albumId) ? [Album.albumSongsCacheKey(song.albumId)] : []
     ])
 
     return result.rows[0]
@@ -102,7 +83,7 @@ class SongsService extends PostgresBase {
   getSongs = async (filters) => {
     try {
       if (filters.albumId) {
-        const cachedSongsByAlbumId = await this.#cacheService.get(SongsService.albumSongsCacheKey(filters.albumId))
+        const cachedSongsByAlbumId = await this.#cacheService.get(Album.albumSongsCacheKey(filters.albumId))
         return {
           songs: JSON.parse(cachedSongsByAlbumId),
           __fromCache: true
@@ -125,9 +106,9 @@ class SongsService extends PostgresBase {
         }
 
         if (cacheFilterFieldTarget) {
-          cachedSongs = await this.#cacheService.hGet(SongsService.songFilterCacheKey, cacheFilterFieldTarget)
+          cachedSongs = await this.#cacheService.hGet(Song.songFilterCacheKey, cacheFilterFieldTarget)
         } else {
-          cachedSongs = await this.#cacheService.get(SongsService.songsCacheKey)
+          cachedSongs = await this.#cacheService.get(Song.songsCacheKey)
         }
 
         return {
@@ -153,7 +134,7 @@ class SongsService extends PostgresBase {
    */
   getSongsFromDb = async (filters) => {
     /** @type {(string | null)} */
-    let cacheKeyTarget = SongsService.songsCacheKey
+    let cacheKeyTarget = Song.songsCacheKey
     let cacheFilterFieldTarget = ''
 
     /** @type {QueryConfig} */
@@ -167,7 +148,7 @@ class SongsService extends PostgresBase {
     if (filters.albumId) {
       query.text += ' WHERE album_id = $1'
       query.values = [filters.albumId]
-      cacheKeyTarget = SongsService.albumSongsCacheKey(filters.albumId)
+      cacheKeyTarget = Album.albumSongsCacheKey(filters.albumId)
     } else {
       let filterCount = 0
 
@@ -186,7 +167,7 @@ class SongsService extends PostgresBase {
       }
 
       if (filterCount > 0) {
-        cacheKeyTarget = SongsService.songFilterCacheKey
+        cacheKeyTarget = Song.songFilterCacheKey
       }
     }
 
@@ -214,7 +195,7 @@ class SongsService extends PostgresBase {
    */
   getSongById = async (id) => {
     try {
-      const cachedSong = await this.#cacheService.get(SongsService.songCacheKey(id))
+      const cachedSong = await this.#cacheService.get(Song.songCacheKey(id))
       return {
         song: JSON.parse(cachedSong),
         __fromCache: true
@@ -234,7 +215,7 @@ class SongsService extends PostgresBase {
 
       const song = queryResult.rows.map(Song.mapDBToModel)[0]
 
-      await this.#cacheService.set(SongsService.songCacheKey(id), JSON.stringify(song), 1800)
+      await this.#cacheService.set(Song.songCacheKey(id), JSON.stringify(song), 1800)
 
       return {
         song,
@@ -269,10 +250,10 @@ class SongsService extends PostgresBase {
     }
 
     await this.#cacheService.dropCaches([
-      SongsService.songsCacheKey,
-      SongsService.songFilterCacheKey,
-      SongsService.songCacheKey(id),
-      ...(song.albumId) ? [SongsService.albumSongsCacheKey(song.albumId)] : []
+      Song.songsCacheKey,
+      Song.songFilterCacheKey,
+      Song.songCacheKey(id),
+      ...(song.albumId) ? [Album.albumSongsCacheKey(song.albumId)] : []
 
     ])
 
@@ -302,10 +283,10 @@ class SongsService extends PostgresBase {
     }
 
     await this.#cacheService.dropCaches([
-      SongsService.songsCacheKey,
-      SongsService.songFilterCacheKey,
-      SongsService.songCacheKey(id),
-      ...(song.albumId) ? [SongsService.albumSongsCacheKey(song.albumId)] : []
+      Song.songsCacheKey,
+      Song.songFilterCacheKey,
+      Song.songCacheKey(id),
+      ...(song.albumId) ? [Album.albumSongsCacheKey(song.albumId)] : []
     ])
 
     return result.rows[0]

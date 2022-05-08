@@ -23,6 +23,24 @@ class Album {
   /** @type {(Song[] | SongListItem[])}  */
   #songs = []
 
+  static albumsCacheKey = 'albums'
+
+  /**
+   * Album cache key
+   *
+   * @param {string} id ID
+   * @returns {string} Cache key
+   */
+  static albumCacheKey = (id) => (`albums:${id}`)
+
+  /**
+   * Album songs cache key
+   *
+   * @param {string} id ID
+   * @returns {string} Cache key
+   */
+  static albumSongsCacheKey = (id) => (`albums:${id}:songs`)
+
   /**
    * Construct a new {@link Album}
    *

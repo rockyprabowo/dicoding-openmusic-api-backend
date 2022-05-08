@@ -26,6 +26,18 @@ class Song {
   duration
   albumId
 
+  static songsCacheKey = 'songs'
+
+  static songFilterCacheKey = 'songs:filters'
+
+  /**
+   * Song cache key
+   *
+   * @param {string} id ID
+   * @returns {string} Cache key
+   */
+  static songCacheKey = (id) => `song:${id}`
+
   /**
    * Construct a new {@link Song}.
    *

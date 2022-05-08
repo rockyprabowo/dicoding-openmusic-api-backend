@@ -58,38 +58,6 @@ class PlaylistsService extends PostgresBase {
   }
 
   /**
-   * Playlist cache key
-   *
-   * @param {string} id ID
-   * @returns {string} Cache key
-   */
-  static playlistCacheKey = (id) => (`playlists:${id}`)
-
-  /**
-   * Playlist owner key
-   *
-   * @param {string} id ID
-   * @returns {string} Cache key
-   */
-  static playlistOwnerCacheKey = (id) => (`playlists:${id}:owner`)
-
-  /**
-   * Playlist songs cache key
-   *
-   * @param {string} id ID
-   * @returns {string} Cache key
-   */
-  static playlistSongsCacheKey = (id) => (`playlists:${id}:songs`)
-
-  /**
-   * Playlist activities cache key
-   *
-   * @param {string} id ID
-   * @returns {string} Cache key
-   */
-  static playlistActivitiesCacheKey = (id) => (`playlists:${id}:activities`)
-
-  /**
    * Verifies playlist ownership
    *
    * @param {string} playlistId Playlist {@link Playlist.id id}
@@ -209,8 +177,8 @@ class PlaylistsService extends PostgresBase {
     await this.verifyPlaylistAccess(playlistId, userId)
 
     try {
-      const cachedPlaylist = await this.#cacheService.get(PlaylistsService.playlistCacheKey(playlistId))
-      const cachedSongs = await this.#cacheService.get(PlaylistsService.playlistSongsCacheKey(playlistId))
+      const cachedPlaylist = await this.#cacheService.get(Playlist.playlistCacheKey(playlistId))
+      const cachedSongs = await this.#cacheService.get(Playlist.playlistSongsCacheKey(playlistId))
       /** @type {Playlist} */
       const playlist = playlistMapper(JSON.parse(cachedPlaylist))
       playlist.songs = Array.from(JSON.parse(cachedSongs)).map(songsMapper) ?? []
@@ -240,7 +208,7 @@ class PlaylistsService extends PostgresBase {
    */
   getPlaylistOwnerById = async (playlistId) => {
     try {
-      const cachedPlaylistOwner = await this.#cacheService.get(PlaylistsService.playlistOwnerCacheKey(playlistId))
+      const cachedPlaylistOwner = await this.#cacheService.get(Playlist.playlistOwnerCacheKey(playlistId))
       return cachedPlaylistOwner
     } catch (error) {
       /** @type {QueryConfig} */
@@ -256,7 +224,7 @@ class PlaylistsService extends PostgresBase {
       const playlist = result.rows.map(Playlist.mapDBToModelWithUsername)[0]
 
       if (playlist.ownerId) {
-        await this.#cacheService.set(PlaylistsService.playlistOwnerCacheKey(playlistId), playlist.ownerId, 1800)
+        await this.#cacheService.set(Playlist.playlistOwnerCacheKey(playlistId), playlist.ownerId, 1800)
       }
       return /** @type {string} */ (playlist.ownerId)
     }
@@ -272,7 +240,7 @@ class PlaylistsService extends PostgresBase {
    */
   getPlaylistDataById = async (playlistId, playlistMapper = Playlist.mapDBToModelWithUsername) => {
     try {
-      const cachedPlaylist = await this.#cacheService.get(PlaylistsService.playlistCacheKey(playlistId))
+      const cachedPlaylist = await this.#cacheService.get(Playlist.playlistCacheKey(playlistId))
       return {
         playlist: playlistMapper(JSON.parse(cachedPlaylist)),
         __fromCache: true
@@ -296,7 +264,7 @@ class PlaylistsService extends PostgresBase {
       const playlist = playlistResult.rows.map(playlistMapper)[0]
       const cachedPlaylist = playlistResult.rows.map(Playlist.mapDBToModelWithUsername)[0]
 
-      await this.#cacheService.set(PlaylistsService.playlistCacheKey(playlistId), JSON.stringify(cachedPlaylist), 1800)
+      await this.#cacheService.set(Playlist.playlistCacheKey(playlistId), JSON.stringify(cachedPlaylist), 1800)
 
       return {
         playlist,
@@ -315,7 +283,7 @@ class PlaylistsService extends PostgresBase {
    */
   getPlaylistSongsById = async (playlistId, songsMapper = Song.mapDBToSongListItem) => {
     try {
-      const cachedSongs = await this.#cacheService.get(PlaylistsService.playlistSongsCacheKey(playlistId))
+      const cachedSongs = await this.#cacheService.get(Playlist.playlistSongsCacheKey(playlistId))
       return {
         songs: Array.from(JSON.parse(cachedSongs)).map(songsMapper),
         __fromCache: true
@@ -333,7 +301,7 @@ class PlaylistsService extends PostgresBase {
       const playlistSongsResult = await this.db.query(playlistSongsQuery)
       const playlistSongs = playlistSongsResult.rows.map(songsMapper)
 
-      await this.#cacheService.set(PlaylistsService.playlistSongsCacheKey(playlistId), JSON.stringify(playlistSongs), 1800)
+      await this.#cacheService.set(Playlist.playlistSongsCacheKey(playlistId), JSON.stringify(playlistSongs), 1800)
 
       return {
         songs: playlistSongs,
@@ -380,11 +348,11 @@ class PlaylistsService extends PostgresBase {
 
     await this.#cacheService.dropCaches([
       UsersService.userPlaylistsCacheKey(userId),
-      PlaylistsService.playlistCacheKey(playlistId),
-      PlaylistsService.playlistOwnerCacheKey(playlistId),
-      PlaylistsService.playlistSongsCacheKey(playlistId),
-      PlaylistsService.playlistActivitiesCacheKey(playlistId),
-      PlaylistsCollaborationsService.collaborationsCacheKey(playlistId)
+      Playlist.playlistCacheKey(playlistId),
+      Playlist.playlistOwnerCacheKey(playlistId),
+      Playlist.playlistSongsCacheKey(playlistId),
+      PlaylistActivities.playlistActivitiesCacheKey(playlistId),
+      PlaylistCollaboration.collaborationsCacheKey(playlistId)
     ])
     return result.rows[0]
   }
@@ -420,8 +388,8 @@ class PlaylistsService extends PostgresBase {
     await this.logActivity({ playlistId, songId, userId, action: 'add' })
 
     await this.#cacheService.dropCaches([
-      PlaylistsService.playlistSongsCacheKey(playlistId),
-      PlaylistsService.playlistActivitiesCacheKey(playlistId)
+      Playlist.playlistSongsCacheKey(playlistId),
+      PlaylistActivities.playlistActivitiesCacheKey(playlistId)
     ])
 
     return result.rows[0]
@@ -457,8 +425,8 @@ class PlaylistsService extends PostgresBase {
     await this.logActivity({ playlistId, songId, userId, action: 'delete' })
 
     await this.#cacheService.dropCaches([
-      PlaylistsService.playlistSongsCacheKey(playlistId),
-      PlaylistsService.playlistActivitiesCacheKey(playlistId)
+      Playlist.playlistSongsCacheKey(playlistId),
+      PlaylistActivities.playlistActivitiesCacheKey(playlistId)
     ])
 
     return result.rows[0]
@@ -473,7 +441,7 @@ class PlaylistsService extends PostgresBase {
    */
   getPlaylistActivities = async (playlistId, userId) => {
     try {
-      const cachedPlaylistActivities = await this.#cacheService.get(PlaylistsService.playlistActivitiesCacheKey(playlistId))
+      const cachedPlaylistActivities = await this.#cacheService.get(PlaylistActivities.playlistActivitiesCacheKey(playlistId))
       const activities = Array.from(JSON.parse(cachedPlaylistActivities)).map(PlaylistActivitiesItem.mapDataToOutput)
       return {
         playlistActivities: { playlistId, activities },
@@ -496,7 +464,7 @@ class PlaylistsService extends PostgresBase {
       const cachedActivities = result.rows.map(PlaylistActivitiesItem.mapDBToDataModel)
       const activities = result.rows.map(PlaylistActivitiesItem.mapDataToOutput)
 
-      await this.#cacheService.set(PlaylistsService.playlistActivitiesCacheKey(playlistId), JSON.stringify(cachedActivities), 1800)
+      await this.#cacheService.set(PlaylistActivities.playlistActivitiesCacheKey(playlistId), JSON.stringify(cachedActivities), 1800)
 
       return {
         playlistActivities: { playlistId, activities },

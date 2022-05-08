@@ -22,6 +22,14 @@ class PlaylistActivities {
   activities
 
   /**
+   * Playlist activities cache key
+   *
+   * @param {string} id ID
+   * @returns {string} Cache key
+   */
+  static playlistActivitiesCacheKey = (id) => (`playlists:${id}:activities`)
+
+  /**
    * Construct a new {@link PlaylistActivities}
    *
    * @param {PlaylistActivitiesPayload} payload Payload

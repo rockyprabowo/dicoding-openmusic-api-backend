@@ -22,6 +22,14 @@ class PlaylistCollaboration {
   userId
 
   /**
+   * Playlist collaboration cache key
+   *
+   * @param {string} playlistId ID
+   * @returns {string} Cache key
+   */
+  static collaborationsCacheKey = (playlistId) => (`playlists:${playlistId}:collaborations`)
+
+  /**
    * Construct a new {@link PlaylistCollaboration}
    *
    *@param {PlaylistCollaborationRequestPayload} payload Payload

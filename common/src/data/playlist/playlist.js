@@ -33,6 +33,30 @@ class Playlist {
   name
   #ownerUsername
 
+  /**
+   * Playlist cache key
+   *
+   * @param {string} id ID
+   * @returns {string} Cache key
+   */
+  static playlistCacheKey = (id) => (`playlists:${id}`)
+
+  /**
+   * Playlist owner key
+   *
+   * @param {string} id ID
+   * @returns {string} Cache key
+   */
+  static playlistOwnerCacheKey = (id) => (`playlists:${id}:owner`)
+
+  /**
+   * Playlist songs cache key
+   *
+   * @param {string} id ID
+   * @returns {string} Cache key
+   */
+  static playlistSongsCacheKey = (id) => (`playlists:${id}:songs`)
+
   /** @type {(string | undefined)} */
   #ownerId
   /** @type {(User | undefined)} */

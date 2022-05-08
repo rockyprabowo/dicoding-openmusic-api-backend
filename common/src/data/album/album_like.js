@@ -23,6 +23,14 @@ class AlbumLike {
   albumId
 
   /**
+   * Like count cache key
+   *
+   * @param {string} id ID
+   * @returns {string} Cache key
+   */
+  static likeCountCacheKey = (id) => `albums:${id}:likes`
+
+  /**
    * Construct an {@link AlbumLike}
    *
    * @param {AlbumLikeRequestPayload} payload Payload
