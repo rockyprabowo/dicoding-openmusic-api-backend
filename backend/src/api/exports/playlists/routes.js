@@ -5,15 +5,15 @@ const { ServerRoute } = require('~types/api')
 /**
  * Exports Plugin - Routes
  *
- *  @typedef {import('.')} ExportsPlugin
+ *  @typedef {import('.')} ExportsPlaylistsPlugin
  */
 
 /**
- * Routes of {@link ExportsPlugin}, handled by {@link ExportsHandler}
+ * Routes of {@link ExportsPlaylistsPlugin}, handled by {@link ExportsPlaylistsHandler}
  *
- * @param {ExportsPlaylistsHandler} handler {@link ExportsPlugin} handler
+ * @param {ExportsPlaylistsHandler} handler {@link ExportsPlaylistsPlugin} handler
  * @returns {ServerRoute[]} Hapi route definitions
- * @memberof module:api/playlists
+ * @memberof module:api/exports/playlists
  */
 const routes = (handler) => [
   {

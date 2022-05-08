@@ -1,5 +1,10 @@
 const amqp = require('amqplib')
 
+/**
+ * Represent a RabbitMQ based message queue producer service
+ *
+ * @module services/rabbitmq/producer_service
+ */
 class ProducerService {
   /**
    * Sends a message to a message queue

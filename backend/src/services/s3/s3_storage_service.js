@@ -10,6 +10,7 @@ const BaseStorageService = require('@openmusic/common/services/storage/base')
 /**
  * Represent a S3 storage service
  *
+ * @module service/s3/s3_storage_service
  */
 class S3StorageService extends BaseStorageService {
   #S3

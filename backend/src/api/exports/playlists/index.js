@@ -5,13 +5,13 @@ const { Plugin } = require('~types/api')
 const { ExportsPlaylistsPluginOptions } = require('~types/api/exports')
 
 /**
- * OpenMusic API - Export Playlists API
+ * OpenMusic API - Exports Playlists API
  *
  * @module api/exports/playlists
  */
 
 /**
- * Exports plugin registration object
+ * Exports Playlists plugin registration object
  *
  * @type {Plugin<ExportsPlaylistsPluginOptions>}
  * @memberof module:api/exports/playlists

@@ -8,17 +8,23 @@ const { UserRequestPayload } = require('@openmusic/common/types/data/user')
  * @typedef {import('@openmusic/common/data/user/user')} User
  */
 
+/**
+ * Represents a class handling the {@link UsersRoutes routes}
+ *
+ * @memberof module:api/users
+ */
 class UsersHandler {
-  usersService
-  validator
+  #usersService
+  #validator
+
   /**
    * Construct a new {@link UsersHandler Users Handler} with {@link UsersPluginOptions options}
    *
    * @param {UsersPluginOptions} options Users plugin options
    */
   constructor (options) {
-    this.usersService = options.usersService
-    this.validator = options.validator
+    this.#usersService = options.usersService
+    this.#validator = options.validator
   }
 
   /**
@@ -30,10 +36,10 @@ class UsersHandler {
   postUserHandler = async (request, h) => {
     const payload = /** @type {UserRequestPayload} */ (request.payload)
 
-    this.validator.validate(payload)
+    this.#validator.validate(payload)
     const { username, password, fullname } = payload
 
-    const user = await this.usersService.addUser({ username, password, fullname })
+    const user = await this.#usersService.addUser({ username, password, fullname })
 
     return h.response({
       status: 'success',
@@ -52,7 +58,7 @@ class UsersHandler {
    */
   getUserByIdHandler = async (request, h) => {
     const { id } = request.params
-    const user = await this.usersService.getUserById(id)
+    const user = await this.#usersService.getUserById(id)
 
     return h.response({
       status: 'success',

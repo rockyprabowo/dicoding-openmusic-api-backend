@@ -14,6 +14,7 @@
  * @typedef {object} UsersPluginOptions
  * @property {UsersService} usersService Service for {@link UsersHandler}
  * @property {UserValidator} validator Validator for {@link UsersHandler}
+ * @memberof module:api/users
  */
 
 module.exports = {}

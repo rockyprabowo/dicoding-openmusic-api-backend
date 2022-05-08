@@ -14,6 +14,7 @@
  * @typedef {object} PlaylistsPluginOptions
  * @property {PlaylistsService} playlistsService Playlists Service
  * @property {PlaylistValidators} validators Validators
+ * @memberof module:api/playlists
  */
 
 module.exports = {}

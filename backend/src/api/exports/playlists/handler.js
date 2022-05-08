@@ -1,8 +1,23 @@
 const { LifecycleMethod, ResponseObject } = require('~types/api')
 const { ExportsPlaylistsPluginOptions } = require('~types/api/exports')
-const { ExportPlaylistRequestPayload, ExportPlaylistQueueMessage } = require('@openmusic/common/types/data/export_playlist')
+const {
+  ExportPlaylistRequestPayload,
+  ExportPlaylistQueueMessage
+} = require('@openmusic/common/types/data/export_playlist')
 const { JWTTokenPayload } = require('~types/utils/tokenise')
 
+/**
+ * Exports Playlists Plugin - Route Handler
+ *
+ * @typedef {import('./routes')} ExportsPlaylistsRoutes
+ * @typedef {import('@openmusic/common/data/user/user')} User
+ */
+
+/**
+ * Represents a class handling the {@link ExportsPlaylistsRoutes routes}
+ *
+ * @memberof module:api/exports/playlists
+ */
 class ExportsPlaylistsHandler {
   #producerService
   #playlistsService

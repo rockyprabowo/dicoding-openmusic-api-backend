@@ -18,6 +18,7 @@
  * @property {UsersService} usersService Users Service for {@link AuthenticationsHandler}
  * @property {TokenManager} tokenManager Token manager for {@link AuthenticationsHandler}
  * @property {AuthenticationValidators} validators Validators for {@link AuthenticationsHandler}
+ * @memberof module:api/authentications
  */
 
 module.exports = {}

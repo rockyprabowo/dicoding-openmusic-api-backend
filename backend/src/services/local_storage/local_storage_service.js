@@ -2,6 +2,11 @@ const fs = require('fs')
 const stream = require('stream')
 const BaseStorageService = require('@openmusic/common/services/storage/base')
 
+/**
+ * Represent a local storage service
+ *
+ * @module services/local_storage/local_storage_service
+ */
 class LocalStorageService extends BaseStorageService {
   #directory
   #urlGenerator

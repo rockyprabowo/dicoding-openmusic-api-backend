@@ -18,8 +18,8 @@ const { JWTTokenPayload } = require('~types/utils/tokenise')
  * @memberof module:api/playlists
  */
 class PlaylistsHandler {
-  playlistsService
-  validators
+  #playlistsService
+  #validators
 
   /**
    * Construct a new {@link PlaylistsHandler Playlists Handler} with {@link PlaylistsPluginOptions options}
@@ -27,8 +27,8 @@ class PlaylistsHandler {
    * @param {PlaylistsPluginOptions} options Playlists plugin options
    */
   constructor (options) {
-    this.playlistsService = options.playlistsService
-    this.validators = options.validators
+    this.#playlistsService = options.playlistsService
+    this.#validators = options.validators
   }
 
   /**
@@ -41,11 +41,11 @@ class PlaylistsHandler {
     const payload = /** @type {PlaylistRequestPayload} */ (request.payload)
     const { id: credentialId } = /** @type {JWTTokenPayload} */ (request.auth.credentials)
 
-    this.validators.PlaylistValidator.validate(payload)
+    this.#validators.PlaylistValidator.validate(payload)
 
     const { name } = payload
 
-    const playlist = await this.playlistsService.addPlaylist({ name, ownerId: credentialId })
+    const playlist = await this.#playlistsService.addPlaylist({ name, ownerId: credentialId })
 
     return h.response({
       status: 'success',
@@ -65,7 +65,7 @@ class PlaylistsHandler {
   getPlaylistsHandler = async (request, h) => {
     const { id: credentialId } = /** @type {JWTTokenPayload} */ (request.auth.credentials)
 
-    const { playlists, __fromCache: cached } = await this.playlistsService.getPlaylists(credentialId)
+    const { playlists, __fromCache: cached } = await this.#playlistsService.getPlaylists(credentialId)
 
     return h.response({
       status: 'success',
@@ -83,7 +83,7 @@ class PlaylistsHandler {
     const { id: playlistId } = request.params
     const { id: credentialId } = /** @type {JWTTokenPayload} */ (request.auth.credentials)
 
-    await this.playlistsService.deletePlaylistById(playlistId, credentialId)
+    await this.#playlistsService.deletePlaylistById(playlistId, credentialId)
 
     return h.response({
       status: 'success',

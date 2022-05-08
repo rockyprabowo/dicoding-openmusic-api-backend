@@ -4,7 +4,7 @@ const fs = require('fs')
 /**
  * OpenMusic API - Developer JSDoc Documentations
  *
- * @module api/docs
+ * @module api/devdocs
  */
 
 /**
@@ -12,7 +12,7 @@ const fs = require('fs')
  *
  * @typedef {object} DocsPluginOptions
  * @property {string} docsPath Documentation path
- * @memberof module:api/docs
+ * @memberof module:api/devdocs
  */
 
 /**

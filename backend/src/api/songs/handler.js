@@ -15,16 +15,16 @@ const { SongRequestPayload } = require('@openmusic/common/types/data/song')
  * @memberof module:api/songs
  */
 class SongsHandler {
-  songsService
-  validator
+  #songsService
+  #validator
   /**
    * Construct a new {@link SongsHandler Songs Handler} with {@link SongsPluginOptions options}
    *
    * @param {SongsPluginOptions} options Songs plugin options
    */
   constructor (options) {
-    this.songsService = options.songsService
-    this.validator = options.validator
+    this.#songsService = options.songsService
+    this.#validator = options.validator
   }
 
   /**
@@ -36,11 +36,11 @@ class SongsHandler {
   postSongHandler = async (request, h) => {
     const payload = /** @type {SongRequestPayload} */ (request.payload)
 
-    this.validator.validate(payload)
+    this.#validator.validate(payload)
 
     const { title, year, performer, genre, duration, albumId } = payload
 
-    const song = await this.songsService.addSong({ title, year, performer, genre, duration, albumId })
+    const song = await this.#songsService.addSong({ title, year, performer, genre, duration, albumId })
 
     return h.response({
       status: 'success',
@@ -59,7 +59,7 @@ class SongsHandler {
    */
   getSongsHandler = async (request, h) => {
     const { performer, title } = request.query
-    const { songs, __fromCache: cached } = await this.songsService.getSongs({ performer, title })
+    const { songs, __fromCache: cached } = await this.#songsService.getSongs({ performer, title })
 
     return h.response({
       status: 'success',
@@ -75,7 +75,7 @@ class SongsHandler {
    */
   getSongByIdHandler = async (request, h) => {
     const { id } = request.params
-    const { song, __fromCache: cached } = await this.songsService.getSongById(id)
+    const { song, __fromCache: cached } = await this.#songsService.getSongById(id)
 
     return h.response({
       status: 'success',
@@ -93,11 +93,11 @@ class SongsHandler {
     const { id } = request.params
     const payload = /** @type {SongRequestPayload} */ (request.payload)
 
-    this.validator.validate(payload)
+    this.#validator.validate(payload)
 
     const { title, genre, performer, year, duration, albumId } = payload
 
-    await this.songsService.editSongById(id, { title, genre, performer, year, duration, albumId })
+    await this.#songsService.editSongById(id, { title, genre, performer, year, duration, albumId })
 
     return h.response({
       status: 'success',
@@ -114,7 +114,7 @@ class SongsHandler {
   deleteSongByIdHandler = async (request, h) => {
     const { id } = request.params
 
-    await this.songsService.deleteSongById(id)
+    await this.#songsService.deleteSongById(id)
 
     return h.response({
       status: 'success',

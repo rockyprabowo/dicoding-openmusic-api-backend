@@ -17,6 +17,7 @@
  * @property {PlaylistsCollaborationsService} playlistsCollaborationsService PlaylistsCollaborations Service for {@link PlaylistsCollaborationsHandler}
  * @property {PlaylistsService} playlistsService Playlists Service for {@link PlaylistsCollaborationsHandler}
  * @property {PlaylistCollaborationValidator} validator Validators for {@link PlaylistsCollaborationsHandler}
+ * @memberof module:api/playlists/collaborations
  */
 
 module.exports = {}

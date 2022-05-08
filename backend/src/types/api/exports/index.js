@@ -17,6 +17,7 @@
  * @property {ProducerService} producerService Producer Service for {@link ExportsPlaylistsHandler}
  * @property {PlaylistsService} playlistsService Playlists Service for {@link ExportsPlaylistsHandler}
  * @property {ExportPlaylistValidator} validator Validator for {@link ExportsPlaylistsHandler}
+ * @memberof module:api/exports/playlists
  */
 
 module.exports = {}

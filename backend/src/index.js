@@ -10,8 +10,8 @@ const { prerequisiteCheck, handleCommandArguments } = require('./setup')
 handleCommandArguments(process.argv).then(
   (result) => {
     if (result.commandCount === 0) {
-      require('module-alias')(path.join(__dirname, '/..'))
-      require('dotenv').config({ path: path.join(__dirname, '../../.env') })
+      require('module-alias')(path.join(__dirname, '/..')) // Register module alias relative to this script location
+      require('dotenv').config({ path: path.join(__dirname, '../../.env') }) // Locate .env on the root project directory
 
       prerequisiteCheck()
       require('./server').start()
@@ -21,8 +21,3 @@ handleCommandArguments(process.argv).then(
     console.error(error)
     process.exit(1)
   })
-
-process.on('unhandledRejection', (err) => {
-  console.error(err)
-  process.exit(1)
-})

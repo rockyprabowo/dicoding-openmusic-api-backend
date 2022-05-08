@@ -17,8 +17,8 @@ const { JWTTokenPayload } = require('~types/utils/tokenise')
  * @memberof module:api/playlists/songs
  */
 class PlaylistsSongsHandler {
-  playlistsService
-  validators
+  #playlistsService
+  #validators
 
   /**
    * Construct a new {@link PlaylistsSongsHandler Playlists Handler} with {@link PlaylistsPluginOptions options}
@@ -26,8 +26,8 @@ class PlaylistsSongsHandler {
    * @param {PlaylistsPluginOptions} options Playlists plugin options
    */
   constructor (options) {
-    this.playlistsService = options.playlistsService
-    this.validators = options.validators
+    this.#playlistsService = options.playlistsService
+    this.#validators = options.validators
   }
 
   /**
@@ -40,7 +40,7 @@ class PlaylistsSongsHandler {
     const { id: credentialId } = /** @type {JWTTokenPayload} */ (request.auth.credentials)
 
     const { id: playlistId } = request.params
-    const { playlist, __fromCache: cached } = await this.playlistsService.getPlaylistById(playlistId, credentialId)
+    const { playlist, __fromCache: cached } = await this.#playlistsService.getPlaylistById(playlistId, credentialId)
 
     return h.response({
       status: 'success',
@@ -60,11 +60,11 @@ class PlaylistsSongsHandler {
 
     const payload = /** @type {PlaylistSongRequestPayload} */ (request.payload)
 
-    this.validators.PlaylistSongValidator.validate(payload)
+    this.#validators.PlaylistSongValidator.validate(payload)
 
     const { songId } = payload
 
-    await this.playlistsService.addPlaylistSong(playlistId, credentialId, { songId })
+    await this.#playlistsService.addPlaylistSong(playlistId, credentialId, { songId })
 
     return h.response({
       status: 'success',
@@ -84,11 +84,11 @@ class PlaylistsSongsHandler {
 
     const payload = /** @type {PlaylistSongRequestPayload} */ (request.payload)
 
-    this.validators.PlaylistSongValidator.validate(payload)
+    this.#validators.PlaylistSongValidator.validate(payload)
 
     const { songId } = payload
 
-    await this.playlistsService.deletePlaylistSong(playlistId, credentialId, { songId })
+    await this.#playlistsService.deletePlaylistSong(playlistId, credentialId, { songId })
 
     return h.response({
       status: 'success',

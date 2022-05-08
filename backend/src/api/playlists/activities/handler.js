@@ -5,6 +5,9 @@ const { JWTTokenPayload } = require('~types/utils/tokenise')
 /**
  * Playlists Activities Plugin - Handler class
  *
+ */
+
+/**
  * @typedef {import('./routes')} PlaylistsActivitiesRoutes
  * @typedef {import('@openmusic/common/data/playlist/playlist') } Playlist
  * @typedef {import('@openmusic/common/data/playlist/playlist_activities').PlaylistActivities } PlaylistActivities

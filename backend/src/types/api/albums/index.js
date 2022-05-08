@@ -27,6 +27,7 @@
  * @property {AlbumsService} albumsService Album Service
  * @property {(LocalStorageService | S3StorageService)} storageService Storage Service
  * @property {ImageUploadValidator} validator Validator
+ * @memberof module:api/albums/cover_art
  */
 
 module.exports = {}
