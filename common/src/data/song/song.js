@@ -14,6 +14,7 @@ const {
 /**
  * Represents a Song
  *
+ * @memberof module:data/song
  */
 class Song {
   static tableName = 'songs'

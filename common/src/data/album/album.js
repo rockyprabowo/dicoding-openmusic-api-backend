@@ -2,6 +2,7 @@ const { nanoid } = require('nanoid')
 const Song = require('../../data/song/song')
 const { AlbumRequestPayload, AlbumDbRow } = require('../../types/data/album')
 const { SongListItem } = require('../../types/data/song')
+
 /**
  * OpenMusic API - Album data model
  *
@@ -11,6 +12,7 @@ const { SongListItem } = require('../../types/data/song')
 /**
  * Represents an Album
  *
+ * @memberof module:data/album
  */
 class Album {
   static tableName = 'albums'

@@ -1,6 +1,11 @@
 const Album = require('../../data/album/album')
 
 /**
+ * Album related typedefs
+ *
+ */
+
+/**
  * @typedef {object} AlbumDbRow
  * @property {string} [id] ID
  * @property {string} name Name

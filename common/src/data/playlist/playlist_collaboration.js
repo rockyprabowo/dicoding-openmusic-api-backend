@@ -5,9 +5,15 @@ const {
 } = require('../../types/data/playlist_collaboration')
 
 /**
+ * OpenMusic API - Playlist Collaboration data model
+ *
+ * @module data/playlist/collaboration
+ */
+
+/**
  * Represents a Playlist Collaboration
  *
- * @module data/collaboration
+ * @memberof module:data/playlist/collaboration
  */
 class PlaylistCollaboration {
   static tableName = 'playlists_collaborations'

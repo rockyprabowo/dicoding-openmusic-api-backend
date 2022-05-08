@@ -21,6 +21,7 @@ const NotFoundError = require('../../exceptions/not_found_error')
 /**
  * Represents a service class related to {@link Song}.
  *
+ * @memberof module:services/postgresql/songs
  */
 class SongsService extends PostgresBase {
   #cacheService

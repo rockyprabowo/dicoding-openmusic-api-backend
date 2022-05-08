@@ -20,6 +20,7 @@ const NotFoundError = require('../../exceptions/not_found_error')
 /**
  * Represents a service class related to {@link Album}.
  *
+ * @memberof module:services/postgresql/albums
  */
 class AlbumsService extends PostgresBase {
   #cacheService

@@ -6,9 +6,15 @@ const {
 } = require('../../types/data/playlist')
 
 /**
+ * OpenMusic API - Playlist Activities data model
+ *
+ * @module data/playlist/activities
+ */
+
+/**
  * Represents a Playlist Activities
  *
- * @memberof module:data/playlist
+ * @memberof module:data/playlist/activities
  */
 class PlaylistActivities {
   static tableName = 'playlist_song_activities'
@@ -29,7 +35,7 @@ class PlaylistActivities {
 /**
  * Represents a Playlist Activities Item
  *
- * @memberof module:data/playlist
+ * @memberof module:data/playlist/activities
  */
 class PlaylistActivitiesItem {
   id

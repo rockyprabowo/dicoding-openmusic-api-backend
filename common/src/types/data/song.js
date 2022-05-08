@@ -1,6 +1,11 @@
 const Song = require('../../data/song/song')
 
 /**
+ * Song related typedefs
+ *
+ */
+
+/**
  * @typedef {object} SongDbRow
  * @property {string} id ID
  * @property {string} title Title

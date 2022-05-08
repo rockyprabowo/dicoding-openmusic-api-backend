@@ -5,6 +5,17 @@ const {
   AlbumLikesCount
 } = require('../../types/data/album_like')
 
+/**
+ * OpenMusic API - Album Like data model
+ *
+ * @module data/album/like
+ */
+
+/**
+ * Represents an Album Like
+ *
+ * @memberof module:data/album/like
+ */
 class AlbumLike {
   static tableName = 'user_album_likes'
   id

@@ -10,6 +10,7 @@ const InvariantError = require('../../exceptions/invariant_error')
 /**
  * Represents a service class related to {@link Authentications}.
  *
+ * @memberof module:services/postgresql/authentications
  */
 class AuthenticationsService extends PostgresBase {
   /**

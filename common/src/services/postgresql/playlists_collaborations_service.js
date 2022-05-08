@@ -1,9 +1,20 @@
 const PostgresBase = require('./base')
 const UsersService = require('./users_service')
-const Collaboration = require('../../data/playlist/playlist_collaboration')
+const PlaylistCollaboration = require('../../data/playlist/playlist_collaboration')
 const InvariantError = require('../../exceptions/invariant_error')
 const CacheService = require('../redis/cache_service')
 
+/**
+ * OpenMusic API - Playlists Collaborations Service (PostgreSQL Persistence)
+ *
+ * @module services/postgresql/playlists_collaborations
+ */
+
+/**
+ * Represents a service class related to {@link PlaylistCollaboration}.
+ *
+ * @memberof module:services/postgresql/playlists_collaborations
+ */
 class PlaylistsCollaborationsService extends PostgresBase {
   #usersService
   #cacheService
@@ -37,10 +48,10 @@ class PlaylistsCollaborationsService extends PostgresBase {
    */
   async addCollaboration (playlistId, userId) {
     await this.#usersService.getUserById(userId)
-    const newCollaboration = new Collaboration({ playlistId, userId })
+    const newCollaboration = new PlaylistCollaboration({ playlistId, userId })
 
     const query = {
-      text: `INSERT INTO ${Collaboration.tableName} (id, playlist_id, user_id) VALUES($1, $2, $3) RETURNING id`,
+      text: `INSERT INTO ${PlaylistCollaboration.tableName} (id, playlist_id, user_id) VALUES($1, $2, $3) RETURNING id`,
       values: [newCollaboration.id, newCollaboration.playlistId, newCollaboration.userId]
     }
 
@@ -64,7 +75,7 @@ class PlaylistsCollaborationsService extends PostgresBase {
    */
   async deleteCollaboration (playlistId, userId) {
     const query = {
-      text: `DELETE FROM  ${Collaboration.tableName} WHERE playlist_id = $1 AND user_id = $2 RETURNING id`,
+      text: `DELETE FROM  ${PlaylistCollaboration.tableName} WHERE playlist_id = $1 AND user_id = $2 RETURNING id`,
       values: [playlistId, userId]
     }
 
@@ -85,7 +96,7 @@ class PlaylistsCollaborationsService extends PostgresBase {
    *
    * @param {string} playlistId Playlist ID
    * @param {string} userId User ID
-   * @returns {Promise<Collaboration>} Collaboration {@link Collaboration.id id}
+   * @returns {Promise<PlaylistCollaboration>} Collaboration {@link PlaylistCollaboration.id id}
    */
   async verifyCollaborator (playlistId, userId) {
     try {
@@ -93,7 +104,7 @@ class PlaylistsCollaborationsService extends PostgresBase {
       return JSON.parse(cachedCollaboration)
     } catch (error) {
       const query = {
-        text: `SELECT * FROM ${Collaboration.tableName} WHERE playlist_id = $1 AND user_id = $2`,
+        text: `SELECT * FROM ${PlaylistCollaboration.tableName} WHERE playlist_id = $1 AND user_id = $2`,
         values: [playlistId, userId]
       }
 
@@ -102,7 +113,7 @@ class PlaylistsCollaborationsService extends PostgresBase {
       if (result.rowCount === 0) {
         throw new InvariantError('Kolaborasi gagal diverifikasi')
       }
-      const collaboration = result.rows.map(Collaboration.mapDBToModel)[0]
+      const collaboration = result.rows.map(PlaylistCollaboration.mapDBToModel)[0]
 
       await this.#cacheService.hSet(PlaylistsCollaborationsService.collaborationsCacheKey(playlistId), userId, JSON.stringify(collaboration))
 

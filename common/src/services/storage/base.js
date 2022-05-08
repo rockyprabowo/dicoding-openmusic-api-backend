@@ -1,6 +1,11 @@
 const stream = require('stream')
 const NotImplementedError = require('../../exceptions/not_implemented_error')
 
+/**
+ * Represents a base storage class
+ *
+ * @module services/storage
+ */
 class BaseStorageService {
   constructor () {
     if (this.constructor === BaseStorageService) {

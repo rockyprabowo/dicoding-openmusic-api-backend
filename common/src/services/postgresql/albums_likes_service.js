@@ -8,7 +8,7 @@ const CacheService = require('../redis/cache_service')
 /**
  * OpenMusic API - Albums Likes Service (PostgreSQL Persistence)
  *
- * @module services/postgresql/albums
+ * @module services/postgresql/albums_likes
  */
 
 /**
@@ -18,6 +18,7 @@ const CacheService = require('../redis/cache_service')
 /**
  * Represents a service class related to {@link Album} likes.
  *
+ * @memberof module:services/postgresql/albums_likes
  */
 class AlbumsLikesService extends PostgresBase {
   #albumsService

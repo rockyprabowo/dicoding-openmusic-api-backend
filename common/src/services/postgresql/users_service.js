@@ -13,6 +13,7 @@ const AuthenticationError = require('../../exceptions/authentication_error')
 /**
  * Represents a service class related to {@link Users}.
  *
+ * @memberof module:services/postgresql/users
  */
 class UsersService extends PostgresBase {
   /**

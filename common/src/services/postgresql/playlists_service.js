@@ -27,6 +27,17 @@ const InvariantError = require('../../exceptions/invariant_error')
 const NotFoundError = require('../../exceptions/not_found_error')
 const AuthorisationError = require('../../exceptions/authorisation_error')
 
+/**
+ * OpenMusic API - Playlists Service (PostgreSQL Persistence)
+ *
+ * @module services/postgresql/playlists
+ */
+
+/**
+ * Represents a service class related to {@link Playlist}.
+ *
+ * @memberof module:services/postgresql/playlists
+ */
 class PlaylistsService extends PostgresBase {
   #playlistsCollaborationService
   #songsService

@@ -1,4 +1,8 @@
 /**
+ * node-postgres related external typedefs
+ *
+ */
+/**
  * @typedef {import('pg').Pool} Pool
  * @external Pool
  * @see http://example.com
