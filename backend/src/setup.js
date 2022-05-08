@@ -104,12 +104,19 @@ const handleCommandArguments = async (argv) => {
   for (const command of uniqueArgv) {
     const currentCommand = commandMap.get(command)
     if (currentCommand) {
-      if (currentCommand.constructor.name === 'AsyncFunction') {
-        await currentCommand()
-      } else {
-        currentCommand()
+      try {
+        if (currentCommand.constructor.name === 'AsyncFunction') {
+          await currentCommand()
+        } else {
+          currentCommand()
+        }
+        validCommandExecuted++
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error(error)
+          process.exit(1)
+        }
       }
-      validCommandExecuted++
     } else {
       console.log(`Warning: invalid command: ${command}`)
     }
@@ -125,16 +132,14 @@ const handleCommandArguments = async (argv) => {
 
 const redisFlushDb = async () => {
   const cacheService = new CacheService()
-  try {
-    const result = await cacheService.flushDb()
-    console.log(`Redis database flushed. result = ${result}`)
-    await cacheService.disconnect()
-  } catch (e) {
-    if (e instanceof Error) {
-      console.log(e.message)
-      process.exit(1)
-    }
-  }
+  cacheService.onError((err) => {
+    console.error(err)
+    process.exit(1)
+  })
+
+  const result = await cacheService.flushAll()
+  console.log(`Redis database flushed. result = ${result}`)
+  await cacheService.disconnect()
 }
 
 /**

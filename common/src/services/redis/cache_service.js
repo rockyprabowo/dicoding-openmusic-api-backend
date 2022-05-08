@@ -28,6 +28,15 @@ class CacheService {
   }
 
   /**
+   * Handle 'error' event
+   *
+   * @param {function(Error): void} cb Callback
+   */
+  onError (cb) {
+    this.#client.on('error', cb)
+  }
+
+  /**
    * Caches a value with a key
    *
    * @param {string} key Key
@@ -127,8 +136,15 @@ class CacheService {
   /**
    * Flushes redis database
    */
-  async flushDb () {
-    return await this.#client.flushDb()
+  async flushAll () {
+    return await this.#client.flushAll()
+  }
+
+  /**
+   * Connect to redis database
+   */
+  async connect () {
+    return await this.#client.connect()
   }
 
   /**
