@@ -130,10 +130,17 @@ class PlaylistsService extends PostgresBase {
    * @async
    */
   getPlaylists = async (userId) => {
+    const mapper = Playlist.mapDBToPlaylistListItem
+    const cacheMapper = Playlist.mapDBToModelWithUsername
+
     try {
       const cachedPlaylists = await this.#cacheService.get(User.userPlaylistsCacheKey(userId))
       return {
-        playlists: Array.from(JSON.parse(cachedPlaylists)).map(Playlist.mapDBToPlaylistListItem),
+        playlists: Array.from(
+          JSON.parse(
+            /** @type {string} */ (cachedPlaylists)
+          )
+        ).map(mapper),
         __fromCache: true
       }
     } catch (error) {
@@ -148,8 +155,8 @@ class PlaylistsService extends PostgresBase {
       }
       const result = await this.db.query(query)
 
-      const playlists = result.rows.map(Playlist.mapDBToPlaylistListItem)
-      const cachedPlaylists = result.rows.map(Playlist.mapDBToModelWithUsername)
+      const playlists = result.rows.map(mapper)
+      const cachedPlaylists = result.rows.map(cacheMapper)
 
       await this.#cacheService.set(User.userPlaylistsCacheKey(userId), JSON.stringify(cachedPlaylists), 1800)
 
@@ -172,15 +179,25 @@ class PlaylistsService extends PostgresBase {
    */
   getPlaylistById = async (playlistId, userId,
     playlistMapper = Playlist.mapDBToModelWithUsername,
-    songsMapper = Song.mapDBToSongListItem) => {
+    songsMapper = Song.mapDBToSongListItem
+  ) => {
     await this.verifyPlaylistAccess(playlistId, userId)
 
     try {
       const cachedPlaylist = await this.#cacheService.get(Playlist.playlistCacheKey(playlistId))
       const cachedSongs = await this.#cacheService.get(Playlist.playlistSongsCacheKey(playlistId))
-      /** @type {Playlist} */
-      const playlist = playlistMapper(JSON.parse(cachedPlaylist))
-      playlist.songs = Array.from(JSON.parse(cachedSongs)).map(songsMapper) ?? []
+
+      const playlist = playlistMapper(
+        JSON.parse(
+          /** @type {string} */ (cachedPlaylist)
+        )
+      )
+
+      playlist.songs = Array.from(
+        JSON.parse(
+          /** @type {string} */ (cachedSongs)
+        )
+      ).map(songsMapper) ?? []
 
       return {
         playlist,
@@ -208,23 +225,26 @@ class PlaylistsService extends PostgresBase {
   getPlaylistOwnerById = async (playlistId) => {
     try {
       const cachedPlaylistOwner = await this.#cacheService.get(Playlist.playlistOwnerCacheKey(playlistId))
-      return cachedPlaylistOwner
+      return /** @type {string} */ (cachedPlaylistOwner)
     } catch (error) {
       /** @type {QueryConfig} */
       const query = {
         text: `SELECT * FROM ${Playlist.tableName} WHERE id = $1`,
         values: [playlistId]
       }
+
       const result = await this.db.query(query)
 
       if (result.rowCount === 0) {
         throw new NotFoundError('Playlist not found')
       }
+
       const playlist = result.rows.map(Playlist.mapDBToModelWithUsername)[0]
 
       if (playlist.ownerId) {
         await this.#cacheService.set(Playlist.playlistOwnerCacheKey(playlistId), playlist.ownerId, 1800)
       }
+
       return /** @type {string} */ (playlist.ownerId)
     }
   }
@@ -241,7 +261,11 @@ class PlaylistsService extends PostgresBase {
     try {
       const cachedPlaylist = await this.#cacheService.get(Playlist.playlistCacheKey(playlistId))
       return {
-        playlist: playlistMapper(JSON.parse(cachedPlaylist)),
+        playlist: playlistMapper(
+          JSON.parse(
+            /** @type {string} */ (cachedPlaylist)
+          )
+        ),
         __fromCache: true
       }
     } catch (error) {
@@ -284,7 +308,11 @@ class PlaylistsService extends PostgresBase {
     try {
       const cachedSongs = await this.#cacheService.get(Playlist.playlistSongsCacheKey(playlistId))
       return {
-        songs: Array.from(JSON.parse(cachedSongs)).map(songsMapper),
+        songs: Array.from(
+          JSON.parse(
+            /** @type {string} */ (cachedSongs)
+          )
+        ).map(songsMapper),
         __fromCache: true
       }
     } catch (error) {
@@ -439,9 +467,15 @@ class PlaylistsService extends PostgresBase {
    * @returns {Promise<CacheablePlaylistActivities>} Playlist Activities
    */
   getPlaylistActivities = async (playlistId, userId) => {
+    const mapper = PlaylistActivitiesItem.mapDataToOutput
+
     try {
       const cachedPlaylistActivities = await this.#cacheService.get(PlaylistActivities.playlistActivitiesCacheKey(playlistId))
-      const activities = Array.from(JSON.parse(cachedPlaylistActivities)).map(PlaylistActivitiesItem.mapDataToOutput)
+      const activities = Array.from(
+        JSON.parse(
+          /** @type {string} */ (cachedPlaylistActivities)
+        )
+      ).map(mapper)
       return {
         playlistActivities: { playlistId, activities },
         __fromCache: true
@@ -461,7 +495,7 @@ class PlaylistsService extends PostgresBase {
       }
       const result = await this.db.query(query)
       const cachedActivities = result.rows.map(PlaylistActivitiesItem.mapDBToDataModel)
-      const activities = result.rows.map(PlaylistActivitiesItem.mapDataToOutput)
+      const activities = result.rows.map(mapper)
 
       await this.#cacheService.set(PlaylistActivities.playlistActivitiesCacheKey(playlistId), JSON.stringify(cachedActivities), 1800)
 

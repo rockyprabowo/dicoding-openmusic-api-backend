@@ -21,12 +21,19 @@
  */
 
 /**
+ * @typedef {object} UserDbRowIdAndPassword
+ * @property {string} id ID
+ * @property {string} password Password
+ * @memberof module:data/user
+ */
+
+/**
  * @typedef {object} UserRequestPayload
  * @property {string} [id] ID
- * @property {string} username Username
+ * @property {string} [username] Username
  * @property {string} [password] Plaintext password
  * @property {string} [hashedPassword] Hashed password
- * @property {string} fullname Full name
+ * @property {string} [fullname] Full name
  * @property {boolean} [__fromDb] Identify whether this payload came from database
  * @memberof module:data/user
  * @memberof module:data/user

@@ -26,6 +26,29 @@ class User {
   #newlyCreated = true
 
   /**
+   * User cache key
+   *
+   * @param {string} userId ID
+   * @returns {string} Cache key
+   */
+  static userCacheKey = (userId) => (`users:${userId}`)
+
+  /**
+   * User cache key
+   *
+   * @param {string} username Username
+   * @returns {string} Cache key
+   */
+  static authCredentialCacheKey = (username) => (`credentials:${username}`)
+
+  /**
+   * Username cache key
+   *
+   * @returns {string} Cache key
+   */
+  static usernamesCacheKey = 'users:usernames'
+
+  /**
    * User Playlists cache key
    *
    * @param {string} userId ID

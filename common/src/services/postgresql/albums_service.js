@@ -91,10 +91,15 @@ class AlbumsService extends PostgresBase {
    * @async
    */
   getAlbums = async () => {
+    const mapper = Album.mapDBToModel
     try {
       const cachedAlbums = await this.#cacheService.get(Album.albumsCacheKey)
       return {
-        albums: JSON.parse(cachedAlbums),
+        albums: Array.from(
+          JSON.parse(
+            /** @type {string} */ (cachedAlbums)
+          )
+        ).map(mapper),
         __fromCache: true
       }
     } catch (error) {
@@ -102,7 +107,7 @@ class AlbumsService extends PostgresBase {
         `SELECT * FROM ${Album.tableName}`
       )
 
-      const albums = queryResult.rows.map(Album.mapDBToModel)
+      const albums = queryResult.rows.map(mapper)
 
       await this.#cacheService.set(Album.albumsCacheKey, JSON.stringify(albums), 1800)
 
@@ -206,11 +211,16 @@ class AlbumsService extends PostgresBase {
    * @async
    */
   getAlbumDataById = async (id) => {
+    const mapper = Album.mapDBToModel
     try {
       const cachedAlbum = await this.#cacheService.get(Album.albumCacheKey(id))
 
       return {
-        album: JSON.parse(cachedAlbum),
+        album: mapper(
+          JSON.parse(
+            /** @type {string} */ (cachedAlbum)
+          )
+        ),
         __fromCache: true
       }
     } catch (error) {
@@ -226,7 +236,7 @@ class AlbumsService extends PostgresBase {
         throw new NotFoundError(`Can't find an album with id ${id}`)
       }
 
-      const album = result.rows.map(Album.mapDBToModel)[0]
+      const album = result.rows.map(mapper)[0]
 
       await this.#cacheService.set(Album.albumCacheKey(id), JSON.stringify(album), 1800)
 

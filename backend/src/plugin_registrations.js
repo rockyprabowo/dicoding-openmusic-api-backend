@@ -48,7 +48,7 @@ const registerPlugins = async (server) => {
   const albumsService = new AlbumsService(cacheService, songsService)
   const albumsLikesService = new AlbumsLikesService(cacheService, albumsService)
   const authenticationsService = new AuthenticationsService()
-  const usersService = new UsersService()
+  const usersService = new UsersService(cacheService)
   const playlistsCollaborationsService = new PlaylistsCollaborationsService(cacheService, usersService)
   const playlistsService = new PlaylistsService(cacheService, songsService, playlistsCollaborationsService)
   const producerService = new ProducerService()

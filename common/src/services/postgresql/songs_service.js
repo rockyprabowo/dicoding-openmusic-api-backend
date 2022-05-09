@@ -81,11 +81,17 @@ class SongsService extends PostgresBase {
    * @async
    */
   getSongs = async (filters) => {
+    const mapper = Song.mapDBToSongListItem
+
     try {
       if (filters.albumId) {
         const cachedSongsByAlbumId = await this.#cacheService.get(Album.albumSongsCacheKey(filters.albumId))
         return {
-          songs: JSON.parse(cachedSongsByAlbumId),
+          songs: Array.from(
+            JSON.parse(
+            /** @type {string} */ (cachedSongsByAlbumId)
+            )
+          ).map(mapper),
           __fromCache: true
         }
       } else {
@@ -112,7 +118,11 @@ class SongsService extends PostgresBase {
         }
 
         return {
-          songs: JSON.parse(cachedSongs),
+          songs: Array.from(
+            JSON.parse(
+            /** @type {string} */ (cachedSongs)
+            )
+          ).map(mapper),
           __fromCache: true
         }
       }
@@ -133,6 +143,8 @@ class SongsService extends PostgresBase {
    * @async
    */
   getSongsFromDb = async (filters) => {
+    const mapper = Song.mapDBToSongListItem
+
     /** @type {(string | null)} */
     let cacheKeyTarget = Song.songsCacheKey
     let cacheFilterFieldTarget = ''
@@ -172,7 +184,7 @@ class SongsService extends PostgresBase {
     }
 
     const queryResult = await this.db.query(query)
-    const songs = queryResult.rows.map(Song.mapDBToSongListItem)
+    const songs = queryResult.rows.map(mapper)
 
     if (cacheKeyTarget) {
       if (cacheFilterFieldTarget) {
@@ -194,10 +206,15 @@ class SongsService extends PostgresBase {
    * @async
    */
   getSongById = async (id) => {
+    const mapper = Song.mapDBToModel
     try {
       const cachedSong = await this.#cacheService.get(Song.songCacheKey(id))
       return {
-        song: JSON.parse(cachedSong),
+        song: mapper(
+          JSON.parse(
+          /** @type {string} */ (cachedSong)
+          )
+        ),
         __fromCache: true
       }
     } catch (error) {
@@ -213,7 +230,7 @@ class SongsService extends PostgresBase {
         throw new NotFoundError(`Can't find a song with id ${id}`)
       }
 
-      const song = queryResult.rows.map(Song.mapDBToModel)[0]
+      const song = queryResult.rows.map(mapper)[0]
 
       await this.#cacheService.set(Song.songCacheKey(id), JSON.stringify(song), 1800)
 

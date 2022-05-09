@@ -48,7 +48,9 @@ class AlbumsLikesService extends PostgresBase {
       const result = await this.#cacheService.get(AlbumLike.likeCountCacheKey(albumId))
 
       return {
-        ...JSON.parse(result),
+        ...JSON.parse(
+          /** @type {string} */ (result)
+        ),
         __fromCache: true
       }
     } catch (error) {
