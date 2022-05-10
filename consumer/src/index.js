@@ -13,7 +13,7 @@ const ExportPlaylistListener = require('./listeners/export_playlist_listener')
 
 const init = async () => {
   const cacheService = new CacheService()
-  const usersService = new UsersService()
+  const usersService = new UsersService(cacheService)
   const songsService = new SongsService(cacheService)
   const playlistsCollaborationsService = new PlaylistsCollaborationsService(cacheService, usersService)
 
