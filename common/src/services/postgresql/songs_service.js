@@ -111,7 +111,7 @@ class SongsService extends PostgresBase {
           ++filterCount
         }
 
-        if (cacheFilterFieldTarget) {
+        if (filterCount !== 0) {
           cachedSongs = await this.#cacheService.hGet(Song.songFilterCacheKey, cacheFilterFieldTarget)
         } else {
           cachedSongs = await this.#cacheService.get(Song.songsCacheKey)
@@ -166,16 +166,16 @@ class SongsService extends PostgresBase {
 
       if (filters.title) {
         const titleTermLowerCase = filters.title.toLowerCase()
+        cacheFilterFieldTarget += `title=${encodeURIComponent(titleTermLowerCase)}`
         query.text += ` WHERE lower(title) LIKE $${++filterCount}`
         query.values?.push(`%${titleTermLowerCase}%`)
-        cacheFilterFieldTarget += `title=${encodeURIComponent(titleTermLowerCase)}`
       }
 
       if (filters.performer) {
         const performerTermLowerCase = filters.performer.toLowerCase()
+        cacheFilterFieldTarget += `${(filterCount !== 0) ? ':' : ''}performer=${encodeURIComponent(performerTermLowerCase)}`
         query.text += ` ${(filterCount !== 0) ? 'AND' : 'WHERE'} lower(performer) LIKE $${++filterCount}`
         query.values?.push(`%${performerTermLowerCase}%`)
-        cacheFilterFieldTarget += `${(filterCount !== 0) ? ':' : ''}performer=${encodeURIComponent(performerTermLowerCase)}`
       }
 
       if (filterCount > 0) {
