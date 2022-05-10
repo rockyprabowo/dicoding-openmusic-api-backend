@@ -110,6 +110,7 @@ class PlaylistsCollaborationsService extends PostgresBase {
       }
 
       await this.#cacheService.sAdd(PlaylistCollaboration.collaboratorsCacheKey(playlistId), userId)
+      await this.#cacheService.expire(PlaylistCollaboration.collaboratorsCacheKey(playlistId), 1800)
     }
   }
 }

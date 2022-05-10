@@ -83,6 +83,7 @@ class UsersService extends PostgresBase {
     }
 
     await this.#cacheService.sAdd(User.usernamesCacheKey, username)
+    await this.#cacheService.expire(User.usernamesCacheKey, 1800)
   }
 
   /**
