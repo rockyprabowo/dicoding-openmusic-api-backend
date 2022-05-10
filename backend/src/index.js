@@ -10,8 +10,8 @@ const { prerequisiteCheck, handleCommandArguments } = require('./setup')
 handleCommandArguments(process.argv).then(
   (result) => {
     if (result.commandCount === 0) {
-      require('module-alias')(path.join(__dirname, '/..')) // Register module alias relative to this script location
       require('dotenv').config({ path: path.join(__dirname, '../../.env') }) // Locate .env on the root project directory
+      require('module-alias')(path.join(__dirname, '/..')) // Register module alias relative to this script location
 
       prerequisiteCheck()
       require('./server').start()

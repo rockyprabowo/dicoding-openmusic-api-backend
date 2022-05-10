@@ -12,7 +12,7 @@
     "keys:generate": "node . --env-generate-keys",
     "db:create": "node . --create-db",
     "cache:flush": "node . --redis-flushdb",
-    "migrate": "node-pg-migrate"
+    "migrate": "node-pg-migrate --envPath ../.env"
   },
   "repository": {
     "type": "git",

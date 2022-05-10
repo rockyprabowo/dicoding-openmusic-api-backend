@@ -220,7 +220,8 @@ const generateKeysToEnvFile = async () => {
  * @returns {Promise<void>}
  */
 const createDatabase = async () => {
-  require('dotenv').config()
+  require('dotenv').config({ path: path.join(__dirname, '../../.env') })
+
   const { Pool } = require('pg')
   const format = require('pg-format')
 
