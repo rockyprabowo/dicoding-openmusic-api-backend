@@ -22,6 +22,12 @@ yarn workspace "@openmusic/api" run keys:generate
 docker compose up
 ```
 
+To run Postman test using newman:
+
+```shell
+yarn workspace "@openmusic/api" test
+```
+
 Included services
 
 - PostgreSQL 14

@@ -19,26 +19,26 @@
     "start": "concurrently -n prod: -c 'bgBlue.bold.black,bgGreen.bold.black,bgCyan.bold.black' 'yarn:*(!docs):start'"
   },
   "devDependencies": {
-    "@types/amqplib": "^0.8.2",
+    "@types/amqplib": "^0.10.1",
     "@types/bcrypt": "^5.0.0",
-    "eslint": "^8.14.0",
+    "eslint": "^8.35.0",
     "eslint-config-standard": "^17.0.0",
-    "eslint-plugin-import": "^2.25.4",
-    "eslint-plugin-jsdoc": "^39.2.1",
-    "eslint-plugin-n": "^15.2.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-jsdoc": "^40.0.1",
+    "eslint-plugin-n": "^15.6.1",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^6.0.0",
-    "jsdoc": "^3.6.10",
+    "eslint-plugin-promise": "^6.1.1",
+    "jsdoc": "^4.0.2",
     "jsdoc-plugin-intersection": "^1.0.4",
-    "jsdoc-ts-utils": "^2.0.1",
-    "nodemon": "^2.0.16"
+    "jsdoc-ts-utils": "^3.1.0",
+    "nodemon": "^2.0.21"
   },
   "dependencies": {
-    "amqplib": "^0.8.0",
-    "bcrypt": "^5.0.1",
-    "concurrently": "^7.1.0",
+    "amqplib": "^0.10.3",
+    "bcrypt": "^5.1.0",
+    "concurrently": "^7.6.0",
     "cross-env": "^7.0.3",
-    "dotenv": "^16.0.0",
+    "dotenv": "^16.0.3",
     "module-alias": "^2.2.2"
   }
 }
