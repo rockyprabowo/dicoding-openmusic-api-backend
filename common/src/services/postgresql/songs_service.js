@@ -210,11 +210,10 @@ class SongsService extends PostgresBase {
     try {
       const cachedSong = await this.#cacheService.get(Song.songCacheKey(id))
       return {
-        song: mapper(
+        song:
           JSON.parse(
           /** @type {string} */ (cachedSong)
-          )
-        ),
+          ),
         __fromCache: true
       }
     } catch (error) {

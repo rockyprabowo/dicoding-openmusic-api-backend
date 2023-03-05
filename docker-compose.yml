@@ -39,7 +39,7 @@ services:
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_BUCKET_NAME: ${AWS_BUCKET_NAME}
       AWS_S3_ENDPOINT: ${AWS_S3_ENDPOINT}
-      AWS_S3_REGION_NAME: ${AWS_S3_REGION_NAME}
+      AWS_S3_REGION: ${AWS_S3_REGION}
   db:
     container_name: openmusic_postgresql
     image: postgres:14-alpine

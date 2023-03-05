@@ -216,11 +216,10 @@ class AlbumsService extends PostgresBase {
       const cachedAlbum = await this.#cacheService.get(Album.albumCacheKey(id))
 
       return {
-        album: mapper(
+        album:
           JSON.parse(
             /** @type {string} */ (cachedAlbum)
-          )
-        ),
+          ),
         __fromCache: true
       }
     } catch (error) {
@@ -237,8 +236,11 @@ class AlbumsService extends PostgresBase {
       }
 
       const album = result.rows.map(mapper)[0]
+      console.log('album', album)
 
       await this.#cacheService.set(Album.albumCacheKey(id), JSON.stringify(album), 1800)
+
+      console.log('cached album', await this.#cacheService.get(Album.albumCacheKey(id)))
 
       return {
         album,

@@ -76,6 +76,9 @@ const prerequisiteCheck = () => {
     if (!process.env.AWS_SECRET_ACCESS_KEY) {
       throw new SecretsMissing('AWS_SECRET_ACCESS_KEY environment variable is missing')
     }
+    if (!process.env.AWS_S3_REGION) {
+      missingConfigurations.push('AWS_S3_REGION')
+    }
     if (!process.env.AWS_BUCKET_NAME) {
       missingConfigurations.push('AWS_BUCKET_NAME')
     }
