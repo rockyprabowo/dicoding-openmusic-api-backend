@@ -42,7 +42,6 @@
     "@hapi/inert": "^6.0.5",
     "@hapi/jwt": "^2.1.1",
     "@openmusic/common": "^3.0.0",
-    "aws-sdk": "^2.1128.0",
     "joi": "^17.8.3",
     "nanoid": "^3.3.4",
     "node-pg-migrate": "^6.2.1",
